@@ -70,18 +70,17 @@ export const digestSchema = z.object({
       domain: z.string(),
       signal: z.string().describe('Recent buying signal, under 10 words'),
       angle: z.string().describe('Suggested outreach angle, under 20 words'),
+      message: z
+        .string()
+        .describe(
+          'Ready-to-send LinkedIn message to this person, 50-90 words, addressed by first name, references their signal and company, ends with a low-pressure ask',
+        ),
     }),
   ),
   linkedinPost: z.object({
     hook: z.string().describe('First line that stops the scroll'),
     body: z.string().describe('Rest of the post, 80-140 words, line breaks allowed'),
   }),
-  linkedinMessages: z.array(
-    z.object({
-      label: z.string().describe('e.g. "Connection request" or "Follow-up"'),
-      message: z.string(),
-    }),
-  ),
   xPost: z.string().describe('Under 270 characters'),
   blogIdea: z.object({
     title: z.string(),

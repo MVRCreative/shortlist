@@ -17,16 +17,23 @@ export function ProfileStep({
   initial,
   pending,
   onSubmit,
+  onDraftChange,
 }: {
   initial: ProfileInput
   pending: boolean
   onSubmit: (profile: ProfileInput) => void
+  onDraftChange: (profile: ProfileInput) => void
 }) {
   const [values, setValues] = useState<ProfileInput>(initial)
   const [errors, setErrors] = useState<FieldErrors>({})
 
+  function setDraft(next: ProfileInput) {
+    setValues(next)
+    onDraftChange(next)
+  }
+
   function update<K extends keyof ProfileInput>(key: K, value: string) {
-    setValues((prev) => ({ ...prev, [key]: value }))
+    setDraft({ ...values, [key]: value })
     if (errors[key]) setErrors((prev) => ({ ...prev, [key]: undefined }))
   }
 
@@ -138,7 +145,7 @@ export function ProfileStep({
           variant="ghost"
           tone="muted"
           onClick={() => {
-            setValues(sampleProfile)
+            setDraft(sampleProfile)
             setErrors({})
           }}
           disabled={pending}

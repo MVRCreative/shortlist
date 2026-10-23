@@ -191,12 +191,20 @@ export function mockDigest(args: {
   const leads = Array.from({ length: leadsPerDigest }, () => {
     const company = companyName(rand)
     const industry = pick(rand, industries)
+    const firstName = pick(rand, FIRST)
+    const signal = pick(rand, SIGNALS)
+    const leadPain = pick(rand, enriched.painsSolved).toLowerCase()
     return {
-      contactName: `${pick(rand, FIRST)} ${pick(rand, LAST)}`,
+      contactName: `${firstName} ${pick(rand, LAST)}`,
       title: pick(rand, enriched.icp.buyerTitles),
       company,
       domain: `${company.toLowerCase()}.com`,
-      signal: pick(rand, SIGNALS),
+      signal,
+      message: pick(rand, [
+        `Hi ${firstName} — saw that ${company} ${signal.charAt(0).toLowerCase()}${signal.slice(1)}. Congrats. That stage is usually when “${leadPain}” starts to bite. We help ${industry} teams fix exactly that at ${input.companyName}. Open to a quick swap of notes on what’s working for peers right now?`,
+        `${firstName}, quick one. ${signal} at ${company} caught my eye — most teams we work with hit “${leadPain}” right after a move like that. ${differentiator}. Worth 15 minutes to see if any of it applies to you?`,
+        `Hi ${firstName}, I work with a handful of ${industry} teams on ${leadPain}. Noticed ${company} ${signal.charAt(0).toLowerCase()}${signal.slice(1)}, so figured it might be timely. No pitch — happy to share what we’re seeing if useful.`,
+      ]),
       angle: pick(rand, [
         `Open with the trigger, then tie it to “${pick(rand, enriched.painsSolved).toLowerCase()}”.`,
         `Reference a peer ${industry} team and how they fixed “${pick(rand, enriched.painsSolved).toLowerCase()}”.`,
@@ -215,20 +223,10 @@ export function mockDigest(args: {
       hook: `Every ${title} I talk to says some version of the same thing: “${pain}.”`,
       body: `It’s rarely a talent issue. It’s a focus issue.\n\nAt ${input.companyName}, we see the same pattern every week — teams trying to reach everyone, and landing with no one.\n\nWhat works instead:\n→ Pick 10 accounts that actually fit\n→ Find the trigger that makes now the right time\n→ Say one specific thing that proves you understand them\n\n${differentiator}. That’s the whole playbook.\n\nCurious how others are approaching this — what’s working for you right now?`,
     },
-    linkedinMessages: [
-      {
-        label: 'Connection request',
-        message: `Hi {{first_name}} — noticed {{company}} is ${pick(rand, ['hiring on the marketing side', 'growing fast', 'launching something new'])}. I work with ${enriched.icp.industries[0]} teams on ${pain.toLowerCase()}. Would love to connect.`,
-      },
-      {
-        label: 'Follow-up',
-        message: `Thanks for connecting, {{first_name}}.\n\nQuick context: ${enriched.oneLiner}\n\nTeams like yours usually come to us when ${pain.toLowerCase()}. ${differentiator}.\n\nWorth a 20-minute call to compare notes? Happy to share what we’re seeing across similar companies either way.`,
-      },
-    ],
     xPost: `${pain}? Stop adding volume. Pick 10 accounts that fit, find the trigger, say one specific thing. That’s ${input.companyName}’s whole approach.`,
     blogIdea: {
       title: `Why ${enriched.icp.industries[0]} teams stall on growth (and the 10-account fix)`,
-      angle: `A practical breakdown of how ${title}s can replace broad campaigns with a focused weekly account list — drawn from ${input.companyName}’s client work.`,
+      angle: `A practical breakdown of how ${pluralizeTitle(title)} can replace broad campaigns with a focused weekly account list — drawn from ${input.companyName}’s client work.`,
       outline: [
         `The real cost of “${pain.toLowerCase()}”`,
         'Why fewer, better-fit accounts outperform volume',

@@ -8,7 +8,9 @@ import { ProfileStep } from '@/components/gtm/profile-step'
 import { EnrichStep } from '@/components/gtm/enrich-step'
 import { MatchStep } from '@/components/gtm/match-step'
 import { ActivateStep } from '@/components/gtm/activate-step'
-import { DigestStep } from '@/components/gtm/digest-step'
+import { Dashboard } from '@/components/gtm/dashboard'
+import { OnboardingRail } from '@/components/gtm/onboarding-rail'
+import { ProfilePreview } from '@/components/gtm/profile-preview'
 import { emptyProfile } from '@/lib/gtm/sample-profile'
 import {
   contentChannels,
@@ -119,13 +121,46 @@ export function GtmApp() {
   }
 
   const fitCount = Object.values(verdicts).filter((v) => v === 'fit').length
+  const missCount = Object.values(verdicts).filter((v) => v === 'nofit').length
+
+  function canVisit(target: Step) {
+    if (target === 'Profile') return true
+    if (target === 'Enrich') return !!enriched
+    return accounts.length > 0
+  }
+
+  if (step === 'Digest') {
+    return (
+      <Dashboard
+        key={week}
+        digest={digest}
+        settings={settings}
+        input={input}
+        isDemo={isDemo}
+        pending={pending === 'digest'}
+        onNextWeek={() => handleGenerateDigest(week + 1)}
+        onProfile={() => goTo('Enrich')}
+        onSettings={() => goTo('Turn on')}
+      />
+    )
+  }
 
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-xl flex-col gap-10 px-4 pb-16 sm:px-6">
-      <AppHeader step={step} isDemo={isDemo} />
-      <main className="flex flex-col">
+    <div className="mx-auto grid min-h-dvh w-full max-w-screen-2xl gap-x-10 px-4 sm:px-6 lg:grid-cols-[16rem_minmax(0,1fr)] xl:grid-cols-[16rem_minmax(0,1fr)_20rem]">
+      <aside className="hidden lg:sticky lg:top-0 lg:block lg:h-dvh">
+        <OnboardingRail step={step} isDemo={isDemo} canVisit={canVisit} onSelect={goTo} />
+      </aside>
+      <div className="lg:hidden">
+        <AppHeader step={step} isDemo={isDemo} />
+      </div>
+      <main className="mx-auto flex w-full max-w-2xl flex-col pt-10 pb-16 lg:pt-16">
         {step === 'Profile' && (
-          <ProfileStep initial={input} pending={pending === 'enrich'} onSubmit={handleEnrich} />
+          <ProfileStep
+            initial={input}
+            pending={pending === 'enrich'}
+            onSubmit={handleEnrich}
+            onDraftChange={setInput}
+          />
         )}
         {step === 'Enrich' && enriched && (
           <EnrichStep
@@ -157,17 +192,16 @@ export function GtmApp() {
             onActivate={() => handleGenerateDigest(0)}
           />
         )}
-        {step === 'Digest' && (
-          <DigestStep
-            digest={digest}
-            settings={settings}
-            companyName={input.companyName}
-            pending={pending === 'digest'}
-            onRegenerate={() => handleGenerateDigest(week + 1)}
-            onEdit={() => goTo('Turn on')}
-          />
-        )}
       </main>
+      <aside aria-label="Profile preview" className="hidden xl:sticky xl:top-0 xl:block xl:max-h-dvh xl:overflow-y-auto">
+        <ProfilePreview
+          input={input}
+          enriched={enriched}
+          fitCount={fitCount}
+          missCount={missCount}
+          settings={settings}
+        />
+      </aside>
     </div>
   )
 }

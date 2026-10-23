@@ -111,7 +111,7 @@ export async function generateDigest(raw: z.infer<typeof digestRequestSchema>): 
         'You write a weekly pipeline digest for a founder or sales leader.',
         'Leads must be fictional people at fictional companies that resemble the accounts marked as a good fit and avoid traits of rejected accounts.',
         'Content must sound like the brand voice, be specific to the offering, and avoid emojis, hashtag spam, and clichés.',
-        'LinkedIn messages: one connection request under 280 characters and one follow-up under 500 characters.',
+        'Every lead gets its own personalized LinkedIn message that names their company and signal; never reuse the same opener twice.',
       ].join(' '),
       prompt: [
         describeProfile(args.input, args.enriched),

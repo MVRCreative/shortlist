@@ -103,7 +103,7 @@
 }
 
 /* Blue is reserved for primary actions; surfaces, selection, and focus stay neutral. */
-:root {
+:root:not(.dark) {
   --background: #fafafa;
   --ring: #a3a3a3;
 }

@@ -49,7 +49,7 @@ function PriceSummary({ settings }: { settings: DigestSettings }) {
 
 const channelDescriptions: Record<ContentChannel, string> = {
   linkedinPost: 'One post written in your voice',
-  linkedinMessage: 'Connection request + follow-up',
+  linkedinMessage: 'A personalized note for every lead',
   xPost: 'One short post',
   blogIdea: 'Title, angle, and outline',
 }
