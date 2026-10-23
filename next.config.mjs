@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   transpilePackages: ['@loople/tokens'],
-  allowedDevOrigins: ['*.vercel.run'],
+  allowedDevOrigins: ['*.vercel.run', '*.vusercontent.net', '*.v0.app', '*.v0.dev', '*.vercel.app'],
   async headers() {
     return [
       {

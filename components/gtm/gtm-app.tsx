@@ -43,14 +43,20 @@ export function GtmApp() {
   function run(kind: Exclude<Pending, null>, task: () => Promise<void>) {
     setPending(kind)
     startTransition(async () => {
-      await task()
-      setPending(null)
+      try {
+        await task()
+      } catch (error) {
+        console.error('[mini-gtm] action failed', error)
+        toast.error('Something went wrong. Please try again.')
+      } finally {
+        setPending(null)
+      }
     })
   }
 
   function goTo(next: Step) {
     setStep(next)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    window.scrollTo({ top: 0, behavior: 'instant' })
   }
 
   function handleEnrich(profile: ProfileInput) {

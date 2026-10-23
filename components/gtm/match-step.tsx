@@ -6,7 +6,7 @@ import { StepHeading } from '@/components/gtm/step-heading'
 import { cn } from '@/lib/utils'
 import type { SampleAccount, Verdict } from '@/lib/gtm/schemas'
 
-const MIN_REVIEWED = 5
+const RECOMMENDED_REVIEWED = 5
 
 function initials(name: string) {
   return name
@@ -98,14 +98,14 @@ export function MatchStep({
 }) {
   const reviewed = Object.keys(verdicts).length
   const fits = Object.values(verdicts).filter((v) => v === 'fit').length
-  const canContinue = reviewed >= MIN_REVIEWED && fits > 0
+  const canContinue = fits > 0
 
   return (
     <div className="flex flex-col gap-8">
       <StepHeading
         eyebrow="Matchmaking"
         title="Good fit, or not?"
-        description={`Rate at least ${MIN_REVIEWED} of these sample accounts. We use your picks to tune who shows up in your digest.`}
+        description={`Mark at least one account as a fit to continue. Rating ${RECOMMENDED_REVIEWED} or more helps us tune who shows up in your digest.`}
       />
 
       <div className="flex flex-col gap-3">
@@ -133,13 +133,13 @@ export function MatchStep({
         </Card>
       </div>
 
-      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="sticky bottom-0 -mx-4 flex flex-col-reverse gap-3 bg-background/90 px-4 py-4 backdrop-blur sm:-mx-6 sm:px-6 sm:flex-row sm:items-center sm:justify-between">
         <Button variant="ghost" tone="muted" onClick={onBack}>
           <ArrowLeft />
           Back to profile
         </Button>
         <Button size="lg" onClick={onContinue} disabled={!canContinue}>
-          {canContinue ? 'Set up my digest' : `Rate ${Math.max(MIN_REVIEWED - reviewed, 0) || 1} more`}
+          {canContinue ? 'Set up my digest' : 'Mark one as a fit'}
           <ArrowRight />
         </Button>
       </div>
