@@ -1,0 +1,28 @@
+{
+  "name": "@loople/tokens",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./css": "./dist/tokens.css",
+    "./preset": "./src/preset.ts",
+    "./typography": "./src/typography.ts",
+    "./motion": "./src/motion.ts",
+    "./sizing": "./src/sizing.ts",
+    "./tokens.json": "./dist/tokens.json"
+  },
+  "scripts": {
+    "build": "tsx scripts/build-css.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "culori": "^4.0.2"
+  },
+  "devDependencies": {
+    "@types/culori": "^4.0.1",
+    "@types/node": "^22",
+    "tsx": "^4.22.3",
+    "typescript": "5.7.3"
+  }
+}
