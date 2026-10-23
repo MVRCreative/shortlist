@@ -63,7 +63,11 @@ function AccountRow({
           size="sm"
           aria-pressed={verdict === 'nofit'}
           onClick={() => toggle('nofit')}
-          className={cn(verdict === 'nofit' && 'border-foreground/30 bg-accent text-foreground hover:bg-accent')}
+          className={cn(
+            'hover:border-status-destructive-bd hover:bg-status-destructive-bg hover:text-status-destructive-fg',
+            verdict === 'nofit' &&
+              'border-status-destructive-bd bg-status-destructive-bg text-status-destructive-fg',
+          )}
         >
           <X />
           <span className="sr-only sm:not-sr-only">Not a fit</span>
@@ -73,7 +77,10 @@ function AccountRow({
           size="sm"
           aria-pressed={verdict === 'fit'}
           onClick={() => toggle('fit')}
-          className={cn(verdict === 'fit' && 'border-foreground bg-foreground text-background hover:bg-foreground/90 hover:text-background')}
+          className={cn(
+            'hover:border-status-success-bd hover:bg-status-success-bg hover:text-status-success-fg',
+            verdict === 'fit' && 'border-status-success-bd bg-status-success-bg text-status-success-fg',
+          )}
         >
           <Check />
           <span className="sr-only sm:not-sr-only">Fit</span>

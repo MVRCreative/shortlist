@@ -96,6 +96,12 @@
   --tracking-caps: 0.06em;
 }
 
+@theme inline {
+  --color-status-destructive-fg: var(--status-destructive-fg);
+  --color-status-destructive-bg: var(--status-destructive-bg);
+  --color-status-destructive-bd: var(--status-destructive-bd);
+}
+
 /* Blue is reserved for primary actions; surfaces, selection, and focus stay neutral. */
 :root {
   --background: #fafafa;

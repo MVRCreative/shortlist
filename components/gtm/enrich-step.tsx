@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { StepHeading } from '@/components/gtm/step-heading'
 import type { EnrichedProfile, ProfileInput } from '@/lib/gtm/schemas'
+import { tagColorClass } from '@/lib/gtm/tag-colors'
 
 function ProfileRow({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -16,12 +17,14 @@ function ProfileRow({ label, children }: { label: string; children: ReactNode })
   )
 }
 
-function Chips({ items }: { items: string[] }) {
+function Chips({ items, colorful = false }: { items: string[]; colorful?: boolean }) {
   return (
     <ul className="flex flex-wrap gap-1.5">
       {items.map((item) => (
         <li key={item}>
-          <Badge variant="secondary">{item}</Badge>
+          <Badge variant="secondary" className={colorful ? tagColorClass(item) : undefined}>
+            {item}
+          </Badge>
         </li>
       ))}
     </ul>
@@ -91,7 +94,7 @@ export function EnrichStep({
 
           <div className="grid gap-6 sm:grid-cols-2">
             <ProfileRow label="Industries">
-              <Chips items={profile.icp.industries} />
+              <Chips items={profile.icp.industries} colorful />
             </ProfileRow>
             <ProfileRow label="Buyer titles">
               <Chips items={profile.icp.buyerTitles} />
