@@ -33,7 +33,7 @@ function Bullets({ items }: { items: string[] }) {
     <ul className="flex flex-col gap-1.5">
       {items.map((item) => (
         <li key={item} className="flex gap-2 text-body">
-          <span aria-hidden="true" className="mt-2 size-1 shrink-0 rounded-full bg-primary" />
+          <span aria-hidden="true" className="mt-2 size-1 shrink-0 rounded-full bg-muted-foreground" />
           <span className="text-pretty">{item}</span>
         </li>
       ))}
@@ -69,7 +69,7 @@ export function EnrichStep({
       <Card>
         <CardContent className="flex flex-col gap-6">
           <div className="flex flex-col gap-3">
-            <Badge variant="brand" className="w-fit">
+            <Badge variant="neutral" className="w-fit">
               {profile.category}
             </Badge>
             <p className="text-section-title text-pretty">{profile.oneLiner}</p>

@@ -10,7 +10,42 @@ import { Slider } from '@/components/ui/slider'
 import { Switch } from '@/components/ui/switch'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { StepHeading } from '@/components/gtm/step-heading'
+import { formatUsd, quoteMonthlyPrice } from '@/lib/gtm/pricing'
 import { channelLabels, contentChannels, type ContentChannel, type DigestSettings } from '@/lib/gtm/schemas'
+
+function PriceSummary({ settings }: { settings: DigestSettings }) {
+  const { lines, total } = quoteMonthlyPrice(settings)
+
+  return (
+    <Card className="gap-0 bg-muted py-0 shadow-none">
+      <CardContent className="flex flex-col gap-4 px-5 py-5">
+        <div className="flex items-baseline justify-between gap-4">
+          <p className="text-eyebrow">Your plan</p>
+          <p className="text-meta">Billed monthly · cancel anytime</p>
+        </div>
+        <dl className="flex flex-col gap-2">
+          {lines.map((line) => (
+            <div key={line.label} className="flex items-baseline justify-between gap-4">
+              <dt className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:gap-2">
+                <span className="text-body">{line.label}</span>
+                <span className="text-meta">{line.detail}</span>
+              </dt>
+              <dd className="text-body tabular">{formatUsd(line.amount)}</dd>
+            </div>
+          ))}
+        </dl>
+        <Separator />
+        <div className="flex items-baseline justify-between gap-4" aria-live="polite">
+          <p className="text-label">Total</p>
+          <p className="tabular">
+            <span className="text-section-title">{formatUsd(total)}</span>
+            <span className="text-meta"> / mo</span>
+          </p>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
 
 const channelDescriptions: Record<ContentChannel, string> = {
   linkedinPost: 'One post written in your voice',
@@ -43,6 +78,7 @@ export function ActivateStep({
     })
 
   const day = settings.cadence === 'weekly' ? 'Every Monday' : 'The first Monday of each month'
+  const { total } = quoteMonthlyPrice(settings)
 
   return (
     <div className="flex flex-col gap-8">
@@ -129,6 +165,8 @@ export function ActivateStep({
         </CardContent>
       </Card>
 
+      <PriceSummary settings={settings} />
+
       <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
         <Button variant="ghost" tone="muted" onClick={onBack} disabled={pending}>
           <ArrowLeft />
@@ -136,7 +174,7 @@ export function ActivateStep({
         </Button>
         <Button size="lg" onClick={onActivate} pending={pending}>
           {pending ? null : <Power />}
-          {pending ? 'Building first digest' : 'Turn on Mini GTM'}
+          {pending ? 'Building first digest' : `Turn on · ${formatUsd(total)}/mo`}
         </Button>
       </div>
     </div>

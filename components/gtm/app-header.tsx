@@ -15,14 +15,14 @@ export function AppHeader({ step, isDemo }: { step: Step; isDemo: boolean }) {
     <header className="flex flex-col gap-4 pt-6">
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-2">
-          <span className="flex size-control-sm items-center justify-center rounded-lg bg-primary text-primary-foreground">
+          <span className="flex size-control-sm items-center justify-center rounded-lg bg-foreground text-background">
             <Crosshair className="size-icon-sm" aria-hidden="true" />
           </span>
           <span className="text-label">Mini GTM</span>
           {isDemo ? (
             <Tooltip>
               <TooltipTrigger asChild>
-                <Badge variant="warning" tabIndex={0}>
+                <Badge variant="neutral" tabIndex={0}>
                   Demo output
                 </Badge>
               </TooltipTrigger>

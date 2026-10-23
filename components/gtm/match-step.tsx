@@ -50,7 +50,7 @@ function AccountRow({
           <p className="text-meta">
             {account.industry} · {account.employees} · {account.location}
           </p>
-          <p className="flex items-center gap-1.5 text-body text-status-warning-fg">
+          <p className="flex items-center gap-1.5 text-body text-foreground">
             <Zap className="size-icon-xs shrink-0" aria-hidden="true" />
             {account.signal}
           </p>
@@ -63,7 +63,7 @@ function AccountRow({
           size="sm"
           aria-pressed={verdict === 'nofit'}
           onClick={() => toggle('nofit')}
-          className={cn(verdict === 'nofit' && 'border-status-danger-bd bg-status-danger-bg text-status-danger-fg')}
+          className={cn(verdict === 'nofit' && 'border-foreground/30 bg-accent text-foreground hover:bg-accent')}
         >
           <X />
           <span className="sr-only sm:not-sr-only">Not a fit</span>
@@ -73,7 +73,7 @@ function AccountRow({
           size="sm"
           aria-pressed={verdict === 'fit'}
           onClick={() => toggle('fit')}
-          className={cn(verdict === 'fit' && 'border-status-success-bd bg-status-success-bg text-status-success-fg')}
+          className={cn(verdict === 'fit' && 'border-foreground bg-foreground text-background hover:bg-foreground/90 hover:text-background')}
         >
           <Check />
           <span className="sr-only sm:not-sr-only">Fit</span>

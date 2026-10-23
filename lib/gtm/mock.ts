@@ -102,7 +102,7 @@ export function mockEnrich(input: ProfileInput): EnrichedProfile {
   return {
     oneLiner: `${core}.`,
     category: isService ? 'Specialist services' : 'B2B software',
-    valueProp: `${input.companyName} helps ${/^(founder|head|vp|director|chief|c[a-z]o)/i.test(buyer) ? `${buyer}s` : buyer} get to outcomes faster without adding headcount — ${input.goal ? `built for teams chasing goals like “${input.goal}”` : 'with a clear, fixed path to results'}.`,
+    valueProp: `${input.companyName} helps ${pluralizeTitle(buyer)} get to outcomes faster without adding headcount — ${input.goal ? `built for teams chasing goals like “${input.goal}”` : 'with a clear, fixed path to results'}.`,
     painsSolved: [
       'Pipeline depends on referrals and founder time',
       'Messaging is generic and doesn’t land with buyers',
@@ -133,6 +133,12 @@ const NAME_START = ['North', 'Bright', 'Hollow', 'Clear', 'Iron', 'Lumen', 'Ceda
 const NAME_END = ['stack', 'loop', 'works', 'labs', 'path', 'grid', 'base', 'ware', 'line', 'form', 'yard', 'field', 'point', 'well']
 const CITIES = ['Austin, US', 'Toronto, CA', 'Denver, US', 'New York, US', 'Chicago, US', 'Seattle, US', 'Boston, US', 'London, UK', 'Vancouver, CA', 'San Francisco, US']
 const SIGNALS = ['Raised Series B last month', 'Hiring a Head of Marketing', 'New CMO started 30 days ago', 'Launched a new product line', 'Hiring 3 SDRs', 'Rebranded domain this quarter', 'Opened a second office', 'Raised Series A in Q3', 'Website traffic up 40% YoY', 'Posted a RevOps role']
+function pluralizeTitle(title: string) {
+  if (/^(head|chief) of /i.test(title)) return title.replace(/^(\w+)/, '$1s')
+  if (/^(founder|vp|director|c[a-z]o)\b/i.test(title)) return `${title}s`
+  return title
+}
+
 const SIZES = ['51–200', '51–200', '201–500', '101–250']
 
 function companyName(rand: () => number) {

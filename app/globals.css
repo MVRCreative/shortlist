@@ -96,6 +96,15 @@
   --tracking-caps: 0.06em;
 }
 
+/* Blue is reserved for primary actions; surfaces, selection, and focus stay neutral. */
+:root {
+  --background: #fafafa;
+  --ring: #a3a3a3;
+}
+.dark {
+  --ring: #737373;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

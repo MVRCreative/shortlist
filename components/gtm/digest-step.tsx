@@ -123,7 +123,7 @@ export function DigestStep({
                       <p className="text-meta">
                         {lead.company} · {lead.domain}
                       </p>
-                      <p className="flex items-center gap-1.5 text-body text-status-warning-fg">
+                      <p className="flex items-center gap-1.5 text-body text-foreground">
                         <Zap className="size-icon-xs shrink-0" aria-hidden="true" />
                         {lead.signal}
                       </p>
