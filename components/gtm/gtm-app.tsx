@@ -9,8 +9,11 @@ import { MatchStep } from '@/components/gtm/match-step'
 import { ActivateStep } from '@/components/gtm/activate-step'
 import { Dashboard } from '@/components/gtm/dashboard'
 import { OnboardingRail } from '@/components/gtm/onboarding-rail'
-import { ProfilePreview } from '@/components/gtm/profile-preview'
+import { ProfileCard, ProfilePreview } from '@/components/gtm/profile-preview'
+import { PlanSummaryPanel } from '@/components/gtm/plan-summary'
+import { DEFAULT_TIER, deliveryFor } from '@/lib/gtm/pricing'
 import { emptyProfile } from '@/lib/gtm/sample-profile'
+import { studioName } from '@/lib/gtm/url'
 import {
   contentChannels,
   type Digest,
@@ -23,6 +26,9 @@ import {
 
 type Pending = 'enrich' | 'match' | 'digest' | null
 
+// Stands in for the signed-in user's email until account creation exists.
+const ACCOUNT_EMAIL = 'josh@studio.com'
+
 export function GtmApp() {
   const [step, setStep] = useState<Step>('Profile')
   const [input, setInput] = useState<ProfileInput>(emptyProfile)
@@ -31,10 +37,10 @@ export function GtmApp() {
   const [accounts, setAccounts] = useState<SampleAccount[]>([])
   const [verdicts, setVerdicts] = useState<Record<string, Verdict>>({})
   const [settings, setSettings] = useState<DigestSettings>({
-    cadence: 'weekly',
-    leadsPerDigest: 10,
+    tier: DEFAULT_TIER,
+    ...deliveryFor(DEFAULT_TIER),
     channels: [...contentChannels],
-    email: '',
+    email: ACCOUNT_EMAIL,
   })
   const [digest, setDigest] = useState<Digest | null>(null)
   const [pending, setPending] = useState<Pending>(null)
@@ -150,7 +156,7 @@ export function GtmApp() {
   }
 
   return (
-    <div className="mx-auto grid min-h-dvh w-full max-w-6xl gap-x-12 px-4 sm:px-6 lg:grid-cols-[12rem_minmax(0,1fr)] xl:grid-cols-[12rem_minmax(0,1fr)_17rem]">
+    <div className="mx-auto grid min-h-dvh w-full max-w-6xl gap-x-8 px-4 sm:px-6 lg:grid-cols-[11rem_minmax(0,1fr)_16rem] xl:grid-cols-[12rem_minmax(0,1fr)_17rem] xl:gap-x-12">
       <aside className="hidden lg:sticky lg:top-0 lg:block lg:h-dvh">
         <OnboardingRail step={step} isDemo={isDemo} canVisit={canVisit} onSelect={goTo} />
       </aside>
@@ -184,19 +190,29 @@ export function GtmApp() {
             settings={settings}
             fitCount={fitCount}
             pending={pending === 'digest'}
+            profileName={studioName(input)}
+            profile={<ProfileCard input={input} enriched={enriched} fitCount={fitCount} missCount={missCount} />}
             onChange={setSettings}
             onBack={() => goTo('Match')}
             onActivate={() => handleGenerateDigest(0)}
           />
         )}
       </main>
-      <aside aria-label="Profile preview" className="hidden xl:sticky xl:top-0 xl:block xl:max-h-dvh xl:overflow-y-auto">
+      <aside aria-label="Profile preview" className="hidden lg:sticky lg:top-0 lg:block lg:max-h-dvh lg:overflow-y-auto">
         <ProfilePreview
           input={input}
           enriched={enriched}
           fitCount={fitCount}
           missCount={missCount}
-          settings={settings}
+          footer={
+            step === 'Turn on' ? (
+              <PlanSummaryPanel
+                settings={settings}
+                pending={pending === 'digest'}
+                onActivate={() => handleGenerateDigest(0)}
+              />
+            ) : undefined
+          }
         />
       </aside>
     </div>

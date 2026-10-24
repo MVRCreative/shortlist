@@ -50,7 +50,7 @@ export function NextDigestCountdown({
           <Clock className="size-icon-sm" aria-hidden="true" />
         </span>
         <div className="flex flex-col">
-          <p className="text-label">Next {leadsPerDigest} leads drop</p>
+          <p className="text-label">Next {leadsPerDigest} accounts drop</p>
           <p className="text-meta">
             {format(target, 'EEE, MMM d · h:mm a')}
             {email ? ` → ${email}` : ''}

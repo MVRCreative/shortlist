@@ -14,10 +14,10 @@ export const emptyProfile: StudioProfile = {
 }
 
 export const sampleProfile: StudioProfile = {
-  website: 'loopframe.studio',
-  companyName: 'Loopframe',
+  website: 'fieldworkstudio.com',
+  companyName: 'Fieldwork Studio',
   services: ['Motion', 'Content & copy'],
-  caseStudies: ['loopframe.studio/work/relay-launch-film', 'loopframe.studio/work/stackline-product-explainer'],
+  caseStudies: ['fieldworkstudio.com/work/relay-launch-film', 'fieldworkstudio.com/work/stackline-product-explainer'],
   seedClients: ['linear.app', 'vercel.com', 'raycast.com'],
   industries: ['B2B SaaS', 'Developer tools'],
   companySizes: ['51–200'],

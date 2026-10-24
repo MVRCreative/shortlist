@@ -1,63 +1,50 @@
 'use client'
 
-import { ArrowLeft, Power } from 'lucide-react'
+import type { ReactNode } from 'react'
+import { ArrowLeft, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Field, FieldDescription, FieldLabel } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { Separator } from '@/components/ui/separator'
-import { Slider } from '@/components/ui/slider'
 import { Switch } from '@/components/ui/switch'
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import { DeliveryEmail } from '@/components/gtm/delivery-email'
+import { PlanSelector } from '@/components/gtm/plan-selector'
+import { PlanSummaryBar } from '@/components/gtm/plan-summary'
 import { StepHeading } from '@/components/gtm/step-heading'
-import { formatUsd, quoteMonthlyPrice } from '@/lib/gtm/pricing'
+import { deliveryFor, deliveryLine } from '@/lib/gtm/pricing'
 import { channelLabels, contentChannels, type ContentChannel, type DigestSettings } from '@/lib/gtm/schemas'
 
-function PriceSummary({ settings }: { settings: DigestSettings }) {
-  const { lines, total } = quoteMonthlyPrice(settings)
-
-  return (
-    <Card className="gap-0 bg-muted py-0 shadow-none">
-      <CardContent className="flex flex-col gap-4 px-5 py-5">
-        <div className="flex items-baseline justify-between gap-4">
-          <p className="text-meta">Your plan</p>
-          <p className="text-meta">Billed monthly · cancel anytime</p>
-        </div>
-        <dl className="flex flex-col gap-2">
-          {lines.map((line) => (
-            <div key={line.label} className="flex items-baseline justify-between gap-4">
-              <dt className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:gap-2">
-                <span className="text-body">{line.label}</span>
-                <span className="text-meta">{line.detail}</span>
-              </dt>
-              <dd className="text-body tabular">{formatUsd(line.amount)}</dd>
-            </div>
-          ))}
-        </dl>
-        <Separator />
-        <div className="flex items-baseline justify-between gap-4" aria-live="polite">
-          <p className="text-label">Total</p>
-          <p className="tabular">
-            <span className="text-label">{formatUsd(total)}</span>
-            <span className="text-meta"> / mo</span>
-          </p>
-        </div>
-      </CardContent>
-    </Card>
-  )
-}
-
 const channelDescriptions: Record<ContentChannel, string> = {
-  linkedinPost: 'One post written in your voice',
-  linkedinMessage: 'A personalized note for every lead',
+  linkedinPost: 'One post written for your studio',
+  linkedinMessage: 'A personalized note for every account',
   xPost: 'One short post',
   blogIdea: 'Title, angle, and outline',
+}
+
+function MobileProfile({ name, children }: { name: string; children: ReactNode }) {
+  return (
+    <Collapsible className="lg:hidden">
+      <CollapsibleTrigger className="group flex w-full items-center justify-between gap-3 rounded-xl border bg-card px-4 py-3 text-left transition-colors duration-150 ease-out hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
+        <span className="flex min-w-0 flex-col gap-0.5">
+          <span className="text-label">Your profile</span>
+          <span className="truncate text-meta">{name}</span>
+        </span>
+        <ChevronDown
+          aria-hidden="true"
+          className="size-icon-sm shrink-0 text-muted-foreground transition-transform duration-200 ease-out group-data-[state=open]:rotate-180"
+        />
+      </CollapsibleTrigger>
+      <CollapsibleContent className="pt-3">{children}</CollapsibleContent>
+    </Collapsible>
+  )
 }
 
 export function ActivateStep({
   settings,
   fitCount,
   pending,
+  profileName,
+  profile,
   onChange,
   onBack,
   onActivate,
@@ -65,6 +52,8 @@ export function ActivateStep({
   settings: DigestSettings
   fitCount: number
   pending: boolean
+  profileName: string
+  profile: ReactNode
   onChange: (settings: DigestSettings) => void
   onBack: () => void
   onActivate: () => void
@@ -77,59 +66,43 @@ export function ActivateStep({
         : settings.channels.filter((c) => c !== channel),
     })
 
-  const day = settings.cadence === 'weekly' ? 'Every Monday' : 'The first Monday of each month'
-  const { total } = quoteMonthlyPrice(settings)
-
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 pb-28 lg:pb-0">
       <StepHeading
         eyebrow="Almost there"
-        title="Turn on your pipeline."
-        description={`Tuned on ${fitCount} account${fitCount === 1 ? '' : 's'} you marked as a fit. Choose how often and what lands in your inbox.`}
+        title="Turn on Shortlist"
+        description={`Tuned on ${fitCount} account${fitCount === 1 ? '' : 's'} you marked as a fit. Pick a plan and what lands in your inbox.`}
       />
+
+      <MobileProfile name={profileName}>{profile}</MobileProfile>
 
       <Card>
         <CardContent className="flex flex-col gap-6">
-          <Field>
-            <FieldLabel id="cadence-label">Cadence</FieldLabel>
-            <ToggleGroup
-              type="single"
-              variant="outline"
-              value={settings.cadence}
-              onValueChange={(value) => {
-                if (value) onChange({ ...settings, cadence: value as DigestSettings['cadence'] })
-              }}
-              aria-labelledby="cadence-label"
-              className="w-full"
-            >
-              <ToggleGroupItem value="weekly" className="flex-1">
-                Weekly
-              </ToggleGroupItem>
-              <ToggleGroupItem value="monthly" className="flex-1">
-                Monthly
-              </ToggleGroupItem>
-            </ToggleGroup>
-          </Field>
-
-          <Field>
-            <div className="flex items-center justify-between">
-              <FieldLabel id="leads-label">Leads per digest</FieldLabel>
-              <span className="text-label tabular">{settings.leadsPerDigest}</span>
-            </div>
-            <Slider
-              min={5}
-              max={25}
-              step={5}
-              value={[settings.leadsPerDigest]}
-              onValueChange={([value]) => onChange({ ...settings, leadsPerDigest: value })}
-              aria-labelledby="leads-label"
+          <section className="flex flex-col gap-3">
+            <h2 id="plan-label" className="text-label">
+              Plan
+            </h2>
+            <PlanSelector
+              value={settings.tier}
+              labelledBy="plan-label"
+              onChange={(tier) => onChange({ ...settings, tier, ...deliveryFor(tier) })}
             />
-          </Field>
+            <div className="flex flex-col gap-1 pt-1">
+              <p className="text-body" aria-live="polite">
+                {deliveryLine(settings)}
+              </p>
+              <DeliveryEmail email={settings.email} onChange={(email) => onChange({ ...settings, email })} />
+            </div>
+          </section>
 
           <Separator />
 
-          <fieldset className="flex flex-col gap-4">
-            <legend className="mb-4 text-label">Content</legend>
+          <fieldset aria-describedby="content-help">
+            <legend className="mb-0.5 text-label">Content</legend>
+            <p id="content-help" className="text-meta">
+              Included in every plan.
+            </p>
+            <div className="mt-4 flex flex-col gap-4">
             {contentChannels.map((channel) => (
               <div key={channel} className="flex items-center justify-between gap-4">
                 <label htmlFor={`channel-${channel}`} className="flex flex-col gap-0.5">
@@ -143,40 +116,19 @@ export function ActivateStep({
                 />
               </div>
             ))}
+            </div>
           </fieldset>
-
-          <Separator />
-
-          <Field>
-            <FieldLabel htmlFor="email">Send to</FieldLabel>
-            <Input
-              id="email"
-              type="email"
-              value={settings.email}
-              onChange={(e) => onChange({ ...settings, email: e.target.value })}
-              placeholder="you@company.com"
-              autoComplete="email"
-            />
-            <FieldDescription>
-              {day}: {settings.leadsPerDigest} leads + {settings.channels.length} content piece
-              {settings.channels.length === 1 ? '' : 's'}.
-            </FieldDescription>
-          </Field>
         </CardContent>
       </Card>
 
-      <PriceSummary settings={settings} />
-
-      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div>
         <Button variant="ghost" tone="muted" onClick={onBack} disabled={pending}>
           <ArrowLeft />
           Back to accounts
         </Button>
-        <Button size="lg" onClick={onActivate} pending={pending}>
-          {pending ? null : <Power />}
-          {pending ? 'Building first digest' : `Turn on · ${formatUsd(total)}/mo`}
-        </Button>
       </div>
+
+      <PlanSummaryBar settings={settings} pending={pending} onActivate={onActivate} />
     </div>
   )
 }

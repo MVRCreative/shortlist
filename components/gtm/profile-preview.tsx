@@ -1,11 +1,10 @@
+import type { ReactNode } from 'react'
 import { Globe } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import { formatUsd, quoteMonthlyPrice } from '@/lib/gtm/pricing'
-import type { DigestSettings, EnrichedProfile, ProfileInput } from '@/lib/gtm/schemas'
+import type { EnrichedProfile, ProfileInput } from '@/lib/gtm/schemas'
 import { describeSizeRange } from '@/lib/gtm/profile-options'
-import { tagColorClass } from '@/lib/gtm/tag-colors'
 import { TONES, toneFor } from '@/lib/gtm/tones'
 import { faviconUrl, normalizeDomain, studioName } from '@/lib/gtm/url'
 
@@ -33,30 +32,32 @@ function TextOrPlaceholder({ value, lines = 1 }: { value: string; lines?: number
   )
 }
 
-export function ProfilePreview({
-  input,
-  enriched,
-  fitCount,
-  missCount,
-  settings,
-}: {
+type ProfileCardProps = {
   input: ProfileInput
   enriched: EnrichedProfile | null
   fitCount: number
   missCount: number
-  settings: DigestSettings
-}) {
-  const domain = normalizeDomain(input.website)
-  const name = domain ? studioName(input) : ''
-  const initial = name.charAt(0).toUpperCase()
-  const { total } = quoteMonthlyPrice(settings)
+}
 
+export function ProfilePreview({ footer, ...card }: ProfileCardProps & { footer?: ReactNode }) {
   return (
-    <div className="flex flex-col gap-4 py-6">
+    <div className="flex flex-col gap-4 pt-6">
       <div className="flex items-center justify-between">
         <p className="text-label">Profile preview</p>
         <p className="text-meta">Updates as you go</p>
       </div>
+      <ProfileCard {...card} />
+      {footer ? <div className="sticky bottom-0 bg-background pt-2 pb-6">{footer}</div> : <div className="pb-6" />}
+    </div>
+  )
+}
+
+export function ProfileCard({ input, enriched, fitCount, missCount }: ProfileCardProps) {
+  const domain = normalizeDomain(input.website)
+  const name = domain ? studioName(input) : ''
+  const initial = name.charAt(0).toUpperCase()
+
+  return (
       <Card className="gap-0 py-0">
         <CardContent className="flex flex-col gap-5 px-5 py-5">
           <div className="flex items-center gap-3">
@@ -109,7 +110,7 @@ export function ProfilePreview({
                 <ul className="flex flex-wrap gap-1.5">
                   {enriched.icp.industries.map((industry) => (
                     <li key={industry}>
-                      <Badge variant="secondary" className={tagColorClass(industry)}>
+                      <Badge variant="secondary">
                         {industry}
                       </Badge>
                     </li>
@@ -132,7 +133,7 @@ export function ProfilePreview({
                   <ul className="flex flex-wrap gap-1.5">
                     {input.industries.map((industry) => (
                       <li key={industry}>
-                        <Badge variant="secondary" className={tagColorClass(industry)}>
+                        <Badge variant="secondary">
                           {industry}
                         </Badge>
                       </li>
@@ -165,23 +166,5 @@ export function ProfilePreview({
           ) : null}
         </CardContent>
       </Card>
-
-      {enriched ? (
-        <div className="flex items-baseline justify-between rounded-xl bg-muted px-5 py-4">
-          <div className="flex flex-col gap-0.5">
-            <p className="text-label">
-              {settings.leadsPerDigest} leads · {settings.cadence}
-            </p>
-            <p className="text-meta">
-              {settings.channels.length} content type{settings.channels.length === 1 ? '' : 's'}
-            </p>
-          </div>
-          <p className="tabular">
-            <span className="text-label">{formatUsd(total)}</span>
-            <span className="text-meta"> / mo</span>
-          </p>
-        </div>
-      ) : null}
-    </div>
   )
 }

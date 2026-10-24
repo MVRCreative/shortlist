@@ -68,7 +68,10 @@ export const channelLabels: Record<ContentChannel, string> = {
   blogIdea: 'Blog idea',
 }
 
+export type TierId = 'starter' | 'pro' | 'growth'
+
 export type DigestSettings = {
+  tier: TierId
   cadence: 'weekly' | 'monthly'
   leadsPerDigest: number
   channels: ContentChannel[]

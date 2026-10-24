@@ -33,8 +33,8 @@ export function AppHeader({ step, isDemo }: { step: Step; isDemo: boolean }) {
           ) : null}
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-meta tabular">
-            {isLive ? 'Live' : `Step ${index + 1} of ${STEPS.length - 1} · ${step}`}
+          <span className="text-meta tabular-nums">
+            {isLive ? 'Live' : `Step ${index + 1} of ${STEPS.length - 1} · ${step === 'Turn on' ? 'Turn on Shortlist' : step}`}
           </span>
           <ThemeToggle />
         </div>

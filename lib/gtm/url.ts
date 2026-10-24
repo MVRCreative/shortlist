@@ -32,15 +32,58 @@ export function faviconUrl(domain: string) {
   return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=64`
 }
 
+const PLACEHOLDER_NAMES = new Set([
+  'website',
+  'yourwebsite',
+  'mywebsite',
+  'site',
+  'yoursite',
+  'mysite',
+  'domain',
+  'example',
+  'company',
+  'yourcompany',
+  'studio',
+  'test',
+  'url',
+])
+
+const NAME_SUFFIXES = [
+  'studios',
+  'studio',
+  'creative',
+  'collective',
+  'design',
+  'digital',
+  'agency',
+  'motion',
+  'media',
+  'works',
+  'house',
+  'labs',
+  'lab',
+  'co',
+]
+
+function splitCompound(word: string) {
+  const suffix = NAME_SUFFIXES.find((s) => word.endsWith(s) && word.length - s.length >= 3)
+  return suffix ? [word.slice(0, -suffix.length), suffix] : [word]
+}
+
+/** "acmestudio.com" → "Acme Studio", "north-beam.co" → "North Beam". Empty for placeholder domains. */
 export function nameFromDomain(domain: string) {
   const root = normalizeDomain(domain)?.split('.')[0] ?? ''
+  if (PLACEHOLDER_NAMES.has(root.replace(/-/g, ''))) return ''
   return root
     .split('-')
     .filter(Boolean)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .flatMap(splitCompound)
+    .map((part) => (part === 'co' ? 'Co' : part.charAt(0).toUpperCase() + part.slice(1)))
     .join(' ')
 }
 
 export function studioName(profile: Pick<StudioProfile, 'companyName' | 'website'>) {
-  return profile.companyName?.trim() || nameFromDomain(profile.website) || 'Your studio'
+  const given = profile.companyName?.trim() ?? ''
+  const usable = given && !PLACEHOLDER_NAMES.has(given.toLowerCase().replace(/[\s-]/g, '')) ? given : ''
+  return usable || nameFromDomain(profile.website) || 'Your studio'
 }
