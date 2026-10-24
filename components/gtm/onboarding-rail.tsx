@@ -2,13 +2,13 @@ import { Check } from 'lucide-react'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { BrandMark } from '@/components/gtm/brand-mark'
 import type { Step } from '@/components/gtm/app-header'
+import { TONES, type Tone } from '@/lib/gtm/tones'
 import { cn } from '@/lib/utils'
 
-const ONBOARDING_STEPS: { step: Step; title: string; description: string }[] = [
-  { step: 'Profile', title: 'Your company', description: 'What you sell and to whom' },
-  { step: 'Enrich', title: 'Review profile', description: 'AI-built ICP and positioning' },
-  { step: 'Match', title: 'Calibrate accounts', description: 'Mark fits and misses' },
-  { step: 'Turn on', title: 'Turn on pipeline', description: 'Cadence, volume, content' },
+const ONBOARDING_STEPS: { step: Step; title: string; description: string; tone: Tone }[] = [
+  { step: 'Profile', title: 'Your profile', description: 'What you sell, to whom', tone: 'purple' },
+  { step: 'Match', title: 'Calibrate accounts', description: 'Mark fits and misses', tone: 'orange' },
+  { step: 'Turn on', title: 'Turn on pipeline', description: 'Cadence, volume, content', tone: 'green' },
 ]
 
 export function OnboardingRail({
@@ -52,7 +52,7 @@ export function OnboardingRail({
                     className={cn(
                       'relative flex size-7 shrink-0 items-center justify-center rounded-full border text-chip tabular',
                       isDone && 'border-foreground bg-foreground text-background',
-                      isCurrent && 'border-foreground bg-background text-foreground',
+                      isCurrent && cn('border-transparent', TONES[item.tone].tile),
                       !isDone && !isCurrent && 'border-border bg-background text-muted-foreground',
                     )}
                   >

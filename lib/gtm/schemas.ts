@@ -4,7 +4,13 @@ export const profileInputSchema = z.object({
   companyName: z.string().trim().min(1, 'Add your company name').max(120),
   website: z.string().trim().max(200),
   offering: z.string().trim().min(10, 'Tell us a bit more about what you sell').max(1200),
-  targetMarket: z.string().trim().min(5, 'Describe who you sell to').max(800),
+  industries: z
+    .array(z.string().trim().min(1).max(60))
+    .min(1, 'Pick at least one industry')
+    .max(8, 'Pick up to 8 industries'),
+  companySizes: z.array(z.string().max(20)).max(6),
+  regions: z.array(z.string().max(40)).max(6),
+  targetMarket: z.string().trim().max(800),
   pricing: z.string().trim().max(300),
   goal: z.string().trim().max(300),
 })

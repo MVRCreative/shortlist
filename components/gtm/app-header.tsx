@@ -4,7 +4,7 @@ import { Progress } from '@/components/ui/progress'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { ThemeToggle } from '@/components/theme-toggle'
 
-export const STEPS = ['Profile', 'Enrich', 'Match', 'Turn on', 'Digest'] as const
+export const STEPS = ['Profile', 'Match', 'Turn on', 'Digest'] as const
 export type Step = (typeof STEPS)[number]
 
 export function AppHeader({ step, isDemo }: { step: Step; isDemo: boolean }) {

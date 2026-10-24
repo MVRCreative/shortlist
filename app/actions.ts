@@ -25,7 +25,10 @@ function describeProfile(input: ProfileInput, enriched?: EnrichedProfile) {
   return [
     `Company: ${input.companyName}${input.website ? ` (${input.website})` : ''}`,
     `What they sell: ${input.offering}`,
-    `Target market: ${input.targetMarket}`,
+    `Target industries: ${input.industries.join(', ')}`,
+    input.companySizes.length > 0 && `Company sizes (employees): ${input.companySizes.join(', ')}`,
+    input.regions.length > 0 && `Regions: ${input.regions.join(', ')}`,
+    input.targetMarket && `Buyer notes: ${input.targetMarket}`,
     input.pricing && `Pricing: ${input.pricing}`,
     input.goal && `Goal: ${input.goal}`,
     enriched && `Enriched profile: ${JSON.stringify(enriched)}`,

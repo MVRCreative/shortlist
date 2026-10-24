@@ -1,3 +1,4 @@
+import { describeSizeRange } from '@/lib/gtm/profile-options'
 import type { Digest, EnrichedProfile, ProfileInput, SampleAccount } from '@/lib/gtm/schemas'
 
 function seededRandom(seedText: string) {
@@ -93,7 +94,11 @@ export function mockEnrich(input: ProfileInput): EnrichedProfile {
   )
 
   const sizeMatch = input.targetMarket.match(/(\d[\d,]*)\s*(?:–|-|to)\s*(\d[\d,]*)\s*(?:employees|people|staff)?/i)
-  const companySize = sizeMatch ? `${sizeMatch[1]}–${sizeMatch[2]} employees` : '20–500 employees'
+  const companySize =
+    describeSizeRange(input.companySizes) ??
+    (sizeMatch ? `${sizeMatch[1]}–${sizeMatch[2]} employees` : '20–500 employees')
+  const chosenIndustries = input.industries.length > 0 ? input.industries : industries
+  const chosenRegions = input.regions.length > 0 ? input.regions : regions
 
   const isService = /studio|agency|consult|service|done-for-you|design/i.test(offering)
   const core = sentence(input.offering).split(/\s[—–-]\s|;/)[0]
@@ -114,9 +119,9 @@ export function mockEnrich(input: ProfileInput): EnrichedProfile {
       'Focused on one ICP instead of everyone',
     ],
     icp: {
-      industries: industries.length ? industries.slice(0, 4) : ['B2B SaaS', 'Professional services', 'Fintech'],
+      industries: chosenIndustries.length ? chosenIndustries.slice(0, 5) : ['B2B SaaS', 'Professional services', 'Fintech'],
       companySize,
-      regions: regions.length ? regions.slice(0, 3) : ['North America'],
+      regions: chosenRegions.length ? chosenRegions.slice(0, 3) : ['North America'],
       buyerTitles: titles.length ? titles.slice(0, 4) : ['Founder', 'Head of Marketing', 'VP Sales'],
     },
     buyingSignals: [

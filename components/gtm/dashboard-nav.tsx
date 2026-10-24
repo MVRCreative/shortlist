@@ -2,6 +2,7 @@ import { FileText, RefreshCw, Settings2, UserRound, Users, type LucideIcon } fro
 import { Button } from '@/components/ui/button'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { BrandMark } from '@/components/gtm/brand-mark'
+import { TONES, type Tone } from '@/lib/gtm/tones'
 import { cn } from '@/lib/utils'
 
 type NavItem = {
@@ -10,6 +11,7 @@ type NavItem = {
   onSelect: () => void
   active?: boolean
   count?: string
+  tone?: Tone
 }
 
 function NavButton({ item, compact = false }: { item: NavItem; compact?: boolean }) {
@@ -26,7 +28,10 @@ function NavButton({ item, compact = false }: { item: NavItem; compact?: boolean
         item.active ? 'text-foreground' : 'text-muted-foreground hover:text-foreground',
       )}
     >
-      <Icon className={cn('size-5 shrink-0', item.active && 'stroke-[2.5]')} aria-hidden="true" />
+      <Icon
+        className={cn('size-5 shrink-0', item.tone && TONES[item.tone].ink, item.active && 'stroke-[2.5]')}
+        aria-hidden="true"
+      />
       {compact ? null : (
         <>
           <span className={cn('flex-1 text-label', !item.active && 'font-normal')}>{item.label}</span>
@@ -61,9 +66,9 @@ export function DashboardNav({
   onNextWeek: () => void
 }) {
   const items: NavItem[] = [
-    { label: 'Leads', icon: Users, onSelect: onLeads, active: true, count: leadsProgress },
-    { label: 'Content', icon: FileText, onSelect: onContent },
-    { label: 'Profile', icon: UserRound, onSelect: onProfile },
+    { label: 'Leads', icon: Users, onSelect: onLeads, active: true, count: leadsProgress, tone: 'orange' },
+    { label: 'Content', icon: FileText, onSelect: onContent, tone: 'purple' },
+    { label: 'Profile', icon: UserRound, onSelect: onProfile, tone: 'teal' },
     { label: 'Settings', icon: Settings2, onSelect: onSettings },
   ]
 

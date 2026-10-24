@@ -5,7 +5,6 @@ import { toast } from 'sonner'
 import { enrichProfile, findSampleAccounts, generateDigest } from '@/app/actions'
 import { AppHeader, type Step } from '@/components/gtm/app-header'
 import { ProfileStep } from '@/components/gtm/profile-step'
-import { EnrichStep } from '@/components/gtm/enrich-step'
 import { MatchStep } from '@/components/gtm/match-step'
 import { ActivateStep } from '@/components/gtm/activate-step'
 import { Dashboard } from '@/components/gtm/dashboard'
@@ -28,6 +27,7 @@ export function GtmApp() {
   const [step, setStep] = useState<Step>('Profile')
   const [input, setInput] = useState<ProfileInput>(emptyProfile)
   const [enriched, setEnriched] = useState<EnrichedProfile | null>(null)
+  const [enrichedFrom, setEnrichedFrom] = useState<string | null>(null)
   const [accounts, setAccounts] = useState<SampleAccount[]>([])
   const [verdicts, setVerdicts] = useState<Record<string, Verdict>>({})
   const [settings, setSettings] = useState<DigestSettings>({
@@ -68,10 +68,13 @@ export function GtmApp() {
       if (!result.ok) return void toast.error(result.error)
       setIsDemo(result.source === 'demo')
       setEnriched(result.data)
+      setEnrichedFrom(JSON.stringify(profile))
       setAccounts([])
       setVerdicts({})
-      goTo('Enrich')
     })
+    requestAnimationFrame(() =>
+      document.getElementById('gtm-profile')?.scrollIntoView({ behavior: 'smooth', block: 'start' }),
+    )
   }
 
   function handleFindAccounts() {
@@ -125,9 +128,10 @@ export function GtmApp() {
 
   function canVisit(target: Step) {
     if (target === 'Profile') return true
-    if (target === 'Enrich') return !!enriched
     return accounts.length > 0
   }
+
+  const isStale = !!enriched && enrichedFrom !== JSON.stringify(input)
 
   if (step === 'Digest') {
     return (
@@ -139,7 +143,7 @@ export function GtmApp() {
         isDemo={isDemo}
         pending={pending === 'digest'}
         onNextWeek={() => handleGenerateDigest(week + 1)}
-        onProfile={() => goTo('Enrich')}
+        onProfile={() => goTo('Profile')}
         onSettings={() => goTo('Turn on')}
       />
     )
@@ -157,20 +161,13 @@ export function GtmApp() {
         {step === 'Profile' && (
           <ProfileStep
             initial={input}
-            pending={pending === 'enrich'}
-            onSubmit={handleEnrich}
-            onDraftChange={setInput}
-          />
-        )}
-        {step === 'Enrich' && enriched && (
-          <EnrichStep
-            input={input}
-            profile={enriched}
+            enriched={enriched}
+            isStale={isStale}
             pendingEnrich={pending === 'enrich'}
             pendingMatch={pending === 'match'}
-            onBack={() => goTo('Profile')}
-            onRegenerate={() => handleEnrich(input)}
-            onContinue={handleFindAccounts}
+            onSubmit={handleEnrich}
+            onDraftChange={setInput}
+            onFindAccounts={handleFindAccounts}
           />
         )}
         {step === 'Match' && (
@@ -178,7 +175,7 @@ export function GtmApp() {
             accounts={accounts}
             verdicts={verdicts}
             onVerdict={handleVerdict}
-            onBack={() => goTo('Enrich')}
+            onBack={() => goTo('Profile')}
             onContinue={() => goTo('Turn on')}
           />
         )}

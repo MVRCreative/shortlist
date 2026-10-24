@@ -4,6 +4,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { CompleteButton } from '@/components/gtm/complete-button'
 import { CopyButton } from '@/components/gtm/copy-button'
 import type { Digest } from '@/lib/gtm/schemas'
+import { TONES } from '@/lib/gtm/tones'
 import { cn } from '@/lib/utils'
 
 type Lead = Digest['leads'][number]
@@ -43,8 +44,10 @@ function LeadItem({
         {done ? null : (
           <>
             <div className="flex flex-col gap-1">
-              <p className="flex items-center gap-1.5 text-body text-foreground">
-                <Zap className="size-icon-xs shrink-0" aria-hidden="true" />
+              <p className="flex items-center gap-2 text-body text-foreground">
+                <span className={cn('flex size-5 shrink-0 items-center justify-center rounded-md', TONES.yellow.tile)}>
+                  <Zap className="size-3" aria-hidden="true" />
+                </span>
                 {lead.signal}
               </p>
               <p className="text-description text-pretty">{lead.angle}</p>

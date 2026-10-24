@@ -1,18 +1,24 @@
+import { AtSign, BookOpen, PenLine, type LucideIcon } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { CompleteButton } from '@/components/gtm/complete-button'
 import { CopyButton } from '@/components/gtm/copy-button'
 import type { ContentChannel, Digest } from '@/lib/gtm/schemas'
+import { TONES, type Tone } from '@/lib/gtm/tones'
 import { cn } from '@/lib/utils'
 
 function ContentItem({
   eyebrow,
+  icon: Icon,
+  tone,
   copyText,
   done,
   onToggle,
   children,
 }: {
   eyebrow: string
+  icon: LucideIcon
+  tone: Tone
   copyText: string
   done: boolean
   onToggle: () => void
@@ -21,7 +27,12 @@ function ContentItem({
   return (
     <Card className="gap-0 py-0">
       <CardContent className="flex flex-col gap-3 px-5 pt-4 pb-3">
-        <p className="text-meta">{eyebrow}</p>
+        <div className="flex items-center gap-2">
+          <span className={cn('flex size-6 items-center justify-center rounded-md', TONES[tone].tile)}>
+            <Icon className="size-3.5" aria-hidden="true" />
+          </span>
+          <p className="text-meta">{eyebrow}</p>
+        </div>
         <div className={cn('flex flex-col gap-3 transition-opacity', done && 'line-clamp-2 opacity-60')}>{children}</div>
         <div className="-mx-2 flex items-center justify-between gap-2">
           <CopyButton text={copyText} />
@@ -68,6 +79,8 @@ export function ContentPanel({
           {has('linkedinPost') ? (
             <ContentItem
               eyebrow="LinkedIn post idea"
+              icon={PenLine}
+              tone="sky"
               copyText={`${digest.linkedinPost.hook}\n\n${digest.linkedinPost.body}`}
               done={completed.has('content-linkedinPost')}
               onToggle={() => onToggle('content-linkedinPost')}
@@ -80,6 +93,8 @@ export function ContentPanel({
           {has('xPost') ? (
             <ContentItem
               eyebrow="X post"
+              icon={AtSign}
+              tone="purple"
               copyText={digest.xPost}
               done={completed.has('content-xPost')}
               onToggle={() => onToggle('content-xPost')}
@@ -92,6 +107,8 @@ export function ContentPanel({
           {has('blogIdea') ? (
             <ContentItem
               eyebrow="Blog idea prompt"
+              icon={BookOpen}
+              tone="orange"
               copyText={`${digest.blogIdea.title}\n\n${digest.blogIdea.angle}\n\n${digest.blogIdea.outline
                 .map((h, i) => `${i + 1}. ${h}`)
                 .join('\n')}`}

@@ -4,7 +4,9 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { formatUsd, quoteMonthlyPrice } from '@/lib/gtm/pricing'
 import type { DigestSettings, EnrichedProfile, ProfileInput } from '@/lib/gtm/schemas'
+import { describeSizeRange } from '@/lib/gtm/profile-options'
 import { tagColorClass } from '@/lib/gtm/tag-colors'
+import { TONES, toneFor } from '@/lib/gtm/tones'
 
 function Placeholder({ className }: { className: string }) {
   return <span aria-hidden="true" className={`block rounded-full bg-muted ${className}`} />
@@ -55,7 +57,11 @@ export function ProfilePreview({
       <Card className="gap-0 py-0">
         <CardContent className="flex flex-col gap-5 px-5 py-5">
           <div className="flex items-center gap-3">
-            <span className="flex size-control-md shrink-0 items-center justify-center rounded-xl bg-muted text-label">
+            <span
+              className={`flex size-control-md shrink-0 items-center justify-center rounded-xl text-label transition-colors ${
+                initial ? TONES[toneFor(input.companyName.trim())].tile : 'bg-muted'
+              }`}
+            >
               {initial || <Globe className="size-icon-sm text-muted-foreground" aria-hidden="true" />}
             </span>
             <div className="flex min-w-0 flex-col gap-1">
@@ -110,9 +116,30 @@ export function ProfilePreview({
               </PreviewRow>
             </>
           ) : (
-            <PreviewRow label="Who you sell to">
-              <TextOrPlaceholder value={input.targetMarket} lines={2} />
-            </PreviewRow>
+            <>
+              <PreviewRow label="Industries">
+                {input.industries.length > 0 ? (
+                  <ul className="flex flex-wrap gap-1.5">
+                    {input.industries.map((industry) => (
+                      <li key={industry}>
+                        <Badge variant="secondary" className={tagColorClass(industry)}>
+                          {industry}
+                        </Badge>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <TextOrPlaceholder value="" lines={1} />
+                )}
+              </PreviewRow>
+              {input.companySizes.length + input.regions.length > 0 ? (
+                <PreviewRow label="Size · Regions">
+                  <p className="text-body text-pretty">
+                    {[describeSizeRange(input.companySizes), input.regions.join(', ')].filter(Boolean).join(' · ')}
+                  </p>
+                </PreviewRow>
+              ) : null}
+            </>
           )}
 
           {fitCount + missCount > 0 ? (
