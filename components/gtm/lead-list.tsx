@@ -1,69 +1,114 @@
-import { Zap } from 'lucide-react'
-import { Card } from '@/components/ui/card'
+'use client'
+
+import { useState } from 'react'
+import { Check, ChevronDown } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
-import { CompleteButton } from '@/components/gtm/complete-button'
 import { CopyButton } from '@/components/gtm/copy-button'
 import type { Digest } from '@/lib/gtm/schemas'
-import { TONES } from '@/lib/gtm/tones'
 import { cn } from '@/lib/utils'
 
 type Lead = Digest['leads'][number]
 
-function LeadItem({
+const EASE_OUT = 'ease-[cubic-bezier(0.23,1,0.32,1)]'
+
+export function DoneCheck({ done, label, onToggle }: { done: boolean; label: string; onToggle: () => void }) {
+  return (
+    <button
+      type="button"
+      role="checkbox"
+      aria-checked={done}
+      aria-label={`Mark ${label} as done`}
+      onClick={onToggle}
+      className={cn(
+        'flex size-5 shrink-0 items-center justify-center rounded-full border transition-[background-color,border-color,transform] duration-150 active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+        EASE_OUT,
+        done ? 'border-primary bg-primary text-primary-foreground' : 'border-border hover:border-muted-foreground',
+      )}
+    >
+      <Check
+        className={cn('size-3 stroke-[3] transition-[opacity,transform] duration-150', EASE_OUT, done ? 'scale-100 opacity-100' : 'scale-75 opacity-0')}
+        aria-hidden="true"
+      />
+    </button>
+  )
+}
+
+function LeadRow({
   lead,
   index,
   done,
+  expanded,
   showMessage,
-  onToggle,
+  onToggleDone,
+  onToggleExpanded,
 }: {
   lead: Lead
   index: number
   done: boolean
+  expanded: boolean
   showMessage: boolean
-  onToggle: () => void
+  onToggleDone: () => void
+  onToggleExpanded: () => void
 }) {
+  const panelId = `lead-panel-${index}`
+
   return (
-    <li className="flex gap-4 px-5 py-5">
-      <span className="w-5 shrink-0 pt-0.5 text-meta tabular" aria-hidden="true">
-        {String(index + 1).padStart(2, '0')}
-      </span>
-      <div className="flex min-w-0 flex-1 flex-col gap-3">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-          <div className={cn('flex min-w-0 flex-col gap-1 transition-opacity', done && 'opacity-60')}>
-            <p className={cn('text-label', done && 'line-through decoration-muted-foreground')}>
-              {lead.contactName}
-              <span className="font-normal text-muted-foreground"> · {lead.title}</span>
+    <li className="group/row">
+      <div className="flex items-center gap-3 px-3">
+        <DoneCheck done={done} label={lead.contactName} onToggle={onToggleDone} />
+        <button
+          type="button"
+          aria-expanded={expanded}
+          aria-controls={panelId}
+          onClick={onToggleExpanded}
+          className="flex min-w-0 flex-1 items-center gap-3 rounded-md py-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <div className={cn('flex min-w-0 flex-1 flex-col gap-0.5 transition-opacity duration-150', done && 'opacity-50')}>
+            <p className="truncate text-label">
+              <span className={cn(done && 'line-through decoration-muted-foreground/60')}>{lead.contactName}</span>
+              <span className="font-normal text-muted-foreground">
+                {' · '}
+                {lead.title}
+              </span>
             </p>
-            <p className="text-meta">
-              {lead.company} · {lead.domain}
+            <p className="truncate text-meta">
+              {lead.company}
+              <span aria-hidden="true"> · </span>
+              <span className="text-foreground/80">{lead.signal}</span>
             </p>
           </div>
-          <CompleteButton done={done} onToggle={onToggle} label={lead.contactName} />
-        </div>
+          <ChevronDown
+            className={cn(
+              'size-4 shrink-0 text-muted-foreground transition-transform duration-200',
+              EASE_OUT,
+              expanded && 'rotate-180',
+            )}
+            aria-hidden="true"
+          />
+        </button>
+      </div>
 
-        {done ? null : (
-          <>
-            <div className="flex flex-col gap-1">
-              <p className="flex items-center gap-2 text-body text-foreground">
-                <span className={cn('flex size-5 shrink-0 items-center justify-center rounded-md', TONES.yellow.tile)}>
-                  <Zap className="size-3" aria-hidden="true" />
-                </span>
-                {lead.signal}
-              </p>
-              <p className="text-description text-pretty">{lead.angle}</p>
-            </div>
-
+      <div
+        id={panelId}
+        className={cn('grid transition-[grid-template-rows] duration-200', EASE_OUT, expanded ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]')}
+        inert={!expanded}
+      >
+        <div className="min-h-0 overflow-hidden">
+          <div className="flex flex-col gap-3 pr-3 pb-4 pl-11">
+            <p className="text-description text-pretty">{lead.angle}</p>
             {showMessage ? (
-              <div className="flex flex-col gap-2 rounded-xl bg-muted px-4 pt-3 pb-2">
-                <p className="text-meta">Personalized message</p>
+              <div className="flex flex-col gap-1 rounded-lg border border-border bg-background px-3 pt-3 pb-1.5">
                 <p className="whitespace-pre-line text-body text-pretty">{lead.message}</p>
-                <div className="-mr-2 flex justify-end">
-                  <CopyButton text={lead.message} label="Copy message" />
+                <div className="-mr-1.5 flex items-center justify-between">
+                  <span className="text-meta">
+                    {lead.domain}
+                  </span>
+                  <CopyButton text={lead.message} label="Copy note" />
                 </div>
               </div>
             ) : null}
-          </>
-        )}
+          </div>
+        </div>
       </div>
     </li>
   )
@@ -71,15 +116,17 @@ function LeadItem({
 
 export function LeadListSkeleton({ rows }: { rows: number }) {
   return (
-    <Card className="gap-0 py-0" aria-busy="true" aria-label="Loading leads">
-      {Array.from({ length: Math.min(rows, 4) }).map((_, i) => (
-        <div key={i} className="flex flex-col gap-3 border-b border-border px-5 py-5 last:border-0">
-          <Skeleton className="h-4 w-2/5" />
-          <Skeleton className="h-3 w-3/5" />
-          <Skeleton className="h-20 w-full rounded-xl" />
+    <div className="flex flex-col divide-y divide-border rounded-xl border border-border bg-card" aria-busy="true" aria-label="Loading accounts">
+      {Array.from({ length: Math.min(rows, 5) }).map((_, i) => (
+        <div key={i} className="flex items-center gap-3 px-3 py-3.5">
+          <Skeleton className="size-5 rounded-full" />
+          <div className="flex flex-1 flex-col gap-1.5">
+            <Skeleton className="h-3.5 w-2/5" />
+            <Skeleton className="h-3 w-3/5" />
+          </div>
         </div>
       ))}
-    </Card>
+    </div>
   )
 }
 
@@ -94,23 +141,31 @@ export function LeadList({
   showMessages: boolean
   onToggle: (key: string) => void
 }) {
+  const [expanded, setExpanded] = useState<number | null>(() => {
+    const firstOpen = leads.findIndex((_, i) => !completed.has(`lead-${i}`))
+    return firstOpen === -1 ? null : firstOpen
+  })
+
   return (
-    <Card className="gap-0 py-0">
-      <ol className="divide-y divide-border">
-        {leads.map((lead, i) => {
-          const key = `lead-${i}`
-          return (
-            <LeadItem
-              key={key}
-              lead={lead}
-              index={i}
-              done={completed.has(key)}
-              showMessage={showMessages}
-              onToggle={() => onToggle(key)}
-            />
-          )
-        })}
-      </ol>
-    </Card>
+    <ol className="flex flex-col divide-y divide-border rounded-xl border border-border bg-card">
+      {leads.map((lead, i) => {
+        const key = `lead-${i}`
+        return (
+          <LeadRow
+            key={key}
+            lead={lead}
+            index={i}
+            done={completed.has(key)}
+            expanded={expanded === i}
+            showMessage={showMessages}
+            onToggleDone={() => {
+              if (!completed.has(key) && expanded === i) setExpanded(null)
+              onToggle(key)
+            }}
+            onToggleExpanded={() => setExpanded((cur) => (cur === i ? null : i))}
+          />
+        )
+      })}
+    </ol>
   )
 }

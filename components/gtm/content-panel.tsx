@@ -1,45 +1,43 @@
-import { AtSign, BookOpen, PenLine, type LucideIcon } from 'lucide-react'
-import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { CompleteButton } from '@/components/gtm/complete-button'
 import { CopyButton } from '@/components/gtm/copy-button'
+import { DoneCheck } from '@/components/gtm/lead-list'
 import type { ContentChannel, Digest } from '@/lib/gtm/schemas'
-import { TONES, type Tone } from '@/lib/gtm/tones'
 import { cn } from '@/lib/utils'
 
 function ContentItem({
   eyebrow,
-  icon: Icon,
-  tone,
+  meta,
   copyText,
   done,
   onToggle,
   children,
 }: {
   eyebrow: string
-  icon: LucideIcon
-  tone: Tone
+  meta?: string
   copyText: string
   done: boolean
   onToggle: () => void
   children: React.ReactNode
 }) {
   return (
-    <Card className="gap-0 py-0">
-      <CardContent className="flex flex-col gap-3 px-5 pt-4 pb-3">
-        <div className="flex items-center gap-2">
-          <span className={cn('flex size-6 items-center justify-center rounded-md', TONES[tone].tile)}>
-            <Icon className="size-3.5" aria-hidden="true" />
-          </span>
-          <p className="text-meta">{eyebrow}</p>
-        </div>
-        <div className={cn('flex flex-col gap-3 transition-opacity', done && 'line-clamp-2 opacity-60')}>{children}</div>
-        <div className="-mx-2 flex items-center justify-between gap-2">
-          <CopyButton text={copyText} />
-          <CompleteButton done={done} onToggle={onToggle} label={eyebrow} />
-        </div>
-      </CardContent>
-    </Card>
+    <article className="flex flex-col gap-3 py-5 first:pt-0">
+      <div className="flex items-center gap-2.5">
+        <DoneCheck done={done} label={eyebrow} onToggle={onToggle} />
+        <h3 className="flex-1 text-meta font-medium text-foreground">{eyebrow}</h3>
+        {meta ? <span className="text-meta tabular-nums">{meta}</span> : null}
+      </div>
+      <div
+        className={cn(
+          'flex flex-col gap-2 pl-7.5 transition-opacity duration-150',
+          done && 'line-clamp-2 opacity-50',
+        )}
+      >
+        {children}
+      </div>
+      <div className="ml-5">
+        <CopyButton text={copyText} />
+      </div>
+    </article>
   )
 }
 
@@ -55,60 +53,49 @@ export function ContentPanel({
   onToggle: (key: string) => void
 }) {
   const has = (channel: ContentChannel) => channels.includes(channel)
-  const hasAny = has('linkedinPost') || has('xPost') || has('blogIdea')
 
   return (
     <section id="content" aria-labelledby="content-heading" className="flex scroll-mt-6 flex-col gap-4">
-      <div className="flex flex-col gap-1">
-        <h2 id="content-heading" className="text-label">
-          Content of the week
-        </h2>
-      </div>
+      <h2 id="content-heading" className="text-label">
+        Content this week
+      </h2>
 
       {!digest ? (
         <div className="flex flex-col gap-3" aria-busy="true" aria-label="Loading content">
-          <Skeleton className="h-40 w-full rounded-xl" />
-          <Skeleton className="h-28 w-full rounded-xl" />
+          <Skeleton className="h-3.5 w-1/3" />
+          <Skeleton className="h-24 w-full rounded-lg" />
+          <Skeleton className="h-3.5 w-1/4" />
+          <Skeleton className="h-16 w-full rounded-lg" />
         </div>
-      ) : !hasAny ? (
-        <p className="rounded-xl bg-muted px-5 py-4 text-description">
-          No post or blog content selected. Turn channels on in Settings.
-        </p>
       ) : (
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col divide-y divide-border">
           {has('linkedinPost') ? (
             <ContentItem
-              eyebrow="LinkedIn post idea"
-              icon={PenLine}
-              tone="sky"
+              eyebrow="LinkedIn post"
               copyText={`${digest.linkedinPost.hook}\n\n${digest.linkedinPost.body}`}
               done={completed.has('content-linkedinPost')}
               onToggle={() => onToggle('content-linkedinPost')}
             >
               <p className="text-label text-pretty">{digest.linkedinPost.hook}</p>
-              <p className="whitespace-pre-line text-body text-pretty">{digest.linkedinPost.body}</p>
+              <p className="line-clamp-6 whitespace-pre-line text-description text-pretty">{digest.linkedinPost.body}</p>
             </ContentItem>
           ) : null}
 
           {has('xPost') ? (
             <ContentItem
               eyebrow="X post"
-              icon={AtSign}
-              tone="purple"
+              meta={`${digest.xPost.length}/280`}
               copyText={digest.xPost}
               done={completed.has('content-xPost')}
               onToggle={() => onToggle('content-xPost')}
             >
-              <p className="whitespace-pre-line text-body text-pretty">{digest.xPost}</p>
-              <p className="text-meta tabular">{digest.xPost.length}/280</p>
+              <p className="whitespace-pre-line text-description text-pretty">{digest.xPost}</p>
             </ContentItem>
           ) : null}
 
           {has('blogIdea') ? (
             <ContentItem
-              eyebrow="Blog idea prompt"
-              icon={BookOpen}
-              tone="orange"
+              eyebrow="Blog idea"
               copyText={`${digest.blogIdea.title}\n\n${digest.blogIdea.angle}\n\n${digest.blogIdea.outline
                 .map((h, i) => `${i + 1}. ${h}`)
                 .join('\n')}`}
@@ -117,11 +104,11 @@ export function ContentPanel({
             >
               <p className="text-label text-pretty">{digest.blogIdea.title}</p>
               <p className="text-description text-pretty">{digest.blogIdea.angle}</p>
-              <ol className="flex flex-col gap-1.5">
+              <ol className="flex flex-col gap-1">
                 {digest.blogIdea.outline.map((heading, i) => (
-                  <li key={heading} className="flex gap-3 text-body">
-                    <span className="text-meta tabular">{String(i + 1).padStart(2, '0')}</span>
-                    {heading}
+                  <li key={heading} className="flex gap-2 text-meta">
+                    <span className="tabular-nums">{i + 1}.</span>
+                    <span className="text-foreground/80">{heading}</span>
                   </li>
                 ))}
               </ol>

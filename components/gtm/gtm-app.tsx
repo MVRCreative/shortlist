@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useEffect, useState, useTransition } from 'react'
 import { toast } from 'sonner'
 import { enrichProfile, findSampleAccounts, generateDigest } from '@/app/actions'
 import { AppHeader, type Step } from '@/components/gtm/app-header'
@@ -13,6 +13,7 @@ import { ProfileCard, ProfilePreview } from '@/components/gtm/profile-preview'
 import { PlanSummaryPanel } from '@/components/gtm/plan-summary'
 import { DEFAULT_TIER, deliveryFor } from '@/lib/gtm/pricing'
 import { emptyProfile } from '@/lib/gtm/sample-profile'
+import { clearSession, loadSession, saveSession } from '@/lib/gtm/session'
 import { studioName } from '@/lib/gtm/url'
 import {
   contentChannels,
@@ -44,9 +45,67 @@ export function GtmApp() {
   })
   const [digest, setDigest] = useState<Digest | null>(null)
   const [pending, setPending] = useState<Pending>(null)
-  const [week, setWeek] = useState(0)
   const [isDemo, setIsDemo] = useState(false)
+  const [completed, setCompleted] = useState<Set<string>>(() => new Set())
+  const [hydrated, setHydrated] = useState(false)
   const [, startTransition] = useTransition()
+
+  useEffect(() => {
+    const saved = loadSession()
+    if (saved) {
+      setStep(saved.step)
+      setInput(saved.input)
+      setEnriched(saved.enriched)
+      setEnrichedFrom(saved.enrichedFrom)
+      setAccounts(saved.accounts)
+      setVerdicts(saved.verdicts)
+      setSettings(saved.settings)
+      setDigest(saved.digest)
+      setIsDemo(saved.isDemo)
+      setCompleted(new Set(saved.completed))
+    }
+    setHydrated(true)
+  }, [])
+
+  useEffect(() => {
+    if (!hydrated) return
+    saveSession({
+      step,
+      input,
+      enriched,
+      enrichedFrom,
+      accounts,
+      verdicts,
+      settings,
+      digest,
+      isDemo,
+      completed: [...completed],
+    })
+  }, [hydrated, step, input, enriched, enrichedFrom, accounts, verdicts, settings, digest, isDemo, completed])
+
+  function toggleCompleted(key: string) {
+    setCompleted((prev) => {
+      const next = new Set(prev)
+      if (next.has(key)) next.delete(key)
+      else next.add(key)
+      return next
+    })
+  }
+
+  function handleSignOut() {
+    clearSession()
+    setStep('Profile')
+    setInput(emptyProfile)
+    setEnriched(null)
+    setEnrichedFrom(null)
+    setAccounts([])
+    setVerdicts({})
+    setSettings({ tier: DEFAULT_TIER, ...deliveryFor(DEFAULT_TIER), channels: [...contentChannels], email: ACCOUNT_EMAIL })
+    setDigest(null)
+    setIsDemo(false)
+    setCompleted(new Set())
+    window.scrollTo({ top: 0, behavior: 'instant' })
+  }
 
   function run(kind: Exclude<Pending, null>, task: () => Promise<void>) {
     setPending(kind)
@@ -106,8 +165,8 @@ export function GtmApp() {
 
   function handleGenerateDigest(nextWeek: number) {
     if (!enriched) return
-    setWeek(nextWeek)
     setDigest(null)
+    setCompleted(new Set())
     goTo('Digest')
     run('digest', async () => {
       const result = await generateDigest({
@@ -139,18 +198,20 @@ export function GtmApp() {
 
   const isStale = !!enriched && enrichedFrom !== JSON.stringify(input)
 
+  if (!hydrated) return <div className="min-h-dvh" aria-busy="true" />
+
   if (step === 'Digest') {
     return (
       <Dashboard
-        key={week}
         digest={digest}
         settings={settings}
         input={input}
         isDemo={isDemo}
-        pending={pending === 'digest'}
-        onNextWeek={() => handleGenerateDigest(week + 1)}
+        completed={completed}
+        onToggle={toggleCompleted}
         onProfile={() => goTo('Profile')}
         onSettings={() => goTo('Turn on')}
+        onSignOut={handleSignOut}
       />
     )
   }
