@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils'
 const ONBOARDING_STEPS: { step: Step; title: string; description: string }[] = [
   { step: 'Profile', title: 'Your profile', description: 'What you do, for whom' },
   { step: 'Match', title: 'Calibrate accounts', description: 'Mark fits and misses' },
-  { step: 'Turn on', title: 'Turn on Shortlist', description: 'Plan and content' },
+  { step: 'Turn on', title: 'Turn on Shortlist', description: 'Pick a plan' },
 ]
 
 function StepMarker({ index, state }: { index: number; state: 'done' | 'current' | 'upcoming' }) {

@@ -192,6 +192,7 @@ export function GtmApp() {
             pending={pending === 'digest'}
             profileName={studioName(input)}
             profile={<ProfileCard input={input} enriched={enriched} fitCount={fitCount} missCount={missCount} />}
+            industries={enriched?.icp.industries ?? input.industries ?? []}
             onChange={setSettings}
             onBack={() => goTo('Match')}
             onActivate={() => handleGenerateDigest(0)}
