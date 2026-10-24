@@ -1,5 +1,6 @@
-import { describeSizeRange } from '@/lib/gtm/profile-options'
+import { dealSizeLabel, describeSizeRange } from '@/lib/gtm/profile-options'
 import type { Digest, EnrichedProfile, ProfileInput, SampleAccount } from '@/lib/gtm/schemas'
+import { studioName } from '@/lib/gtm/url'
 
 function seededRandom(seedText: string) {
   let seed = 0
@@ -14,123 +15,64 @@ function pick<T>(rand: () => number, list: readonly T[]) {
   return list[Math.floor(rand() * list.length)]
 }
 
-function sentence(text: string) {
-  const trimmed = text.trim().replace(/\s+/g, ' ')
-  const first = trimmed.split(/(?<=[.!?])\s/)[0] ?? trimmed
-  return first.replace(/[.!?]*$/, '')
-}
-
-const REGION_KEYWORDS: Record<string, string> = {
-  'north america': 'North America',
-  'united states': 'United States',
-  us: 'United States',
-  usa: 'United States',
-  canada: 'Canada',
-  uk: 'United Kingdom',
-  europe: 'Europe',
-  emea: 'EMEA',
-  apac: 'APAC',
-  australia: 'Australia',
-  latam: 'LATAM',
-}
-
-const TITLE_PATTERNS = [
-  /\b(head of [a-z]+)/gi,
-  /\b(vp(?: of)? [a-z]+)/gi,
-  /\b(director of [a-z]+)/gi,
-  /\b(chief [a-z]+ officer)/gi,
-  /\b(cmo|cro|cto|ceo|coo|founders?)\b/gi,
-]
-
-const INDUSTRY_KEYWORDS: Record<string, string> = {
-  saas: 'B2B SaaS',
-  fintech: 'Fintech',
-  health: 'Healthtech',
-  ecommerce: 'E-commerce',
-  'e-commerce': 'E-commerce',
-  agency: 'Agencies',
-  manufactur: 'Manufacturing',
-  logistics: 'Logistics',
-  security: 'Cybersecurity',
-  developer: 'Developer tools',
-  education: 'Edtech',
-  'real estate': 'Proptech',
-  retail: 'Retail',
-  marketing: 'Martech',
-}
-
-function titleCase(text: string) {
-  return text.replace(/\b\w/g, (c) => c.toUpperCase()).replace(/\b(Of|And)\b/g, (w) => w.toLowerCase())
-}
-
 function unique(list: string[]) {
   return [...new Set(list)]
 }
 
+function joinList(list: string[]) {
+  if (list.length <= 1) return list[0] ?? ''
+  return `${list.slice(0, -1).join(', ')} and ${list[list.length - 1]}`
+}
+
+const SIGNAL_DETAIL: Record<string, string> = {
+  'Just raised funding': 'Raised a seed to Series C round in the last 90 days',
+  'Hiring marketing or design': 'Hiring for marketing, brand, or design roles',
+  'Launching a product': 'Preparing a product or feature launch',
+  'New leadership': 'New CMO, Head of Brand, or founder-level hire',
+  'Outdated website': 'Website hasn’t been redesigned in 3+ years',
+}
+
+const CATEGORY_BY_SERVICE: Record<string, string> = {
+  Motion: 'Motion design studio',
+  Branding: 'Brand studio',
+  'Web design': 'Web design studio',
+  'Webflow / development': 'Web development studio',
+  'Product & UX': 'Product design studio',
+  'Content & copy': 'Content studio',
+}
+
 export function mockEnrich(input: ProfileInput): EnrichedProfile {
-  const market = input.targetMarket.toLowerCase()
-  const offering = input.offering.toLowerCase()
-  const combined = `${market} ${offering}`
-
-  const industries = unique(
-    Object.entries(INDUSTRY_KEYWORDS)
-      .filter(([key]) => combined.includes(key))
-      .map(([, label]) => label),
-  )
-  const regions = unique(
-    Object.entries(REGION_KEYWORDS)
-      .filter(([key]) => new RegExp(`\\b${key}\\b`).test(market))
-      .map(([, label]) => label),
-  )
-  const titles = unique(
-    TITLE_PATTERNS.flatMap((pattern) =>
-      [...input.targetMarket.matchAll(pattern)].map((m) => {
-        const raw = m[1]
-        if (/^founders?$/i.test(raw)) return 'Founder'
-        if (/^(cmo|cro|cto|ceo|coo)$/i.test(raw)) return raw.toUpperCase()
-        return titleCase(raw.replace(/^vp\b/i, 'VP'))
-      }),
-    ),
-  )
-
-  const sizeMatch = input.targetMarket.match(/(\d[\d,]*)\s*(?:–|-|to)\s*(\d[\d,]*)\s*(?:employees|people|staff)?/i)
-  const companySize =
-    describeSizeRange(input.companySizes) ??
-    (sizeMatch ? `${sizeMatch[1]}–${sizeMatch[2]} employees` : '20–500 employees')
-  const chosenIndustries = input.industries.length > 0 ? input.industries : industries
-  const chosenRegions = input.regions.length > 0 ? input.regions : regions
-
-  const isService = /studio|agency|consult|service|done-for-you|design/i.test(offering)
-  const core = sentence(input.offering).split(/\s[—–-]\s|;/)[0]
-  const buyer = titles[0] ?? 'growth leaders'
+  const name = studioName(input)
+  const services = input.services.map((service) => service.toLowerCase())
+  const industries = input.industries.length ? input.industries : ['B2B SaaS']
+  const buyer = input.buyerTitles[0] ?? 'Head of Marketing'
+  const deal = dealSizeLabel(input.dealSize)
+  const signals = input.signals.length
+    ? input.signals.map((signal) => SIGNAL_DETAIL[signal] ?? signal)
+    : Object.values(SIGNAL_DETAIL).slice(0, 4)
 
   return {
-    oneLiner: `${core}.`,
-    category: isService ? 'Specialist services' : 'B2B software',
-    valueProp: `${input.companyName} helps ${pluralizeTitle(buyer)} get to outcomes faster without adding headcount — ${input.goal ? `built for teams chasing goals like “${input.goal}”` : 'with a clear, fixed path to results'}.`,
+    oneLiner: `${name} is a ${joinList(services.slice(0, 2))} studio for ${joinList(industries.slice(0, 2))} teams.`,
+    category: CATEGORY_BY_SERVICE[input.services[0]] ?? 'Creative studio',
+    valueProp: `${name} gives ${pluralizeTitle(buyer)} senior ${services[0] ?? 'creative'} work that looks like the brands they admire — the same caliber as ${joinList(input.seedClients.slice(0, 2))}.`,
     painsSolved: [
-      'Pipeline depends on referrals and founder time',
-      'Messaging is generic and doesn’t land with buyers',
-      'Teams lack the bandwidth to execute consistently',
+      'Brand and launch work lags behind the product',
+      'In-house team is stretched thin before a big moment',
+      'Agencies they’ve tried feel generic or slow',
     ],
     differentiators: [
-      isService ? 'Senior-only team, no handoffs' : 'Live in days, not quarters',
-      input.pricing ? `Transparent pricing: ${input.pricing}` : 'Simple, predictable pricing',
-      'Focused on one ICP instead of everyone',
+      'Senior-only team, no handoffs',
+      deal ? `Typical engagement: ${deal}` : 'Fixed-scope, predictable projects',
+      input.caseStudies.length ? 'Proven work for similar teams' : `Focused on ${industries[0]} only`,
     ],
     icp: {
-      industries: chosenIndustries.length ? chosenIndustries.slice(0, 5) : ['B2B SaaS', 'Professional services', 'Fintech'],
-      companySize,
-      regions: chosenRegions.length ? chosenRegions.slice(0, 3) : ['North America'],
-      buyerTitles: titles.length ? titles.slice(0, 4) : ['Founder', 'Head of Marketing', 'VP Sales'],
+      industries: industries.slice(0, 5),
+      companySize: describeSizeRange(input.companySizes) ?? '51–500 employees',
+      regions: input.regions.length ? input.regions.slice(0, 3) : ['North America'],
+      buyerTitles: input.buyerTitles.slice(0, 4),
     },
-    buyingSignals: [
-      'Recently raised a funding round',
-      'Hiring for marketing or sales roles',
-      'New executive in the buyer seat',
-      'Launching a new product or market',
-    ],
-    voice: 'Direct, confident, and specific — sounds like an operator, not a vendor.',
+    buyingSignals: signals.slice(0, 4),
+    voice: 'Warm, specific, and craft-first — sounds like a peer who has shipped this before.',
   }
 }
 
@@ -138,7 +80,8 @@ const NAME_START = ['North', 'Bright', 'Hollow', 'Clear', 'Iron', 'Lumen', 'Ceda
 const NAME_END = ['stack', 'loop', 'works', 'labs', 'path', 'grid', 'base', 'ware', 'line', 'form', 'yard', 'field', 'point', 'well']
 const CITIES = ['Austin, US', 'Toronto, CA', 'Denver, US', 'New York, US', 'Chicago, US', 'Seattle, US', 'Boston, US', 'London, UK', 'Vancouver, CA', 'San Francisco, US']
 const SIGNALS = ['Raised Series B last month', 'Hiring a Head of Marketing', 'New CMO started 30 days ago', 'Launched a new product line', 'Hiring 3 SDRs', 'Rebranded domain this quarter', 'Opened a second office', 'Raised Series A in Q3', 'Website traffic up 40% YoY', 'Posted a RevOps role']
-function pluralizeTitle(title: string) {
+function pluralizeTitle(raw: string) {
+  const title = raw.split(' / ').pop() ?? raw
   if (/^(head|chief) of /i.test(title)) return title.replace(/^(\w+)/, '$1s')
   if (/^(founder|vp|director|c[a-z]o)\b/i.test(title)) return `${title}s`
   return title
@@ -153,7 +96,7 @@ function companyName(rand: () => number) {
 }
 
 export function mockAccounts(input: ProfileInput, enriched: EnrichedProfile): SampleAccount[] {
-  const rand = seededRandom(`${input.companyName}-accounts`)
+  const rand = seededRandom(`${studioName(input)}-accounts`)
   const used = new Set<string>()
   return Array.from({ length: 10 }, (_, index) => {
     let name = companyName(rand)
@@ -170,7 +113,7 @@ export function mockAccounts(input: ProfileInput, enriched: EnrichedProfile): Sa
       location: pick(rand, CITIES),
       signal: pick(rand, SIGNALS),
       fitReason: borderline
-        ? `Partial match — ${industry.toLowerCase()} buyers rarely fit ${input.companyName}’s motion.`
+        ? `Partial match — ${industry.toLowerCase()} buyers rarely fit ${studioName(input)}’s motion.`
         : `${industry} team in the ${enriched.icp.companySize.replace(' employees', '')} range with a clear trigger.`,
     }
   })
@@ -187,7 +130,7 @@ export function mockDigest(args: {
   week: number
 }): Digest {
   const { input, enriched, fits, leadsPerDigest, week } = args
-  const rand = seededRandom(`${input.companyName}-digest-${week}`)
+  const rand = seededRandom(`${studioName(input)}-digest-${week}`)
   const industries = unique(fits.map((f) => f.industry)).concat(enriched.icp.industries)
   const pain = pick(rand, enriched.painsSolved)
   const differentiator = pick(rand, enriched.differentiators)
@@ -206,7 +149,7 @@ export function mockDigest(args: {
       domain: `${company.toLowerCase()}.com`,
       signal,
       message: pick(rand, [
-        `Hi ${firstName} — saw that ${company} ${signal.charAt(0).toLowerCase()}${signal.slice(1)}. Congrats. That stage is usually when “${leadPain}” starts to bite. We help ${industry} teams fix exactly that at ${input.companyName}. Open to a quick swap of notes on what’s working for peers right now?`,
+        `Hi ${firstName} — saw that ${company} ${signal.charAt(0).toLowerCase()}${signal.slice(1)}. Congrats. That stage is usually when “${leadPain}” starts to bite. We help ${industry} teams fix exactly that at ${studioName(input)}. Open to a quick swap of notes on what’s working for peers right now?`,
         `${firstName}, quick one. ${signal} at ${company} caught my eye — most teams we work with hit “${leadPain}” right after a move like that. ${differentiator}. Worth 15 minutes to see if any of it applies to you?`,
         `Hi ${firstName}, I work with a handful of ${industry} teams on ${leadPain}. Noticed ${company} ${signal.charAt(0).toLowerCase()}${signal.slice(1)}, so figured it might be timely. No pitch — happy to share what we’re seeing if useful.`,
       ]),
@@ -226,12 +169,12 @@ export function mockDigest(args: {
     leads,
     linkedinPost: {
       hook: `Every ${title} I talk to says some version of the same thing: “${pain}.”`,
-      body: `It’s rarely a talent issue. It’s a focus issue.\n\nAt ${input.companyName}, we see the same pattern every week — teams trying to reach everyone, and landing with no one.\n\nWhat works instead:\n→ Pick 10 accounts that actually fit\n→ Find the trigger that makes now the right time\n→ Say one specific thing that proves you understand them\n\n${differentiator}. That’s the whole playbook.\n\nCurious how others are approaching this — what’s working for you right now?`,
+      body: `It’s rarely a talent issue. It’s a focus issue.\n\nAt ${studioName(input)}, we see the same pattern every week — teams trying to reach everyone, and landing with no one.\n\nWhat works instead:\n→ Pick 10 accounts that actually fit\n→ Find the trigger that makes now the right time\n→ Say one specific thing that proves you understand them\n\n${differentiator}. That’s the whole playbook.\n\nCurious how others are approaching this — what’s working for you right now?`,
     },
-    xPost: `${pain}? Stop adding volume. Pick 10 accounts that fit, find the trigger, say one specific thing. That’s ${input.companyName}’s whole approach.`,
+    xPost: `${pain}? Stop adding volume. Pick 10 accounts that fit, find the trigger, say one specific thing. That’s ${studioName(input)}’s whole approach.`,
     blogIdea: {
       title: `Why ${enriched.icp.industries[0]} teams stall on growth (and the 10-account fix)`,
-      angle: `A practical breakdown of how ${pluralizeTitle(title)} can replace broad campaigns with a focused weekly account list — drawn from ${input.companyName}’s client work.`,
+      angle: `A practical breakdown of how ${pluralizeTitle(title)} can replace broad campaigns with a focused weekly account list — drawn from ${studioName(input)}’s client work.`,
       outline: [
         `The real cost of “${pain.toLowerCase()}”`,
         'Why fewer, better-fit accounts outperform volume',

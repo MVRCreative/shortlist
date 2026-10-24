@@ -12,9 +12,9 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Mini GTM — 10 accounts, every week',
+  title: 'Shortlist — 10 accounts, every week',
   description:
-    'Build pipeline on autopilot. Mini GTM learns your business, matches you with best-fit accounts, and sends a digest of leads and tailored content.',
+    'Pipeline for creative studios. Shortlist learns your studio, finds more clients like your best ones, and sends a digest of leads and tailored content.',
 }
 
 export const viewport: Viewport = {

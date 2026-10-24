@@ -7,6 +7,7 @@ import type { DigestSettings, EnrichedProfile, ProfileInput } from '@/lib/gtm/sc
 import { describeSizeRange } from '@/lib/gtm/profile-options'
 import { tagColorClass } from '@/lib/gtm/tag-colors'
 import { TONES, toneFor } from '@/lib/gtm/tones'
+import { faviconUrl, normalizeDomain, studioName } from '@/lib/gtm/url'
 
 function Placeholder({ className }: { className: string }) {
   return <span aria-hidden="true" className={`block rounded-full bg-muted ${className}`} />
@@ -45,7 +46,9 @@ export function ProfilePreview({
   missCount: number
   settings: DigestSettings
 }) {
-  const initial = input.companyName.trim().charAt(0).toUpperCase()
+  const domain = normalizeDomain(input.website)
+  const name = domain ? studioName(input) : ''
+  const initial = name.charAt(0).toUpperCase()
   const { total } = quoteMonthlyPrice(settings)
 
   return (
@@ -59,22 +62,14 @@ export function ProfilePreview({
           <div className="flex items-center gap-3">
             <span
               className={`flex size-control-md shrink-0 items-center justify-center rounded-xl text-label transition-colors ${
-                initial ? TONES[toneFor(input.companyName.trim())].tile : 'bg-muted'
+                initial ? TONES[toneFor(name)].tile : 'bg-muted'
               }`}
             >
               {initial || <Globe className="size-icon-sm text-muted-foreground" aria-hidden="true" />}
             </span>
             <div className="flex min-w-0 flex-col gap-1">
-              {input.companyName.trim() ? (
-                <p className="truncate text-label">{input.companyName}</p>
-              ) : (
-                <Placeholder className="h-3 w-28" />
-              )}
-              {input.website.trim() ? (
-                <p className="truncate text-meta">{input.website}</p>
-              ) : (
-                <Placeholder className="h-2 w-20" />
-              )}
+              {name ? <p className="truncate text-label">{name}</p> : <Placeholder className="h-3 w-28" />}
+              {domain ? <p className="truncate text-meta">{domain}</p> : <Placeholder className="h-2 w-20" />}
             </div>
           </div>
 
@@ -86,9 +81,24 @@ export function ProfilePreview({
               </Badge>
             </>
           ) : (
-            <PreviewRow label="What you sell">
-              <TextOrPlaceholder value={input.offering} lines={3} />
-            </PreviewRow>
+            <>
+              <PreviewRow label="What you do">
+                <TextOrPlaceholder value={input.services.join(', ')} lines={1} />
+              </PreviewRow>
+              {input.seedClients.length > 0 ? (
+                <PreviewRow label="More clients like">
+                  <ul className="flex flex-wrap gap-1.5">
+                    {input.seedClients.map((client) => (
+                      <li key={client} className="flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-meta">
+                        {/* eslint-disable-next-line @next/next/no-img-element -- remote favicon */}
+                        <img src={faviconUrl(client)} alt="" width={12} height={12} className="size-3 rounded-sm" />
+                        {client}
+                      </li>
+                    ))}
+                  </ul>
+                </PreviewRow>
+              ) : null}
+            </>
           )}
 
           <Separator />

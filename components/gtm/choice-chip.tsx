@@ -6,18 +6,20 @@ export function ChoiceChip({
   onToggle,
   selectedClassName = 'border-foreground/20 bg-accent text-foreground',
   disabled,
+  mode = 'toggle',
   children,
 }: {
   selected: boolean
   onToggle: () => void
   selectedClassName?: string
   disabled?: boolean
+  mode?: 'toggle' | 'radio'
   children: React.ReactNode
 }) {
   return (
     <button
       type="button"
-      aria-pressed={selected}
+      {...(mode === 'radio' ? { role: 'radio', 'aria-checked': selected } : { 'aria-pressed': selected })}
       onClick={onToggle}
       disabled={disabled}
       className={cn(

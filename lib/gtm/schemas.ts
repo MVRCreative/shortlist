@@ -1,20 +1,29 @@
 import { z } from 'zod'
 
-export const profileInputSchema = z.object({
-  companyName: z.string().trim().min(1, 'Add your company name').max(120),
-  website: z.string().trim().max(200),
-  offering: z.string().trim().min(10, 'Tell us a bit more about what you sell').max(1200),
-  industries: z
-    .array(z.string().trim().min(1).max(60))
-    .min(1, 'Pick at least one industry')
-    .max(8, 'Pick up to 8 industries'),
-  companySizes: z.array(z.string().max(20)).max(6),
-  regions: z.array(z.string().max(40)).max(6),
-  targetMarket: z.string().trim().max(800),
-  pricing: z.string().trim().max(300),
-  goal: z.string().trim().max(300),
+export const dealSizes = ['<10k', '10-25k', '25-75k', '75k+'] as const
+export type DealSize = (typeof dealSizes)[number]
+
+const label = z.string().trim().min(1).max(60)
+const domain = z.string().trim().min(3).max(253)
+
+export const studioProfileSchema = z.object({
+  website: domain,
+  companyName: z.string().trim().max(120).optional(),
+  services: z.array(label).min(1).max(12),
+  caseStudies: z.array(z.string().trim().max(500)).max(3),
+  seedClients: z.array(domain).min(2).max(3),
+  industries: z.array(label).min(1).max(12),
+  companySizes: z.array(z.string().max(20)).min(1).max(6),
+  regions: z.array(z.string().max(40)).min(1).max(6),
+  buyerTitles: z.array(label).min(1).max(10),
+  signals: z.array(label).max(10),
+  dealSize: z.enum(dealSizes).optional(),
+  excludedDomains: z.array(domain).max(200),
 })
-export type ProfileInput = z.infer<typeof profileInputSchema>
+export type StudioProfile = z.infer<typeof studioProfileSchema>
+
+export const profileInputSchema = studioProfileSchema
+export type ProfileInput = StudioProfile
 
 export const enrichedProfileSchema = z.object({
   oneLiner: z.string().describe('One sentence describing what the company does, under 20 words'),

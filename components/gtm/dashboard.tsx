@@ -10,6 +10,7 @@ import { DashboardNav } from '@/components/gtm/dashboard-nav'
 import { LeadList, LeadListSkeleton } from '@/components/gtm/lead-list'
 import { NextDigestCountdown } from '@/components/gtm/next-digest-countdown'
 import type { Digest, DigestSettings, ProfileInput } from '@/lib/gtm/schemas'
+import { studioName } from '@/lib/gtm/url'
 
 export function Dashboard({
   digest,
@@ -49,7 +50,7 @@ export function Dashboard({
       <aside className="lg:sticky lg:top-0 lg:row-span-2 lg:h-dvh">
         <DashboardNav
           isDemo={isDemo}
-          companyName={input.companyName}
+          companyName={studioName(input)}
           website={input.website}
           leadsProgress={`${leadsDone}/${leadCount}`}
           pending={pending}
@@ -75,7 +76,7 @@ export function Dashboard({
               Live
             </Badge>
             <p className="text-meta">
-              {input.companyName}’s {settings.cadence} digest · {format(new Date(), 'MMM d')}
+              {studioName(input)}’s {settings.cadence} digest · {format(new Date(), 'MMM d')}
             </p>
           </div>
           <h1 className="text-lg font-medium tracking-tight text-balance">

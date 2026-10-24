@@ -1,26 +1,29 @@
-import type { ProfileInput } from '@/lib/gtm/schemas'
+import type { StudioProfile } from '@/lib/gtm/schemas'
 
-export const emptyProfile: ProfileInput = {
-  companyName: '',
+export const emptyProfile: StudioProfile = {
   website: '',
-  offering: '',
+  services: [],
+  caseStudies: [],
+  seedClients: [],
   industries: [],
   companySizes: [],
   regions: [],
-  targetMarket: '',
-  pricing: '',
-  goal: '',
+  buyerTitles: [],
+  signals: [],
+  excludedDomains: [],
 }
 
-export const sampleProfile: ProfileInput = {
-  companyName: 'Northbeam Studio',
-  website: 'northbeam.studio',
-  offering:
-    'A brand and web design studio that rebuilds marketing sites for B2B SaaS companies in 6 weeks — positioning, identity refresh, and a Next.js site the marketing team can edit themselves.',
-  industries: ['B2B SaaS', 'Fintech', 'Developer tools'],
-  companySizes: ['51–200', '201–500'],
+export const sampleProfile: StudioProfile = {
+  website: 'loopframe.studio',
+  companyName: 'Loopframe',
+  services: ['Motion', 'Content & copy'],
+  caseStudies: ['loopframe.studio/work/relay-launch-film', 'loopframe.studio/work/stackline-product-explainer'],
+  seedClients: ['linear.app', 'vercel.com', 'raycast.com'],
+  industries: ['B2B SaaS', 'Developer tools'],
+  companySizes: ['51–200'],
   regions: ['North America'],
-  targetMarket: 'Series A–C. Usually the Head of Marketing or VP Marketing, sometimes the founder.',
-  pricing: 'Fixed-scope projects from $40k–$90k',
-  goal: '4 qualified intro calls per month',
+  buyerTitles: ['CMO / Head of Marketing', 'Founder / CEO'],
+  signals: ['Just raised funding', 'Launching a product'],
+  dealSize: '25-75k',
+  excludedDomains: ['relay.so', 'stackline.dev', 'buck.co'],
 }

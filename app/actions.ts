@@ -3,6 +3,8 @@
 import { generateText, Output } from 'ai'
 import { z } from 'zod'
 import { mockAccounts, mockDigest, mockEnrich } from '@/lib/gtm/mock'
+import { dealSizeLabel } from '@/lib/gtm/profile-options'
+import { studioName } from '@/lib/gtm/url'
 import {
   contentChannels,
   digestSchema,
@@ -23,14 +25,17 @@ type Result<T> = { ok: true; data: T; source: DataSource } | { ok: false; error:
 
 function describeProfile(input: ProfileInput, enriched?: EnrichedProfile) {
   return [
-    `Company: ${input.companyName}${input.website ? ` (${input.website})` : ''}`,
-    `What they sell: ${input.offering}`,
+    `Studio: ${studioName(input)} (${input.website})`,
+    `Services: ${input.services.join(', ')}`,
+    input.caseStudies.length > 0 && `Case studies: ${input.caseStudies.join(', ')}`,
+    `Clients they want more of (lookalike seeds): ${input.seedClients.join(', ')}`,
     `Target industries: ${input.industries.join(', ')}`,
-    input.companySizes.length > 0 && `Company sizes (employees): ${input.companySizes.join(', ')}`,
-    input.regions.length > 0 && `Regions: ${input.regions.join(', ')}`,
-    input.targetMarket && `Buyer notes: ${input.targetMarket}`,
-    input.pricing && `Pricing: ${input.pricing}`,
-    input.goal && `Goal: ${input.goal}`,
+    `Client company sizes (employees): ${input.companySizes.join(', ')}`,
+    `Regions: ${input.regions.join(', ')}`,
+    `Decision makers: ${input.buyerTitles.join(', ')}`,
+    input.signals.length > 0 && `Prioritize accounts showing: ${input.signals.join(', ')}`,
+    input.dealSize && `Typical project size: ${dealSizeLabel(input.dealSize)}`,
+    input.excludedDomains.length > 0 && `Never include these domains: ${input.excludedDomains.join(', ')}`,
     enriched && `Enriched profile: ${JSON.stringify(enriched)}`,
   ]
     .filter(Boolean)
@@ -38,7 +43,7 @@ function describeProfile(input: ProfileInput, enriched?: EnrichedProfile) {
 }
 
 function logFallback(step: string, error: unknown) {
-  console.warn(`[mini-gtm] ${step}: AI unavailable, using demo output —`, error instanceof Error ? error.message : error)
+  console.warn(`[shortlist] ${step}: AI unavailable, using demo output —`, error instanceof Error ? error.message : error)
 }
 
 export async function enrichProfile(raw: ProfileInput): Promise<Result<EnrichedProfile>> {
@@ -51,7 +56,7 @@ export async function enrichProfile(raw: ProfileInput): Promise<Result<EnrichedP
       model: MODEL,
       output: Output.object({ schema: enrichedProfileSchema }),
       system:
-        'You are a senior go-to-market strategist. Turn rough company inputs into a sharp, specific GTM profile. Be concrete, avoid buzzwords, never invent metrics.',
+        'You are a senior go-to-market strategist for creative studios. Turn the studio inputs into a sharp, specific GTM profile. Use the seed client websites as the strongest signal of who to target. Be concrete, avoid buzzwords, never invent metrics.',
       prompt: describeProfile(input),
     })
     return { ok: true, data: output, source: 'ai' }
@@ -77,7 +82,11 @@ export async function findSampleAccounts(
         'You simulate a Clay enrichment table for a prototype. Generate realistic but fictional companies (never real company names) that plausibly match the ICP. Make about 7 strong matches and 3 borderline ones so the user has something to reject.',
       prompt: `Generate exactly 10 sample accounts for this seller:\n${describeProfile(input.data, enriched.data)}`,
     })
-    const accounts = output.accounts.slice(0, 10).map((account, index) => ({
+    const skipped = new Set(input.data.excludedDomains)
+    const accounts = output.accounts
+      .filter((account) => !skipped.has(account.domain.toLowerCase().replace(/^www\./, '')))
+      .slice(0, 10)
+      .map((account, index) => ({
       ...account,
       id: `acct-${index}-${account.domain}`,
     }))

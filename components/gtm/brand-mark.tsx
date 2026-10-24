@@ -8,7 +8,7 @@ export function BrandMark({ isDemo }: { isDemo: boolean }) {
       <span className="flex size-control-sm items-center justify-center rounded-lg bg-foreground text-background">
         <Crosshair className="size-icon-sm" aria-hidden="true" />
       </span>
-      <span className="text-label">Mini GTM</span>
+      <span className="text-label">Shortlist</span>
       {isDemo ? (
         <Tooltip>
           <TooltipTrigger asChild>

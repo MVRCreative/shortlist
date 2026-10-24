@@ -48,7 +48,7 @@ export function GtmApp() {
       try {
         await task()
       } catch (error) {
-        console.error('[mini-gtm] action failed', error)
+        console.error('[shortlist] action failed', error)
         toast.error('Something went wrong. Please try again.')
       } finally {
         setPending(null)
