@@ -45,7 +45,7 @@ export function Dashboard({
   const leadsDone = [...completed].filter((key) => key.startsWith('lead-')).length
 
   return (
-    <div className="mx-auto grid min-h-dvh w-full max-w-screen-2xl gap-x-8 px-4 sm:px-6 lg:grid-cols-[15rem_minmax(0,1fr)] xl:grid-cols-[15rem_minmax(0,1fr)_22rem]">
+    <div className="mx-auto grid min-h-dvh w-full max-w-6xl gap-x-10 px-4 sm:px-6 lg:grid-cols-[13rem_minmax(0,1fr)] xl:grid-cols-[13rem_minmax(0,1fr)_18rem]">
       <aside className="lg:sticky lg:top-0 lg:row-span-2 lg:h-dvh">
         <DashboardNav
           isDemo={isDemo}
@@ -61,7 +61,7 @@ export function Dashboard({
         />
       </aside>
 
-      <main className="flex min-w-0 flex-col gap-6 pt-2 pb-10 lg:pt-6">
+      <main className="flex min-w-0 flex-col gap-8 pt-2 pb-16 lg:pt-6">
         <NextDigestCountdown
           cadence={settings.cadence}
           leadsPerDigest={settings.leadsPerDigest}
@@ -78,7 +78,7 @@ export function Dashboard({
               {input.companyName}’s {settings.cadence} digest · {format(new Date(), 'MMM d')}
             </p>
           </div>
-          <h1 className="text-editorial-title text-balance">
+          <h1 className="text-lg font-medium tracking-tight text-balance">
             {digest ? `${digest.theme}.` : 'Writing your first digest.'}
           </h1>
         </div>
@@ -87,7 +87,7 @@ export function Dashboard({
           <div className="flex items-end justify-between gap-4">
             <div className="flex min-w-0 flex-1 flex-col gap-2">
               <div className="flex items-baseline justify-between gap-4">
-                <h2 id="leads-heading" className="text-section-title whitespace-nowrap">
+                <h2 id="leads-heading" className="text-label whitespace-nowrap">
                   {leadCount} leads
                 </h2>
                 <p className="text-meta tabular whitespace-nowrap">

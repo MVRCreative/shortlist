@@ -11,7 +11,7 @@ import { tagColorClass } from '@/lib/gtm/tag-colors'
 function ProfileRow({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-eyebrow">{label}</p>
+      <p className="text-meta">{label}</p>
       {children}
     </div>
   )
@@ -62,7 +62,7 @@ export function EnrichStep({
   onContinue: () => void
 }) {
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-6">
       <StepHeading
         eyebrow="Your GTM profile"
         title={`Here’s how we see ${input.companyName}.`}
@@ -75,7 +75,7 @@ export function EnrichStep({
             <Badge variant="neutral" className="w-fit">
               {profile.category}
             </Badge>
-            <p className="text-section-title text-pretty">{profile.oneLiner}</p>
+            <p className="text-label text-pretty">{profile.oneLiner}</p>
             <p className="text-description text-pretty">{profile.valueProp}</p>
           </div>
 

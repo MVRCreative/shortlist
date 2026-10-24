@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils"
  * `Section` / `SectionHeader` / `SectionPanel` from `@/components/ui/section`
  * (same hierarchy as Home Reminders). Do not use CardHeader as a page eyebrow.
  */
-export const cardSurface = "rounded-xl border border-border bg-card text-card-foreground shadow-card"
+export const cardSurface = "rounded-xl border border-transparent bg-card text-card-foreground shadow-card"
 
 /**
  * Feed objects (posts, reminders, broadcasts, the composer, sidebar panels on

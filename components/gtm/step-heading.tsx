@@ -10,10 +10,10 @@ export function StepHeading({
   description?: ReactNode
 }) {
   return (
-    <div className="flex flex-col gap-3">
-      <p className="text-eyebrow">{eyebrow}</p>
-      <h1 className="text-editorial-title text-balance sm:text-editorial-display">{title}</h1>
-      {description ? <p className="text-body-reading text-pretty text-muted-foreground">{description}</p> : null}
+    <div className="flex flex-col gap-1">
+      <p className="text-meta">{eyebrow}</p>
+      <h1 className="text-lg font-medium tracking-tight text-balance">{title}</h1>
+      {description ? <p className="text-body text-pretty text-muted-foreground">{description}</p> : null}
     </div>
   )
 }

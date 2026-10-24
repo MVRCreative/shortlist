@@ -60,7 +60,7 @@ export function NextDigestCountdown({
       <p className="flex items-baseline gap-1 tabular" role="timer" aria-live="off" aria-label={`Next digest in ${days} days ${hours} hours ${minutes} minutes`}>
         {units.map((unit) => (
           <span key={unit.label} className="flex items-baseline">
-            <span className="text-section-title">{unit.label === 'd' ? unit.value : pad(unit.value)}</span>
+            <span className="text-label">{unit.label === 'd' ? unit.value : pad(unit.value)}</span>
             <span className="text-meta">{unit.label}</span>
           </span>
         ))}

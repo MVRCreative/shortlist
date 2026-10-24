@@ -21,7 +21,7 @@ function ContentItem({
   return (
     <Card className="gap-0 py-0">
       <CardContent className="flex flex-col gap-3 px-5 pt-4 pb-3">
-        <p className="text-eyebrow">{eyebrow}</p>
+        <p className="text-meta">{eyebrow}</p>
         <div className={cn('flex flex-col gap-3 transition-opacity', done && 'line-clamp-2 opacity-60')}>{children}</div>
         <div className="-mx-2 flex items-center justify-between gap-2">
           <CopyButton text={copyText} />
@@ -49,10 +49,9 @@ export function ContentPanel({
   return (
     <section id="content" aria-labelledby="content-heading" className="flex scroll-mt-6 flex-col gap-4">
       <div className="flex flex-col gap-1">
-        <h2 id="content-heading" className="text-section-title">
+        <h2 id="content-heading" className="text-label">
           Content of the week
         </h2>
-        <p className="text-meta">{digest ? digest.theme : 'Drafting ideas…'}</p>
       </div>
 
       {!digest ? (

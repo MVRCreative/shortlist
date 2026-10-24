@@ -13,7 +13,7 @@ function Placeholder({ className }: { className: string }) {
 function PreviewRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <p className="text-eyebrow">{label}</p>
+      <p className="text-meta">{label}</p>
       {children}
     </div>
   )
@@ -55,12 +55,12 @@ export function ProfilePreview({
       <Card className="gap-0 py-0">
         <CardContent className="flex flex-col gap-5 px-5 py-5">
           <div className="flex items-center gap-3">
-            <span className="flex size-control-md shrink-0 items-center justify-center rounded-xl bg-muted text-section-title">
+            <span className="flex size-control-md shrink-0 items-center justify-center rounded-xl bg-muted text-label">
               {initial || <Globe className="size-icon-sm text-muted-foreground" aria-hidden="true" />}
             </span>
             <div className="flex min-w-0 flex-col gap-1">
               {input.companyName.trim() ? (
-                <p className="truncate text-section-title">{input.companyName}</p>
+                <p className="truncate text-label">{input.companyName}</p>
               ) : (
                 <Placeholder className="h-3 w-28" />
               )}
@@ -140,7 +140,7 @@ export function ProfilePreview({
             </p>
           </div>
           <p className="tabular">
-            <span className="text-section-title">{formatUsd(total)}</span>
+            <span className="text-label">{formatUsd(total)}</span>
             <span className="text-meta"> / mo</span>
           </p>
         </div>

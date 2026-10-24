@@ -20,7 +20,7 @@ function PriceSummary({ settings }: { settings: DigestSettings }) {
     <Card className="gap-0 bg-muted py-0 shadow-none">
       <CardContent className="flex flex-col gap-4 px-5 py-5">
         <div className="flex items-baseline justify-between gap-4">
-          <p className="text-eyebrow">Your plan</p>
+          <p className="text-meta">Your plan</p>
           <p className="text-meta">Billed monthly · cancel anytime</p>
         </div>
         <dl className="flex flex-col gap-2">
@@ -38,7 +38,7 @@ function PriceSummary({ settings }: { settings: DigestSettings }) {
         <div className="flex items-baseline justify-between gap-4" aria-live="polite">
           <p className="text-label">Total</p>
           <p className="tabular">
-            <span className="text-section-title">{formatUsd(total)}</span>
+            <span className="text-label">{formatUsd(total)}</span>
             <span className="text-meta"> / mo</span>
           </p>
         </div>
@@ -81,7 +81,7 @@ export function ActivateStep({
   const { total } = quoteMonthlyPrice(settings)
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-6">
       <StepHeading
         eyebrow="Almost there"
         title="Turn on your pipeline."

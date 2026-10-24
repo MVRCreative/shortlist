@@ -106,6 +106,10 @@
 :root:not(.dark) {
   --background: #fafafa;
   --ring: #a3a3a3;
+  --elevation-card: 0 0 0 1px rgb(0 0 0 / 0.06), 0 1px 2px rgb(0 0 0 / 0.04);
+}
+.dark {
+  --elevation-card: 0 0 0 1px rgb(255 255 255 / 0.07);
 }
 .dark {
   --ring: #737373;

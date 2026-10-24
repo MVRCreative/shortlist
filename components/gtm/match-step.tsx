@@ -108,7 +108,7 @@ export function MatchStep({
   const canContinue = fits > 0
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-6">
       <StepHeading
         eyebrow="Matchmaking"
         title="Good fit, or not?"

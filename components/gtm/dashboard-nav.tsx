@@ -22,14 +22,14 @@ function NavButton({ item, compact = false }: { item: NavItem; compact?: boolean
       aria-label={compact ? item.label : undefined}
       className={cn(
         'flex items-center gap-4 rounded-full text-left transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-        compact ? 'size-control-md justify-center' : 'w-full px-4 py-3',
+        compact ? 'size-control-md justify-center' : 'w-full px-2 py-2',
         item.active ? 'text-foreground' : 'text-muted-foreground hover:text-foreground',
       )}
     >
       <Icon className={cn('size-5 shrink-0', item.active && 'stroke-[2.5]')} aria-hidden="true" />
       {compact ? null : (
         <>
-          <span className={cn('flex-1 text-section-title', !item.active && 'font-normal')}>{item.label}</span>
+          <span className={cn('flex-1 text-label', !item.active && 'font-normal')}>{item.label}</span>
           {item.count ? <span className="text-meta tabular">{item.count}</span> : null}
         </>
       )}
@@ -83,7 +83,7 @@ export function DashboardNav({
       </div>
 
       <div className="hidden h-full flex-col gap-8 py-6 lg:flex">
-        <div className="px-4">
+        <div className="px-2">
           <BrandMark isDemo={isDemo} />
         </div>
         <nav aria-label="Dashboard" className="flex flex-col gap-1">
@@ -91,7 +91,7 @@ export function DashboardNav({
             <NavButton key={item.label} item={item} />
           ))}
         </nav>
-        <Button size="lg" shape="pill" className="w-full" onClick={onNextWeek} pending={pending}>
+        <Button shape="pill" className="w-full" onClick={onNextWeek} pending={pending}>
           {pending ? null : <RefreshCw />}
           Preview next week
         </Button>

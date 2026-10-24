@@ -146,14 +146,14 @@ export function GtmApp() {
   }
 
   return (
-    <div className="mx-auto grid min-h-dvh w-full max-w-screen-2xl gap-x-10 px-4 sm:px-6 lg:grid-cols-[16rem_minmax(0,1fr)] xl:grid-cols-[16rem_minmax(0,1fr)_20rem]">
+    <div className="mx-auto grid min-h-dvh w-full max-w-6xl gap-x-12 px-4 sm:px-6 lg:grid-cols-[12rem_minmax(0,1fr)] xl:grid-cols-[12rem_minmax(0,1fr)_17rem]">
       <aside className="hidden lg:sticky lg:top-0 lg:block lg:h-dvh">
         <OnboardingRail step={step} isDemo={isDemo} canVisit={canVisit} onSelect={goTo} />
       </aside>
       <div className="lg:hidden">
         <AppHeader step={step} isDemo={isDemo} />
       </div>
-      <main className="mx-auto flex w-full max-w-2xl flex-col pt-10 pb-16 lg:pt-16">
+      <main className="mx-auto flex w-full max-w-xl flex-col pt-8 pb-16 lg:pt-6">
         {step === 'Profile' && (
           <ProfileStep
             initial={input}

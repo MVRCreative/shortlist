@@ -52,7 +52,7 @@ function LeadItem({
 
             {showMessage ? (
               <div className="flex flex-col gap-2 rounded-xl bg-muted px-4 pt-3 pb-2">
-                <p className="text-eyebrow">Personalized message</p>
+                <p className="text-meta">Personalized message</p>
                 <p className="whitespace-pre-line text-body text-pretty">{lead.message}</p>
                 <div className="-mr-2 flex justify-end">
                   <CopyButton text={lead.message} label="Copy message" />
