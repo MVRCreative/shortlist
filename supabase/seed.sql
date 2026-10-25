@@ -1,0 +1,1 @@
+-- Local seed placeholder. Production seeds live in migrations.

@@ -6,7 +6,7 @@
  * load failures (use ErrorState) and not for transient confirmation (toast).
  *
  * Tones: `info`, `warning`, `success`, `danger` — the same names and status
- * tokens Badge uses. Title is `text-label`, description 14px muted. The
+ * tokens Badge uses. Title is `text-label-sm`, description 14px muted. The
  * optional action sits under the copy on narrow screens and to the right
  * from `sm` up.
  *
@@ -20,18 +20,18 @@ import { cn } from "@/lib/utils"
 export type StatusTone = "info" | "warning" | "success" | "danger"
 
 const TONE: Record<StatusTone, { surface: string; icon: string; Icon: typeof Info }> = {
-  info: { surface: "border-status-info-bd bg-status-info-bg", icon: "text-status-info-fg", Icon: Info },
+  info: { surface: "border-information-light bg-information-lighter", icon: "text-information-base", Icon: Info },
   warning: {
-    surface: "border-status-warning-bd bg-status-warning-bg",
-    icon: "text-status-warning-fg",
+    surface: "border-warning-light bg-warning-lighter",
+    icon: "text-warning-base",
     Icon: AlertTriangle,
   },
   success: {
-    surface: "border-status-success-bd bg-status-success-bg",
-    icon: "text-status-success-fg",
+    surface: "border-success-light bg-success-lighter",
+    icon: "text-success-base",
     Icon: CheckCircle2,
   },
-  danger: { surface: "border-status-danger-bd bg-status-danger-bg", icon: "text-status-danger-fg", Icon: XCircle },
+  danger: { surface: "border-error-light bg-error-lighter", icon: "text-error-base", Icon: XCircle },
 }
 
 export function StatusBanner({
@@ -54,16 +54,16 @@ export function StatusBanner({
       data-slot="status-banner"
       data-tone={tone}
       className={cn(
-        "flex flex-col gap-3 rounded-xl border px-3 py-2.5 text-foreground sm:flex-row sm:items-start sm:justify-between",
+        "flex flex-col gap-3 rounded-20 border px-3 py-2.5 text-text-strong-950 sm:flex-row sm:items-start sm:justify-between",
         surface,
         className
       )}
     >
       <div className="flex min-w-0 gap-3">
-        <Icon className={cn("mt-0.5 size-icon-lg shrink-0", icon)} aria-hidden />
+        <Icon className={cn("mt-0.5 size-5 shrink-0", icon)} aria-hidden />
         <div className="min-w-0">
-          <p className="text-label break-words">{title}</p>
-          {description ? <p className="mt-0.5 text-description break-words">{description}</p> : null}
+          <p className="text-label-sm break-words">{title}</p>
+          {description ? <p className="mt-0.5 text-paragraph-sm break-words">{description}</p> : null}
         </div>
       </div>
       {action ? <div className="shrink-0 pl-8 sm:pt-0.5 sm:pl-0">{action}</div> : null}

@@ -1,36 +1,20 @@
-/**
- * Input
- *
- * Purpose: single-line text entry. Shares `fieldSurface` with Textarea and
- * SelectTrigger so every field has one height, radius, border, and focus ring.
- *
- * Sizes (`fieldSize`): `sm` 32, `default` 40, `lg` 44. Use `fieldSize`, not a
- * height class, to change it.
- *
- * Accessibility: pair with a Label (or `aria-label`), and set `aria-invalid`
- * plus an error message id on validation failure.
- */
-import * as React from "react"
+import * as React from 'react'
+import { cn } from '@/lib/utils'
 
-import { fieldSize, fieldSurface } from "@/components/ui/field-surface"
-import { cn } from "@/lib/utils"
-
-function Input({
-  className,
-  type,
-  fieldSize: size = "default",
-  ...props
-}: React.ComponentProps<"input"> & { fieldSize?: "sm" | "default" | "lg" }) {
+/** Single-line field. AlignUI input surface (shadow, radius, type). */
+function Input({ className, type, ...props }: React.ComponentProps<'input'>) {
   return (
     <input
       type={type}
       data-slot="input"
-      data-size={size}
       className={cn(
-        fieldSurface,
-        fieldSize({ size }),
-        "py-1 selection:bg-primary selection:text-primary-foreground file:inline-flex file:h-control-xs file:border-0 file:bg-transparent file:text-label file:text-foreground",
-        className
+        'h-10 w-full min-w-0 rounded-10 bg-bg-white-0 px-3 text-paragraph-sm text-text-strong-950 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200 outline-none',
+        'transition duration-200 ease-out placeholder:text-text-soft-400',
+        'hover:bg-bg-weak-50 hover:ring-transparent',
+        'focus:bg-bg-white-0 focus:shadow-button-important-focus focus:ring-stroke-strong-950',
+        'disabled:pointer-events-none disabled:bg-bg-weak-50 disabled:text-text-disabled-300',
+        'aria-invalid:ring-error-base',
+        className,
       )}
       {...props}
     />

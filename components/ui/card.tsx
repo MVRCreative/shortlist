@@ -6,23 +6,25 @@ import { cn } from "@/lib/utils"
  * Card — content object surface only.
  *
  * `cardSurface` is the one object surface in the app: hairline border,
- * `bg-card`, `surface` radius (xl), `shadow-card` (flat at rest). Card,
+ * `bg-bg-white-0`, `surface` radius (xl), `shadow-card` (flat at rest). Card,
  * SectionPanel, and feed objects all build on it; a hand-written
- * `rounded-xl border bg-card` string is drift. Load failures use `ErrorState`
+ * `rounded-20 border bg-bg-white-0` string is drift. Load failures use `ErrorState`
  * (destructive status surface), not this card.
  *
  * For page sections with a title, put the title **outside** the surface using
  * `Section` / `SectionHeader` / `SectionPanel` from `@/components/ui/section`
  * (same hierarchy as Home Reminders). Do not use CardHeader as a page eyebrow.
  */
-export const cardSurface = "rounded-xl border border-transparent bg-card text-card-foreground shadow-card"
+export const cardSurface =
+  "rounded-20 bg-bg-white-0 text-text-strong-950 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200"
 
 /**
  * Feed objects (posts, reminders, broadcasts, the composer, sidebar panels on
  * the feed). Page and card are the same white, so the hairline is what
  * separates them. Dark mode uses the same line.
  */
-export const feedSurface = "rounded-xl border border-border bg-card text-card-foreground shadow-card"
+export const feedSurface =
+  "rounded-20 bg-bg-white-0 text-text-strong-950 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200"
 
 function Card({ className, ...props }: React.ComponentProps<"div">) {
   return <div data-slot="card" className={cn(cardSurface, "flex flex-col gap-6 py-6", className)} {...props} />
@@ -42,11 +44,11 @@ function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
 }
 
 function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
-  return <div data-slot="card-title" className={cn("text-card-title", className)} {...props} />
+  return <div data-slot="card-title" className={cn("text-label-md", className)} {...props} />
 }
 
 function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
-  return <div data-slot="card-description" className={cn("text-description", className)} {...props} />
+  return <div data-slot="card-description" className={cn("text-paragraph-sm", className)} {...props} />
 }
 
 function CardAction({ className, ...props }: React.ComponentProps<"div">) {

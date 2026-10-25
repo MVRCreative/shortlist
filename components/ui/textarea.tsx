@@ -1,32 +1,18 @@
-/**
- * Textarea
- *
- * Purpose: multi-line text entry that grows with its content. Same surface as
- * Input (`fieldSurface`); minimum height is two control heights.
- *
- * Variants: default is the field well. `bare` drops the border, fill, radius,
- * and focus ring so the text sits on whatever surface holds it (composer, reply).
- * Accessibility: the caret is the focus cue when bare; the labelled field keeps
- * the 3px ring. Disabled copy stays muted.
- *
- * Usage: `<Textarea bare placeholder="What's happening?" />`
- */
-import * as React from "react"
+import * as React from 'react'
+import { cn } from '@/lib/utils'
 
-import { fieldBare, fieldSurface } from "@/components/ui/field-surface"
-import { cn } from "@/lib/utils"
-
-function Textarea({
-  className,
-  bare = false,
-  ...props
-}: React.ComponentProps<"textarea"> & { bare?: boolean }) {
+function Textarea({ className, ...props }: React.ComponentProps<'textarea'>) {
   return (
     <textarea
       data-slot="textarea"
       className={cn(
-        bare ? fieldBare : cn(fieldSurface, "flex field-sizing-content min-h-20 px-3 py-2"),
-        className
+        'min-h-28 w-full resize-y rounded-10 bg-bg-white-0 px-3 py-2.5 text-paragraph-sm text-text-strong-950 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200 outline-none',
+        'transition duration-200 ease-out placeholder:text-text-soft-400',
+        'hover:bg-bg-weak-50 hover:ring-transparent',
+        'focus:bg-bg-white-0 focus:shadow-button-important-focus focus:ring-stroke-strong-950',
+        'disabled:pointer-events-none disabled:bg-bg-weak-50 disabled:text-text-disabled-300',
+        'aria-invalid:ring-error-base',
+        className,
       )}
       {...props}
     />

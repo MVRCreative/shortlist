@@ -1,27 +1,32 @@
 import type { Metadata, Viewport } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Geist_Mono, Inter, Syne } from 'next/font/google'
 import { ThemeProvider } from 'next-themes'
-import { Toaster } from 'sonner'
+import { ShortlistProvider } from '@/components/shortlist/shortlist-provider'
+import { Toaster } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import './globals.css'
 
-const geist = Geist({ subsets: ['latin'], variable: '--font-geist-sans' })
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 const geistMono = Geist_Mono({
   subsets: ['latin'],
   variable: '--font-geist-mono',
 })
+const syne = Syne({
+  subsets: ['latin'],
+  variable: '--font-syne',
+})
 
 export const metadata: Metadata = {
-  title: 'Shortlist — 10 accounts, every week',
+  title: 'Shortlist — A digest of accounts, every week',
   description:
-    'Pipeline for creative studios. Shortlist learns your studio, finds more clients like your best ones, and sends a digest of leads and tailored content.',
+    'A digest of accounts delivered every week — who to contact, why they fit, and what to say. Built for creative studios.',
 }
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
-  themeColor: '#fafafa',
+  viewportFit: 'cover',
+  themeColor: '#f7f7f7',
 }
 
 export default function RootLayout({
@@ -33,17 +38,19 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${geist.variable} ${geistMono.variable} bg-background`}
+      className={`${inter.variable} ${geistMono.variable} ${syne.variable} bg-bg-weak-50`}
     >
-      <body className="font-sans antialiased">
+      <body className="font-sans antialiased [font-family:var(--font-inter),Inter,ui-sans-serif,system-ui,sans-serif]">
         <ThemeProvider
           attribute="class"
           defaultTheme="light"
           enableSystem={false}
           disableTransitionOnChange
         >
-          <TooltipProvider>{children}</TooltipProvider>
-          <Toaster richColors position="bottom-center" />
+          <ShortlistProvider>
+            <TooltipProvider>{children}</TooltipProvider>
+          </ShortlistProvider>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

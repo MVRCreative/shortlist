@@ -1,0 +1,74 @@
+import * as VerticalStepper from '@/components/alignui/vertical-stepper'
+import { ThemeToggle } from '@/components/theme-toggle'
+import { BrandMark } from '@/components/shortlist/brand-mark'
+import type { Step } from '@/lib/shortlist/steps'
+import { cn } from '@/lib/utils'
+
+const ONBOARDING_STEPS: { step: Step; title: string; description: string }[] = [
+  { step: 'Profile', title: 'Your profile', description: 'What you do, for whom' },
+  { step: 'Match', title: 'Calibrate accounts', description: 'Mark fits and misses' },
+  { step: 'Turn on', title: 'Turn on Shortlist', description: 'Pick a plan' },
+]
+
+export function OnboardingRail({
+  step,
+  isDemo,
+  canVisit,
+  onSelect,
+}: {
+  step: Step
+  isDemo: boolean
+  canVisit: (step: Step) => boolean
+  onSelect: (step: Step) => void
+}) {
+  const currentIndex = ONBOARDING_STEPS.findIndex((s) => s.step === step)
+
+  return (
+    <div className="flex h-full flex-col gap-8 py-6">
+      <BrandMark isDemo={isDemo} />
+      <nav aria-label="Setup steps" className="flex flex-1 flex-col gap-4">
+        <VerticalStepper.Root>
+          {ONBOARDING_STEPS.map((item, index) => {
+            const state =
+              index < currentIndex ? 'completed' : index === currentIndex ? 'active' : 'default'
+            const enabled = state !== 'active' && canVisit(item.step)
+            return (
+              <VerticalStepper.Item
+                key={item.step}
+                state={state}
+                disabled={!enabled}
+                aria-current={state === 'active' ? 'step' : undefined}
+                onClick={() => {
+                  if (enabled) onSelect(item.step)
+                }}
+                className={cn(!enabled && state !== 'active' && 'cursor-default opacity-70')}
+              >
+                <VerticalStepper.ItemIndicator>
+                  {state === 'completed' ? null : index + 1}
+                </VerticalStepper.ItemIndicator>
+                <span className="flex min-w-0 flex-col gap-0.5">
+                  <span className="text-label-sm">
+                    {state === 'completed' ? <span className="sr-only">Completed: </span> : null}
+                    {item.title}
+                  </span>
+                  <span
+                    className={cn(
+                      'text-paragraph-xs',
+                      state === 'active' ? 'text-text-sub-600' : 'text-text-soft-400',
+                    )}
+                  >
+                    {item.description}
+                  </span>
+                </span>
+              </VerticalStepper.Item>
+            )
+          })}
+        </VerticalStepper.Root>
+        <p className="px-2 text-paragraph-xs text-text-soft-400">Setup takes about 3 minutes</p>
+      </nav>
+      <div className="flex">
+        <ThemeToggle />
+      </div>
+    </div>
+  )
+}

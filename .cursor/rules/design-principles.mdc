@@ -1,0 +1,18 @@
+---
+description: Shortlist UI/motion design principles (Emil Kowalski craft)
+alwaysApply: true
+---
+
+# Design principles
+
+Full reference: `docs/design-principles.md` (from [emilkowalski/skills](https://github.com/emilkowalski/skills)).
+
+## Hard rules
+
+- Extend `@loople/tokens` / existing `components/ui` — do not fork motion, color, or toast systems.
+- Animate only when frequency + purpose pass the gate; never animate keyboard / 100+/day actions.
+- Prefer CSS transitions; animate `transform`/`opacity` only; never `scale(0)` or `ease-in` on UI; keep UI motion ≤300ms.
+- Gate hover with `(hover: hover) and (pointer: fine)`; honor `prefers-reduced-motion`.
+- One Sonner `<Toaster />` in root layout; use Radix/shadcn for dialogs/menus — do not hand-roll.
+- Mobile: no `maximum-scale=1` as a zoom fix; inputs ≥16px on touch; prefer `dvh`/`svh` over `100vh`.
+- When reviewing UI/motion, report findings as a `| Before | After | Why |` table.

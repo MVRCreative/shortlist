@@ -18,22 +18,22 @@ import { useTheme } from 'next-themes'
 import { Toaster as Sonner, type ToasterProps } from 'sonner'
 
 const TOKEN_VARS = {
-  '--normal-bg': 'var(--popover)',
-  '--normal-text': 'var(--popover-foreground)',
-  '--normal-border': 'var(--border)',
-  '--success-bg': 'var(--status-success-bg)',
-  '--success-text': 'var(--status-success-fg)',
-  '--success-border': 'var(--status-success-bd)',
-  '--info-bg': 'var(--status-info-bg)',
-  '--info-text': 'var(--status-info-fg)',
-  '--info-border': 'var(--status-info-bd)',
-  '--warning-bg': 'var(--status-warning-bg)',
-  '--warning-text': 'var(--status-warning-fg)',
-  '--warning-border': 'var(--status-warning-bd)',
-  '--error-bg': 'var(--status-danger-bg)',
-  '--error-text': 'var(--status-danger-fg)',
-  '--error-border': 'var(--status-danger-bd)',
-  '--border-radius': 'var(--radius)',
+  '--normal-bg': 'var(--color-bg-white-0)',
+  '--normal-text': 'var(--color-text-strong-950)',
+  '--normal-border': 'var(--color-stroke-soft-200)',
+  '--success-bg': 'var(--color-success-lighter)',
+  '--success-text': 'var(--color-success-base)',
+  '--success-border': 'var(--color-success-light)',
+  '--info-bg': 'var(--color-information-lighter)',
+  '--info-text': 'var(--color-information-base)',
+  '--info-border': 'var(--color-information-light)',
+  '--warning-bg': 'var(--color-warning-lighter)',
+  '--warning-text': 'var(--color-warning-base)',
+  '--warning-border': 'var(--color-warning-light)',
+  '--error-bg': 'var(--color-error-lighter)',
+  '--error-text': 'var(--color-error-base)',
+  '--error-border': 'var(--color-error-light)',
+  '--border-radius': '0.625rem',
 } as CSSProperties
 
 function Toaster(props: ToasterProps) {
@@ -48,9 +48,9 @@ function Toaster(props: ToasterProps) {
       style={TOKEN_VARS}
       toastOptions={{
         classNames: {
-          toast: 'font-sans px-3! py-2.5! shadow-floating!',
-          title: 'text-label! text-current!',
-          description: 'text-description! text-foreground-secondary!',
+          toast: 'font-sans px-3! py-2.5! shadow-regular-md!',
+          title: 'text-label-sm! text-current!',
+          description: 'text-paragraph-sm! text-text-sub-600!',
         },
       }}
       {...props}

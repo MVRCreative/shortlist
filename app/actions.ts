@@ -2,25 +2,27 @@
 
 import { generateText, Output } from 'ai'
 import { z } from 'zod'
-import { mockAccounts, mockDigest, mockEnrich } from '@/lib/gtm/mock'
-import { dealSizeLabel } from '@/lib/gtm/profile-options'
-import { studioName } from '@/lib/gtm/url'
+import { mockDigest } from '@/lib/shortlist/mock'
+import { matchAccountsFromOcean } from '@/lib/shortlist/ocean-match'
+import { aiErrorMessage, profileModel } from '@/lib/shortlist/openai'
+import { dealSizeLabel } from '@/lib/shortlist/profile-options'
+import { readWebsiteProfile, type WebsiteRead } from '@/lib/shortlist/read-website'
+import { studioName } from '@/lib/shortlist/url'
 import {
   contentChannels,
   digestSchema,
   enrichedProfileSchema,
   profileInputSchema,
   sampleAccountSchema,
-  sampleAccountsSchema,
   type Digest,
   type EnrichedProfile,
   type ProfileInput,
   type SampleAccount,
-} from '@/lib/gtm/schemas'
+} from '@/lib/shortlist/schemas'
 
 const MODEL = 'google/gemini-3.5-flash'
 
-export type DataSource = 'ai' | 'demo'
+export type DataSource = 'ai' | 'demo' | 'ocean'
 type Result<T> = { ok: true; data: T; source: DataSource } | { ok: false; error: string }
 
 function describeProfile(input: ProfileInput, enriched?: EnrichedProfile) {
@@ -46,6 +48,22 @@ function logFallback(step: string, error: unknown) {
   console.warn(`[shortlist] ${step}: AI unavailable, using demo output —`, error instanceof Error ? error.message : error)
 }
 
+const readRequestSchema = z.object({
+  companyName: z.string().trim().min(1).max(120),
+  website: z.string().trim().min(3).max(253),
+})
+
+export async function readStudioWebsite(raw: {
+  companyName: string
+  website: string
+}): Promise<Result<WebsiteRead>> {
+  const parsed = readRequestSchema.safeParse(raw)
+  if (!parsed.success) return { ok: false, error: 'Enter a company name and website.' }
+  const result = await readWebsiteProfile(parsed.data)
+  if (!result.ok) return result
+  return { ok: true, data: result.data, source: 'ai' }
+}
+
 export async function enrichProfile(raw: ProfileInput): Promise<Result<EnrichedProfile>> {
   const parsed = profileInputSchema.safeParse(raw)
   if (!parsed.success) return { ok: false, error: 'Some profile fields are missing.' }
@@ -53,16 +71,16 @@ export async function enrichProfile(raw: ProfileInput): Promise<Result<EnrichedP
 
   try {
     const { output } = await generateText({
-      model: MODEL,
+      model: profileModel(),
       output: Output.object({ schema: enrichedProfileSchema }),
+      providerOptions: { openai: { reasoningEffort: 'low' } },
       system:
-        'You are a senior go-to-market strategist for creative studios. Turn the studio inputs into a sharp, specific GTM profile. Use the seed client websites as the strongest signal of who to target. Be concrete, avoid buzzwords, never invent metrics.',
+        'You write a go-to-market profile from the inputs the user confirmed. Use their industries, buyers, regions, and seed clients as given. Be concrete, avoid buzzwords, never invent metrics or clients.',
       prompt: describeProfile(input),
     })
     return { ok: true, data: output, source: 'ai' }
   } catch (error) {
-    logFallback('enrichProfile', error)
-    return { ok: true, data: mockEnrich(input), source: 'demo' }
+    return { ok: false, error: aiErrorMessage(error, "Couldn't build the profile. Try again.") }
   }
 }
 
@@ -74,27 +92,9 @@ export async function findSampleAccounts(
   const enriched = enrichedProfileSchema.safeParse(rawEnriched)
   if (!input.success || !enriched.success) return { ok: false, error: 'Profile is incomplete.' }
 
-  try {
-    const { output } = await generateText({
-      model: MODEL,
-      output: Output.object({ schema: sampleAccountsSchema }),
-      system:
-        'You simulate a Clay enrichment table for a prototype. Generate realistic but fictional companies (never real company names) that plausibly match the ICP. Make about 7 strong matches and 3 borderline ones so the user has something to reject.',
-      prompt: `Generate exactly 10 sample accounts for this seller:\n${describeProfile(input.data, enriched.data)}`,
-    })
-    const skipped = new Set(input.data.excludedDomains)
-    const accounts = output.accounts
-      .filter((account) => !skipped.has(account.domain.toLowerCase().replace(/^www\./, '')))
-      .slice(0, 10)
-      .map((account, index) => ({
-      ...account,
-      id: `acct-${index}-${account.domain}`,
-    }))
-    return { ok: true, data: accounts, source: 'ai' }
-  } catch (error) {
-    logFallback('findSampleAccounts', error)
-    return { ok: true, data: mockAccounts(input.data, enriched.data), source: 'demo' }
-  }
+  const matched = await matchAccountsFromOcean(input.data)
+  if (!matched.ok) return matched
+  return { ok: true, data: matched.accounts, source: 'ocean' }
 }
 
 const digestRequestSchema = z.object({
@@ -121,9 +121,10 @@ export async function generateDigest(raw: z.infer<typeof digestRequestSchema>): 
       output: Output.object({ schema: digestSchema }),
       system: [
         'You write a weekly pipeline digest for a founder or sales leader.',
-        'Leads must be fictional people at fictional companies that resemble the accounts marked as a good fit and avoid traits of rejected accounts.',
+        'Accounts must be fictional people at fictional companies that resemble the accounts marked as a good fit and avoid traits of rejected accounts.',
         'Content must sound like the brand voice, be specific to the offering, and avoid emojis, hashtag spam, and clichés.',
-        'Every lead gets its own personalized LinkedIn message that names their company and signal; never reuse the same opener twice.',
+        'Every account gets its own personalized LinkedIn message that names their company and signal; never reuse the same opener twice.',
+        'Always include a plausible linkedinUrl and company domain. Set email to a verified work address, or null when verification would fail — never invent an unverified email string.',
       ].join(' '),
       prompt: [
         describeProfile(args.input, args.enriched),

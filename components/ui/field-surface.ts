@@ -18,22 +18,22 @@
 import { cva } from "class-variance-authority"
 
 /** 1px brand ring at 30%. The border does not change color. */
-export const fieldFocusVisible = "focus-visible:ring-1 focus-visible:ring-ring/30"
+export const fieldFocusVisible = "focus-visible:ring-1 focus-visible:ring-primary-base/30"
 
 export const fieldSurface = [
-  "w-full min-w-0 rounded-lg border border-input bg-transparent text-body-reading text-foreground outline-none transition-[color,background-color,border-color,box-shadow] duration-fast placeholder:text-muted-foreground aria-invalid:border-destructive aria-invalid:ring-destructive/20 disabled:cursor-not-allowed disabled:opacity-50 md:text-body dark:aria-invalid:ring-destructive/40",
+  "w-full min-w-0 rounded-lg border border-stroke-soft-200 bg-transparent text-paragraph-md text-text-strong-950 outline-none transition-[color,background-color,border-color,box-shadow] duration-200 placeholder:text-text-sub-600 aria-invalid:border-destructive aria-invalid:ring-destructive/20 disabled:cursor-not-allowed disabled:opacity-50 md:text-paragraph-sm dark:aria-invalid:ring-destructive/40",
   fieldFocusVisible,
 ].join(" ")
 
 export const fieldBare =
-  "w-full min-w-0 resize-none field-sizing-content border-0 bg-transparent p-0 text-body-reading text-foreground shadow-none outline-none placeholder:text-muted-foreground focus-visible:ring-0 disabled:cursor-not-allowed disabled:opacity-50"
+  "w-full min-w-0 resize-none field-sizing-content border-0 bg-transparent p-0 text-paragraph-md text-text-strong-950 shadow-none outline-none placeholder:text-text-sub-600 focus-visible:ring-0 disabled:cursor-not-allowed disabled:opacity-50"
 
 export const fieldSize = cva("", {
   variants: {
     size: {
-      sm: "h-control-sm px-2.5",
-      default: "h-control-md px-3",
-      lg: "h-control-lg px-3.5",
+      sm: "h-8 px-2.5",
+      default: "h-10 px-3",
+      lg: "h-11 px-3.5",
     },
   },
   defaultVariants: { size: "default" },

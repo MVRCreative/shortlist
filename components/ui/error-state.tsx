@@ -54,20 +54,20 @@ export function ErrorState({
       data-slot="error-state"
       data-layout={layout}
       className={cn(
-        "flex min-w-0 flex-col gap-3 rounded-xl border border-status-destructive-bd bg-status-destructive-bg px-3 text-foreground sm:flex-row sm:items-start sm:justify-between",
+        "flex min-w-0 flex-col gap-3 rounded-20 border border-error-light bg-error-lighter px-3 text-text-strong-950 sm:flex-row sm:items-start sm:justify-between",
         region ? "py-8" : "py-2.5",
         className
       )}
     >
       <div className="flex min-w-0 gap-3">
         <AlertCircle
-          className="mt-0.5 size-icon-lg shrink-0 text-status-destructive-fg"
+          className="mt-0.5 size-5 shrink-0 text-error-base"
           aria-hidden
         />
         <div className="min-w-0">
-          <p className="text-label break-words">{title}</p>
+          <p className="text-label-sm break-words">{title}</p>
           {description ? (
-            <p className="mt-0.5 text-description break-words">{description}</p>
+            <p className="mt-0.5 text-paragraph-sm break-words">{description}</p>
           ) : null}
         </div>
       </div>
