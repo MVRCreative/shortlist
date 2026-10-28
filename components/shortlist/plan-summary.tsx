@@ -27,7 +27,7 @@ export function PlanSummaryPanel({
   const tier = getTier(settings.tier)
 
   return (
-    <section aria-label="Plan summary" className="flex flex-col gap-4 rounded-20 border bg-bg-white-0 p-5 shadow-regular-xs">
+    <section aria-label="Plan summary" className="surface-group flex flex-col gap-4 p-5">
       <div className="flex items-start justify-between gap-3" aria-live="polite">
         <div className="flex min-w-0 flex-col gap-0.5">
           <p className="text-label-sm">{tier.name}</p>

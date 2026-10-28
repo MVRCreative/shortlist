@@ -2,7 +2,6 @@
 
 import { generateText, Output } from 'ai'
 import { z } from 'zod'
-import { mockDigest } from '@/lib/shortlist/mock'
 import { matchAccountsFromOcean } from '@/lib/shortlist/ocean-match'
 import { aiErrorMessage, profileModel } from '@/lib/shortlist/openai'
 import { dealSizeLabel } from '@/lib/shortlist/profile-options'
@@ -137,6 +136,10 @@ export async function generateDigest(raw: z.infer<typeof digestRequestSchema>): 
     return { ok: true, data: { ...output, leads: output.leads.slice(0, args.leadsPerDigest) }, source: 'ai' }
   } catch (error) {
     logFallback('generateDigest', error)
-    return { ok: true, data: mockDigest(args), source: 'demo' }
+    // Guest preview only — never invent a member-facing drop.
+    return {
+      ok: false,
+      error: "Couldn't build a preview digest. Check your connection and try again.",
+    }
   }
 }

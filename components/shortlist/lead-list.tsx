@@ -34,9 +34,8 @@ function LeadRow({
   return (
     <li
       className={cn(
-        'rounded-20 border border-stroke-soft-200 bg-bg-white-0 transition-[box-shadow,background-color] duration-200',
-        expanded ? 'shadow-[var(--elevation-card)]' : 'fine-hover:bg-bg-weak-50/40',
-        done && !expanded && 'opacity-55',
+        'border-b border-stroke-soft-200 last:border-b-0 transition-[background-color] duration-200',
+        expanded && 'surface-selected surface-selected-leading',
       )}
     >
       <div className="flex items-start gap-3 px-3 py-3.5 sm:px-4">
@@ -48,10 +47,10 @@ function LeadRow({
           onClick={onToggleExpanded}
           className="flex min-w-0 flex-1 items-start gap-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-base"
         >
-          <span className="mt-0.5 font-mono text-paragraph-xs tabular-nums text-text-sub-600">{n}</span>
+          <span className="kicker mt-0.5 tabular-nums">{n}</span>
           <div className="flex min-w-0 flex-1 flex-col gap-1">
-            <p className="truncate text-paragraph-sm font-medium text-text-strong-950">
-              <span className={cn(done && 'line-through decoration-foreground/25')}>{lead.contactName}</span>
+            <p className="truncate text-paragraph-sm font-normal text-text-strong-950">
+              <span className={cn(done && 'line-through decoration-text-sub-600/40')}>{lead.contactName}</span>
             </p>
             <p className="truncate text-paragraph-xs text-text-sub-600">
               {lead.title}
@@ -73,11 +72,11 @@ function LeadRow({
       {expanded ? (
         <div id={panelId} className="flex flex-col gap-4 border-t border-stroke-soft-200 px-3 pt-3 pb-4 sm:px-4">
           <div className="pl-7 sm:pl-11">
-            <p className="text-paragraph-xs font-medium uppercase tracking-caps text-text-sub-600">Why now</p>
+            <p className="kicker">Why now</p>
             <p className="mt-1.5 text-paragraph-sm text-pretty text-text-strong-950">{lead.angle}</p>
           </div>
           <div className="pl-7 sm:pl-11">
-            <p className="text-paragraph-xs font-medium uppercase tracking-caps text-text-sub-600">Reach out</p>
+            <p className="kicker">Reach out</p>
             <AccountActions
               className="mt-2"
               email={lead.email}
@@ -88,9 +87,9 @@ function LeadRow({
             />
           </div>
           {showMessage ? (
-            <div className="rounded-lg bg-bg-weak-50/70 px-3 py-3 sm:ml-11 sm:px-4">
+            <div className="rounded-lg bg-bg-soft-200/50 px-3 py-3 sm:ml-11 sm:px-4">
               <div className="flex items-center justify-between gap-2">
-                <p className="text-paragraph-xs font-medium uppercase tracking-caps text-text-sub-600">Note</p>
+                <p className="kicker">Note</p>
                 <CopyButton text={lead.message} label="Copy note" iconOnly />
               </div>
               <p className="mt-2 whitespace-pre-line text-paragraph-sm text-pretty text-text-strong-950">{lead.message}</p>
@@ -104,9 +103,9 @@ function LeadRow({
 
 export function LeadListSkeleton({ rows }: { rows: number }) {
   return (
-    <div className="flex flex-col gap-2" aria-busy="true" aria-label="Loading accounts">
+    <div className="surface-group" aria-busy="true" aria-label="Loading accounts">
       {Array.from({ length: Math.min(rows, 5) }).map((_, i) => (
-        <div key={i} className="flex items-center gap-3 rounded-20 border border-stroke-soft-200/60 px-4 py-3.5">
+        <div key={i} className="flex items-center gap-3 border-b border-stroke-soft-200 px-4 py-3.5 last:border-b-0">
           <Skeleton className="size-4 rounded-[3px]" />
           <div className="flex flex-1 flex-col gap-1.5">
             <Skeleton className="h-3.5 w-2/5" />
@@ -135,7 +134,7 @@ export function LeadList({
   })
 
   return (
-    <ol className="flex flex-col gap-2">
+    <ol className="surface-group">
       {leads.map((lead, i) => {
         const key = `lead-${i}`
         return (

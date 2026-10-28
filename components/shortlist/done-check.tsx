@@ -2,8 +2,8 @@ import { Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 /**
- * Quiet done mark — hairline square, check appears, no filled orb / status pill.
- * The row’s opacity and strike carry most of the state; this is just the affordance.
+ * Quiet done mark — hairline square, check appears in deep blue.
+ * Strike on the label carries most of the state; this is the affordance.
  */
 export function DoneCheck({ done, label, onToggle }: { done: boolean; label: string; onToggle: () => void }) {
   return (
@@ -17,7 +17,7 @@ export function DoneCheck({ done, label, onToggle }: { done: boolean; label: str
         'press mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-[3px] border transition-[border-color,background-color,color] duration-200',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-base focus-visible:ring-offset-2 focus-visible:ring-offset-bg-white-0',
         done
-          ? 'border-stroke-strong-950 text-text-strong-950'
+          ? 'border-primary-base bg-primary-base text-static-white'
           : 'border-stroke-soft-200 text-transparent fine-hover:border-stroke-sub-300',
       )}
     >

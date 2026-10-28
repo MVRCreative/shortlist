@@ -8,7 +8,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { TONES, type Tone } from "@/lib/shortlist/tones";
+import type { Tone } from "@/lib/shortlist/tones";
 import { cn } from "@/lib/utils";
 
 export function FormSection({
@@ -17,8 +17,8 @@ export function FormSection({
   title,
   description,
   summary,
-  icon: Icon,
-  tone,
+  icon: _Icon,
+  tone: _tone,
   complete,
   invalid,
   open,
@@ -49,30 +49,32 @@ export function FormSection({
         )}
       >
         <CollapsibleTrigger
-          className="group flex w-full items-center gap-4 rounded-20 px-5 py-4 text-left outline-none focus-visible:ring-2 focus-visible:ring-primary-base/50"
+          className="group flex w-full items-center gap-4 rounded-25 px-5 py-4 text-left outline-none focus-visible:ring-2 focus-visible:ring-primary-base/50"
           aria-controls={`${id}-content`}
         >
           <span
             className={cn(
-              "flex size-9 shrink-0 items-center justify-center rounded-lg transition-colors",
-              complete ? TONES.green.tile : TONES[tone].tile,
+              "flex size-8 shrink-0 items-center justify-center rounded-10",
+              complete
+                ? "bg-primary-base text-static-white"
+                : "bg-bg-soft-200 text-text-strong-950",
             )}
+            aria-hidden="true"
           >
             {complete ? (
-              <Check className="size-4" aria-hidden="true" />
+              <Check className="size-3.5" />
             ) : (
-              <Icon className="size-4" aria-hidden="true" />
+              <span className="text-label-xs tabular-nums">
+                {String(index).padStart(2, "0")}
+              </span>
             )}
           </span>
           <span className="flex min-w-0 flex-1 flex-col gap-0.5">
             <span className="flex items-baseline gap-2">
-              <span className="text-paragraph-xs tabular" aria-hidden="true">
-                {String(index).padStart(2, "0")}
-              </span>
               <span className="text-label-sm text-text-strong-950">{title}</span>
               {complete ? <span className="sr-only">(complete)</span> : null}
             </span>
-            <span className="truncate text-paragraph-sm text-text-sub-600">
+            <span className="truncate text-paragraph-sm text-text-soft-400">
               {showSummary ? summary : description}
             </span>
           </span>

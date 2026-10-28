@@ -12,7 +12,7 @@ import {
 import { usePathname, useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { enrichProfile, findSampleAccounts, generateDigest } from '@/app/actions'
-import { getSessionDigest, signOutAction } from '@/app/auth/actions'
+import { getSessionDigest, requestFirstDrop, signOutAction } from '@/app/auth/actions'
 import { DEFAULT_TIER, deliveryFor } from '@/lib/shortlist/pricing'
 import { emptyProfile } from '@/lib/shortlist/sample-profile'
 import {
@@ -124,17 +124,25 @@ export function ShortlistProvider({ children }: { children: ReactNode }) {
       }
 
       const saved = loadSession()
-      if (saved && !session.authenticated) {
+      // Guests restore full local session. Signed-in members restore onboarding
+      // profile (seeds) only — never restore AI/demo digests as live product.
+      if (saved && (!session.authenticated || !session.digest)) {
         setInput(saved.input)
         setEnriched(saved.enriched)
         setEnrichedFrom(saved.enrichedFrom)
         setAccounts(saved.accounts)
         setVerdicts(saved.verdicts)
-        setSettings(saved.settings)
-        setDigest(saved.digest)
-        setIsDemo(saved.isDemo)
-        setDigestSource(saved.isDemo ? 'demo' : saved.digest ? 'ai' : null)
-        setCompleted(new Set(saved.completed))
+        if (!session.authenticated || !session.email) {
+          setSettings(saved.settings)
+        } else {
+          setSettings({ ...saved.settings, email: session.email })
+        }
+        if (!session.authenticated) {
+          setDigest(saved.digest)
+          setIsDemo(saved.isDemo)
+          setDigestSource(saved.isDemo ? 'demo' : saved.digest ? 'ai' : null)
+          setCompleted(new Set(saved.completed))
+        }
       }
 
       setHydrated(true)
@@ -208,7 +216,8 @@ export function ShortlistProvider({ children }: { children: ReactNode }) {
     if (step === 'Match' || step === 'Turn on') {
       if (accounts.length === 0) goTo('Profile')
     } else if (step === 'Digest') {
-      if (!digest && pending !== 'digest') goTo('Turn on')
+      // Signed-in members can wait here before the first drop exists.
+      if (!authenticated && !digest && pending !== 'digest') goTo('Turn on')
     }
   }, [
     hydrated,
@@ -328,28 +337,54 @@ export function ShortlistProvider({ children }: { children: ReactNode }) {
   }
 
   function handleGenerateDigest(nextWeek: number) {
-    if (authenticated) {
-      run('digest', async () => {
-        const session = await getSessionDigest()
-        if (session.digest) {
-          setDigest(session.digest)
-          setDigestSource('supabase')
-          setIsDemo(false)
-          goTo('Digest')
-          return
-        }
-        setActionError(
-          'No delivered Shortlist yet. Run the Ocean delivery for this account, then refresh.',
-        )
-        toast.error('No delivered Shortlist yet.')
-      })
-      return
-    }
-    if (!enriched) return
-    setDigest(null)
     setCompleted(new Set())
     goTo('Digest')
     run('digest', async () => {
+      if (authenticated) {
+        const seeds = input.seedClients.filter(Boolean)
+        if (seeds.length < 2) {
+          const message =
+            'Add 2–3 example client websites in your profile so we can find lookalikes.'
+          setActionError(message)
+          toast.error(message)
+          goTo('Profile')
+          return
+        }
+
+        const result = await requestFirstDrop({
+          seeds,
+          website: input.website || undefined,
+          companySizes: input.companySizes,
+          regions: input.regions,
+          excludedDomains: input.excludedDomains,
+          targetCount: settings.leadsPerDigest,
+        })
+        if (!result.ok) {
+          setActionError(result.error)
+          toast.error(result.error)
+          return
+        }
+        setDigest(result.digest)
+        setDigestSource('supabase')
+        setIsDemo(false)
+        if (result.created) {
+          toast.success(
+            result.deliveredCount === 1
+              ? 'Your first account is ready'
+              : `Your first ${result.deliveredCount} accounts are ready`,
+          )
+        }
+        return
+      }
+
+      // Guest preview only — never used for signed-in members.
+      if (!enriched) {
+        const message = 'Build your profile before turning on Shortlist.'
+        setActionError(message)
+        toast.error(message)
+        goTo('Profile')
+        return
+      }
       const result = await generateDigest({
         input,
         enriched,
@@ -369,6 +404,7 @@ export function ShortlistProvider({ children }: { children: ReactNode }) {
         setIsDemo(true)
         setDigestSource('demo')
       } else {
+        setIsDemo(false)
         setDigestSource('ai')
       }
       setDigest(result.data)

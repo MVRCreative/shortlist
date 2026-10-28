@@ -4,8 +4,6 @@ import type { ReactNode } from 'react'
 import { AppHeader } from '@/components/shortlist/app-header'
 import { DemoBanner } from '@/components/shortlist/demo-banner'
 import { OnboardingRail } from '@/components/shortlist/onboarding-rail'
-import { PlanSummaryPanel } from '@/components/shortlist/plan-summary'
-import { ProfilePreview } from '@/components/shortlist/profile-preview'
 import { useShortlist } from '@/components/shortlist/shortlist-provider'
 import { ErrorState } from '@/components/ui/error-state'
 
@@ -16,13 +14,6 @@ export function OnboardingShell({ children }: { children: ReactNode }) {
     isDemo,
     canVisit,
     goTo,
-    input,
-    enriched,
-    fitCount,
-    missCount,
-    settings,
-    pending,
-    handleGenerateDigest,
     actionError,
     clearActionError,
   } = useShortlist()
@@ -32,7 +23,7 @@ export function OnboardingShell({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="mx-auto grid min-h-dvh w-full max-w-6xl gap-x-8 px-4 pb-[env(safe-area-inset-bottom)] sm:px-6 lg:grid-cols-[11rem_minmax(0,1fr)_16rem] xl:grid-cols-[12rem_minmax(0,1fr)_17rem] xl:gap-x-12">
+    <div className="mx-auto grid min-h-dvh w-full max-w-5xl gap-x-8 px-4 pb-[env(safe-area-inset-bottom)] sm:px-6 lg:grid-cols-[11rem_minmax(0,1fr)] xl:grid-cols-[12rem_minmax(0,1fr)] xl:gap-x-12">
       <aside className="hidden lg:sticky lg:top-0 lg:block lg:h-dvh">
         <OnboardingRail step={step} isDemo={isDemo} canVisit={canVisit} onSelect={goTo} />
       </aside>
@@ -46,26 +37,6 @@ export function OnboardingShell({ children }: { children: ReactNode }) {
         ) : null}
         {children}
       </main>
-      <aside
-        aria-label="Profile preview"
-        className="hidden lg:sticky lg:top-0 lg:block lg:max-h-dvh lg:overflow-y-auto"
-      >
-        <ProfilePreview
-          input={input}
-          enriched={enriched}
-          fitCount={fitCount}
-          missCount={missCount}
-          footer={
-            step === 'Turn on' ? (
-              <PlanSummaryPanel
-                settings={settings}
-                pending={pending === 'digest'}
-                onActivate={() => handleGenerateDigest(0)}
-              />
-            ) : undefined
-          }
-        />
-      </aside>
     </div>
   )
 }

@@ -31,7 +31,7 @@ function FieldLegend({
       data-slot="field-legend"
       data-variant={variant}
       className={cn(
-        'mb-3 data-[variant=legend]:text-label-md data-[variant=label]:text-label-sm',
+        'mb-3 text-text-strong-950 data-[variant=legend]:text-label-md data-[variant=label]:text-label-sm',
         className,
       )}
       {...props}
@@ -141,7 +141,7 @@ function FieldDescription({ className, ...props }: React.ComponentProps<'p'>) {
     <p
       data-slot="field-description"
       className={cn(
-        'text-paragraph-sm group-has-[[data-orientation=horizontal]]/field:text-balance',
+        'text-paragraph-sm text-text-soft-400 group-has-[[data-orientation=horizontal]]/field:text-balance',
         'last:mt-0 nth-last-2:-mt-1 [[data-variant=legend]+&]:-mt-1.5',
         '[&>a]:text-link',
         className,

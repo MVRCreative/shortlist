@@ -5,26 +5,18 @@ import { cn } from "@/lib/utils"
 /**
  * Card — content object surface only.
  *
- * `cardSurface` is the one object surface in the app: hairline border,
- * `bg-bg-white-0`, `surface` radius (xl), `shadow-card` (flat at rest). Card,
- * SectionPanel, and feed objects all build on it; a hand-written
- * `rounded-20 border bg-bg-white-0` string is drift. Load failures use `ErrorState`
- * (destructive status surface), not this card.
- *
- * For page sections with a title, put the title **outside** the surface using
- * `Section` / `SectionHeader` / `SectionPanel` from `@/components/ui/section`
- * (same hierarchy as Home Reminders). Do not use CardHeader as a page eyebrow.
+ * `cardSurface` is the one object surface in the app: paper fill, hairline
+ * border, proposal radius (25). No resting shadow. Prefer the `surface-group`
+ * utility for lists and plan grids. Load failures use `ErrorState`.
  */
 export const cardSurface =
-  "rounded-20 bg-bg-white-0 text-text-strong-950 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200"
+  "rounded-25 border border-stroke-soft-200 bg-bg-white-0 text-text-strong-950"
 
 /**
- * Feed objects (posts, reminders, broadcasts, the composer, sidebar panels on
- * the feed). Page and card are the same white, so the hairline is what
- * separates them. Dark mode uses the same line.
+ * Feed objects share the same paper + hairline surface as cards.
  */
 export const feedSurface =
-  "rounded-20 bg-bg-white-0 text-text-strong-950 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200"
+  "rounded-25 border border-stroke-soft-200 bg-bg-white-0 text-text-strong-950"
 
 function Card({ className, ...props }: React.ComponentProps<"div">) {
   return <div data-slot="card" className={cn(cardSurface, "flex flex-col gap-6 py-6", className)} {...props} />

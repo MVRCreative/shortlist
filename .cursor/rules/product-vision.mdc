@@ -13,6 +13,7 @@ Full reference: `docs/product-vision.md`. Read it before adding features, data m
 - Shortlist does not send emails or LinkedIn messages, automate outreach, export contact lists, manage pipelines, or expose configuration (scoring weights, prompts, providers, custom fields).
 - Every account uses the same fixed fields: company, website, industry/size/location, why it fits, signal + source, decision-maker (name, title, LinkedIn), verified email only, outreach angle, LinkedIn message draft.
 - Never fabricate signals, contacts, fit reasons, or personalization. If a drop can't be filled, deliver fewer, say so, carry the shortfall forward.
+- First drop lands immediately after activation — never default to a multi-day empty waiting state.
 - Drops come from shared sector libraries in Supabase, ranked per user. No per-user discovery API calls per drop. Contacts are looked up and verified only at delivery.
 - An account goes to at most 3 users per quarter (configurable). Never deliver skipped domains, the user's own domain, or repeats.
 - Only use data licensed for customer-facing delivery. Do not use Clay-sourced data in Shortlist without written approval from Clay.

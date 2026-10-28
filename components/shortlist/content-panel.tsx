@@ -20,15 +20,12 @@ function ContentItem({
   children: React.ReactNode
 }) {
   return (
-    <article
-      className={cn(
-        'flex flex-col gap-3 rounded-20 border border-stroke-soft-200 bg-bg-white-0 p-4 shadow-[var(--elevation-card)]',
-        done && 'opacity-55',
-      )}
-    >
+    <article className="flex flex-col gap-3 border-b border-stroke-soft-200 p-4 last:border-b-0">
       <div className="flex items-center gap-2">
         <DoneCheck done={done} label={eyebrow} onToggle={onToggle} />
-        <h3 className="min-w-0 flex-1 truncate text-label-sm text-text-strong-950">{eyebrow}</h3>
+        <h3 className="min-w-0 flex-1 truncate text-label-sm font-normal text-text-strong-950">
+          <span className={cn(done && 'line-through decoration-text-sub-600/40')}>{eyebrow}</span>
+        </h3>
         {meta ? <span className="text-paragraph-xs tabular-nums text-text-sub-600">{meta}</span> : null}
         <CopyButton text={copyText} label={`Copy ${eyebrow}`} iconOnly />
       </div>
@@ -53,19 +50,19 @@ export function ContentPanel({
   return (
     <section id="content" aria-labelledby="content-heading" className="flex scroll-mt-8 flex-col gap-3">
       <div className="flex items-baseline justify-between gap-3">
-        <h2 id="content-heading" className="text-label-sm">
+        <h2 id="content-heading" className="kicker">
           Content
         </h2>
         <p className="text-paragraph-xs text-text-sub-600">Optional this week</p>
       </div>
 
       {!digest ? (
-        <div className="flex flex-col gap-3" aria-busy="true" aria-label="Loading content">
-          <Skeleton className="h-28 w-full rounded-20" />
-          <Skeleton className="h-24 w-full rounded-20" />
+        <div className="surface-group flex flex-col" aria-busy="true" aria-label="Loading content">
+          <Skeleton className="h-28 w-full rounded-none" />
+          <Skeleton className="h-24 w-full rounded-none" />
         </div>
       ) : (
-        <div className="flex flex-col gap-3">
+        <div className="surface-group">
           {has('linkedinPost') ? (
             <ContentItem
               eyebrow="LinkedIn post"
@@ -73,7 +70,7 @@ export function ContentPanel({
               done={completed.has('content-linkedinPost')}
               onToggle={() => onToggle('content-linkedinPost')}
             >
-              <p className="text-label-sm text-pretty">{digest.linkedinPost.hook}</p>
+              <p className="text-label-sm font-normal text-pretty">{digest.linkedinPost.hook}</p>
               <p className="line-clamp-5 whitespace-pre-line text-paragraph-sm text-pretty text-text-sub-600">
                 {digest.linkedinPost.body}
               </p>
@@ -101,7 +98,7 @@ export function ContentPanel({
               done={completed.has('content-blogIdea')}
               onToggle={() => onToggle('content-blogIdea')}
             >
-              <p className="text-label-sm text-pretty">{digest.blogIdea.title}</p>
+              <p className="text-label-sm font-normal text-pretty">{digest.blogIdea.title}</p>
               <p className="text-paragraph-sm text-pretty text-text-sub-600">{digest.blogIdea.angle}</p>
               <ol className="flex flex-col gap-1.5 border-t border-stroke-soft-200 pt-2">
                 {digest.blogIdea.outline.map((heading, i) => (

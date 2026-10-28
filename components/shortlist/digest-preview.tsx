@@ -74,7 +74,7 @@ export function DigestPreview({ settings, industries }: { settings: DigestSettin
           ))}
         </ul>
         <div className="pointer-events-none absolute inset-x-0 bottom-0 flex h-2/3 items-end justify-center bg-gradient-to-b from-transparent via-card/80 to-card pb-2">
-          <p className="flex items-center gap-2 rounded-full border bg-bg-white-0 px-3 py-1.5 text-paragraph-xs text-text-strong-950 shadow-regular-xs">
+          <p className="flex items-center gap-2 rounded-full border border-stroke-soft-200 bg-bg-white-0 px-3 py-1.5 text-paragraph-xs text-text-strong-950">
             <Lock className="size-3" aria-hidden="true" />
             Unlocks when you start Shortlist
           </p>

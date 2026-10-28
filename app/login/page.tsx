@@ -12,14 +12,17 @@ import { Label } from "@/components/ui/label";
 function LoginForm() {
   const searchParams = useSearchParams();
   const next = searchParams.get("next") ?? "/digest";
-  const [error, setError] = useState<string | null>(null);
+  const linkError = searchParams.get("error") === "link";
+  const [error, setError] = useState<string | null>(
+    linkError ? "That link is invalid or has expired. Request a new one." : null,
+  );
   const [pending, startTransition] = useTransition();
 
   return (
     <>
       <div className="flex flex-col gap-2">
         <BrandMark />
-        <h1 className="font-[family-name:var(--font-syne)] text-2xl font-semibold tracking-tight">
+        <h1 className="text-2xl font-normal tracking-tight text-text-strong-950">
           Sign in
         </h1>
         <p className="text-paragraph-sm text-text-sub-600">
@@ -67,6 +70,12 @@ function LoginForm() {
         <Button type="submit" size="lg" pending={pending}>
           Sign in
         </Button>
+        <Link
+          href="/forgot-password"
+          className="text-paragraph-sm text-text-sub-600 underline-offset-4 hover:underline"
+        >
+          Forgot password
+        </Link>
       </form>
 
       <p className="text-paragraph-sm text-text-sub-600">

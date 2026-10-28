@@ -37,9 +37,17 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const path = request.nextUrl.pathname;
-  const isAuthPage = path === "/login" || path === "/signup";
+  const isAuthPage =
+    path === "/login" || path === "/signup" || path === "/forgot-password";
   const isProtected =
     path.startsWith("/digest") || path.startsWith("/onboarding");
+
+  if (!user && path.startsWith("/auth/update-password")) {
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.pathname = "/forgot-password";
+    redirectUrl.search = "?error=expired";
+    return NextResponse.redirect(redirectUrl);
+  }
 
   if (!user && isProtected) {
     const redirectUrl = request.nextUrl.clone();

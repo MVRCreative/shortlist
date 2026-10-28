@@ -195,13 +195,32 @@
   --color-neutral-alpha-16: var(--color-gray-alpha-16);
   --color-neutral-alpha-10: var(--color-gray-alpha-10);
 
-  /* AlignUI Dynamic Primary Colors */
-  --color-primary-dark: var(--color-blue-800);
-  --color-primary-darker: var(--color-blue-700);
-  --color-primary-base: var(--color-blue-500);
-  --color-primary-alpha-24: var(--color-blue-alpha-24);
-  --color-primary-alpha-16: var(--color-blue-alpha-16);
-  --color-primary-alpha-10: var(--color-blue-alpha-10);
+  /* Proposal brand — deep blue action, sky mark */
+  --color-brand-paper: #f4f2ee;
+  --color-brand-ink: #0b1822;
+  --color-brand-secondary: #3e5c78;
+  --color-brand-action: #1d4f82;
+  --color-brand-action-hover: #163a61;
+  --color-brand-sky: #58a5f9;
+  --color-brand-sky-hover: color-mix(in srgb, #58a5f9 88%, #0b1822);
+  --color-brand-hairline: #e1e0dd;
+  --color-brand-action-alpha-24: #1d4f823d;
+  --color-brand-action-alpha-16: #1d4f8229;
+  --color-brand-action-alpha-10: #1d4f821a;
+  --color-brand-sky-wash: color-mix(in srgb, var(--color-brand-sky) 8%, transparent);
+  /* Filled primary button: sky fill, deep-blue label */
+  --color-on-primary: var(--color-brand-action);
+
+  /* AlignUI Dynamic Primary Colors → proposal action */
+  --color-primary-dark: var(--color-brand-action-hover);
+  --color-primary-darker: var(--color-brand-action-hover);
+  --color-primary-base: var(--color-brand-action);
+  --color-primary-alpha-24: var(--color-brand-action-alpha-24);
+  --color-primary-alpha-16: var(--color-brand-action-alpha-16);
+  --color-primary-alpha-10: var(--color-brand-action-alpha-10);
+  --color-sky: var(--color-brand-sky);
+  --color-sky-hover: var(--color-brand-sky-hover);
+  --color-on-primary: var(--color-brand-action);
 
   /* AlignUI Social Colors */
   --color-social-apple: #000;
@@ -217,37 +236,38 @@
   --color-overlay-slate: #2b303b3d;
   --color-overlay: var(--color-overlay-gray);
 
-  /* AlignUI Semantic Colors */
-  --color-static-black: var(--color-neutral-950);
-  --color-static-white: var(--color-neutral-0);
+  /* AlignUI Semantic Colors → proposal paper system
+     Page = paper; cards/surfaces = white so they lift off the page. */
+  --color-static-black: var(--color-brand-ink);
+  --color-static-white: #ffffff;
 
-  --color-bg-strong-950: var(--color-neutral-950);
+  --color-bg-strong-950: var(--color-brand-ink);
   --color-bg-surface-800: var(--color-neutral-800);
-  --color-bg-sub-300: var(--color-neutral-300);
-  --color-bg-soft-200: var(--color-neutral-200);
-  --color-bg-weak-50: var(--color-neutral-50);
-  --color-bg-white-0: var(--color-neutral-0);
+  --color-bg-sub-300: var(--color-brand-hairline);
+  --color-bg-soft-200: color-mix(in srgb, var(--color-brand-ink) 5%, #ffffff);
+  --color-bg-weak-50: var(--color-brand-paper);
+  --color-bg-white-0: #ffffff;
 
-  --color-text-strong-950: var(--color-neutral-950);
-  --color-text-sub-600: var(--color-neutral-600);
-  --color-text-soft-400: var(--color-neutral-400);
-  --color-text-disabled-300: var(--color-neutral-300);
-  --color-text-white-0: var(--color-neutral-0);
+  --color-text-strong-950: var(--color-brand-ink);
+  --color-text-sub-600: var(--color-brand-secondary);
+  --color-text-soft-400: color-mix(in srgb, var(--color-brand-ink) 48%, transparent);
+  --color-text-disabled-300: color-mix(in srgb, var(--color-brand-ink) 38%, transparent);
+  --color-text-white-0: #ffffff;
 
-  --color-stroke-strong-950: var(--color-neutral-950);
-  --color-stroke-sub-300: var(--color-neutral-300);
-  --color-stroke-soft-200: var(--color-neutral-200);
-  --color-stroke-white-0: var(--color-neutral-0);
+  --color-stroke-strong-950: var(--color-brand-ink);
+  --color-stroke-sub-300: var(--color-brand-hairline);
+  --color-stroke-soft-200: var(--color-brand-hairline);
+  --color-stroke-white-0: var(--color-brand-paper);
 
   --color-faded-dark: var(--color-neutral-800);
   --color-faded-base: var(--color-neutral-500);
   --color-faded-light: var(--color-neutral-200);
   --color-faded-lighter: var(--color-neutral-100);
 
-  --color-information-dark: var(--color-blue-950);
-  --color-information-base: var(--color-blue-500);
-  --color-information-light: var(--color-blue-200);
-  --color-information-lighter: var(--color-blue-50);
+  --color-information-dark: var(--color-brand-action-hover);
+  --color-information-base: var(--color-brand-action);
+  --color-information-light: color-mix(in srgb, var(--color-brand-sky) 35%, var(--color-brand-paper));
+  --color-information-lighter: color-mix(in srgb, var(--color-brand-sky) 12%, var(--color-brand-paper));
 
   --color-warning-dark: var(--color-orange-950);
   --color-warning-base: var(--color-orange-500);
@@ -274,10 +294,10 @@
   --color-feature-light: var(--color-purple-200);
   --color-feature-lighter: var(--color-purple-50);
 
-  --color-verified-dark: var(--color-sky-950);
-  --color-verified-base: var(--color-blue-500);
-  --color-verified-light: var(--color-sky-200);
-  --color-verified-lighter: var(--color-sky-50);
+  --color-verified-dark: var(--color-brand-action-hover);
+  --color-verified-base: var(--color-brand-action);
+  --color-verified-light: color-mix(in srgb, var(--color-brand-sky) 35%, var(--color-brand-paper));
+  --color-verified-lighter: color-mix(in srgb, var(--color-brand-sky) 12%, var(--color-brand-paper));
 
   --color-highlighted-dark: var(--color-pink-950);
   --color-highlighted-base: var(--color-pink-500);
@@ -474,6 +494,8 @@
 
   --radius-20: 1.25rem;
 
+  --radius-25: 1.5625rem;
+
   /* AlignUI Animation System - Dynamic from tokens.ts */
 
   --animate-accordion-down: accordion-down 0.2s ease-out;
@@ -609,35 +631,52 @@
   }
 } */
 
-/* Class-based Dark Mode Support */
+/* Class-based Dark Mode Support — proposal ink ground */
 .dark {
-  --color-bg-strong-950: var(--color-neutral-0);
-  --color-bg-surface-800: var(--color-neutral-200);
-  --color-bg-sub-300: var(--color-neutral-600);
-  --color-bg-soft-200: var(--color-neutral-700);
-  --color-bg-weak-50: var(--color-gray-700);
-  --color-bg-white-0: var(--color-neutral-950);
+  --color-brand-paper: #0b1822;
+  --color-brand-ink: #f4f2ee;
+  --color-brand-secondary: color-mix(in srgb, #f4f2ee 65%, #58a5f9);
+  --color-brand-hairline: color-mix(in srgb, #f4f2ee 12%, transparent);
+  --color-brand-sky-wash: color-mix(in srgb, #58a5f9 16%, transparent);
+  --color-primary-base: #58a5f9;
+  --color-primary-dark: #7bb8fa;
+  --color-primary-darker: #7bb8fa;
+  --color-primary-alpha-24: #58a5f93d;
+  --color-primary-alpha-16: #58a5f929;
+  --color-primary-alpha-10: #58a5f91a;
+  --color-sky: #58a5f9;
+  --color-sky-hover: color-mix(in srgb, #58a5f9 88%, #f4f2ee);
+  --color-on-primary: #1d4f82;
+  --color-static-white: #0b1822;
+  --color-static-black: #f4f2ee;
 
-  --color-text-strong-950: var(--color-neutral-0);
-  --color-text-sub-600: var(--color-neutral-400);
-  --color-text-soft-400: var(--color-neutral-500);
-  --color-text-disabled-300: var(--color-neutral-600);
-  --color-text-white-0: var(--color-neutral-950);
+  --color-bg-strong-950: #f4f2ee;
+  --color-bg-surface-800: color-mix(in srgb, #f4f2ee 12%, #0b1822);
+  --color-bg-sub-300: color-mix(in srgb, #f4f2ee 18%, #0b1822);
+  --color-bg-soft-200: color-mix(in srgb, #f4f2ee 10%, #0b1822);
+  --color-bg-weak-50: #0b1822;
+  --color-bg-white-0: color-mix(in srgb, #f4f2ee 6%, #0b1822);
 
-  --color-stroke-strong-950: var(--color-neutral-0);
-  --color-stroke-sub-300: var(--color-neutral-600);
-  --color-stroke-soft-200: var(--color-neutral-700);
-  --color-stroke-white-0: var(--color-neutral-950);
+  --color-text-strong-950: #f4f2ee;
+  --color-text-sub-600: color-mix(in srgb, #f4f2ee 72%, transparent);
+  --color-text-soft-400: color-mix(in srgb, #f4f2ee 55%, transparent);
+  --color-text-disabled-300: color-mix(in srgb, #f4f2ee 42%, transparent);
+  --color-text-white-0: #0b1822;
 
-  --color-faded-dark: var(--color-neutral-300);
-  --color-faded-base: var(--color-neutral-500);
-  --color-faded-light: var(--color-neutral-alpha-24);
-  --color-faded-lighter: var(--color-neutral-alpha-16);
+  --color-stroke-strong-950: #f4f2ee;
+  --color-stroke-sub-300: color-mix(in srgb, #f4f2ee 12%, transparent);
+  --color-stroke-soft-200: color-mix(in srgb, #f4f2ee 12%, transparent);
+  --color-stroke-white-0: #0b1822;
 
-  --color-information-dark: var(--color-blue-400);
-  --color-information-base: var(--color-blue-500);
-  --color-information-light: var(--color-blue-alpha-24);
-  --color-information-lighter: var(--color-blue-alpha-16);
+  --color-faded-dark: color-mix(in srgb, #f4f2ee 70%, transparent);
+  --color-faded-base: color-mix(in srgb, #f4f2ee 50%, transparent);
+  --color-faded-light: color-mix(in srgb, #f4f2ee 16%, transparent);
+  --color-faded-lighter: color-mix(in srgb, #f4f2ee 10%, transparent);
+
+  --color-information-dark: #7bb8fa;
+  --color-information-base: #58a5f9;
+  --color-information-light: color-mix(in srgb, #58a5f9 24%, transparent);
+  --color-information-lighter: color-mix(in srgb, #58a5f9 16%, transparent);
 
   --color-warning-dark: var(--color-orange-400);
   --color-warning-base: var(--color-orange-600);
@@ -664,10 +703,10 @@
   --color-feature-light: var(--color-purple-alpha-24);
   --color-feature-lighter: var(--color-purple-alpha-16);
 
-  --color-verified-dark: var(--color-sky-400);
-  --color-verified-base: var(--color-sky-600);
-  --color-verified-light: var(--color-blue-alpha-24);
-  --color-verified-lighter: var(--color-blue-alpha-16);
+  --color-verified-dark: #7bb8fa;
+  --color-verified-base: #58a5f9;
+  --color-verified-light: color-mix(in srgb, #58a5f9 24%, transparent);
+  --color-verified-lighter: color-mix(in srgb, #58a5f9 16%, transparent);
 
   --color-highlighted-dark: var(--color-pink-400);
   --color-highlighted-base: var(--color-pink-600);
@@ -814,7 +853,7 @@
 
 /* AlignUI Body Styles */
 body {
-  background: var(--color-bg-white-0);
+  background: var(--color-bg-weak-50);
   color: var(--color-text-strong-950);
   font-family: var(--font-sans), Inter, Arial, Helvetica, sans-serif;
   margin: 0;
@@ -870,7 +909,6 @@ body {
 @theme inline {
   --font-sans: var(--font-inter), Inter, ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Geist Mono", "Geist Mono Fallback", ui-monospace, monospace;
-  --font-display: var(--font-syne), "Syne", sans-serif;
 }
 
 @layer base {
@@ -922,6 +960,37 @@ body {
   .tabular {
     font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
+  }
+
+  /* Proposal document utilities */
+  .kicker {
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-primary-base);
+  }
+  .kicker-strong {
+    font-weight: 600;
+  }
+
+  .surface-group {
+    overflow: hidden;
+    border-radius: var(--radius-25);
+    border: 1px solid var(--color-stroke-soft-200);
+    background: var(--color-bg-white-0);
+    color: var(--color-text-strong-950);
+  }
+
+  .surface-selected {
+    background: var(--color-brand-sky-wash);
+  }
+  .surface-selected-top {
+    border-top: 2px solid var(--color-sky);
+  }
+  .surface-selected-leading {
+    border-left: 2px solid var(--color-sky);
   }
 
   .shimmer {

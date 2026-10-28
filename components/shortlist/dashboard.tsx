@@ -87,10 +87,10 @@ export function Dashboard({
         ) : (
           <>
             <header className="flex flex-col gap-3 border-b border-stroke-soft-200 pb-8">
-              <p className="text-paragraph-xs font-medium uppercase tracking-caps text-text-sub-600">
+              <p className="kicker">
                 {cadenceLabel} digest · {format(new Date(), 'MMM d')}
               </p>
-              <h1 className="text-title-h5 text-balance tracking-tight">
+              <h1 className="text-2xl font-normal text-balance tracking-tight text-text-strong-950">
                 {digest ? digest.theme : 'Writing your first digest'}
               </h1>
               <NextDigestCountdown
@@ -103,7 +103,7 @@ export function Dashboard({
             <section aria-labelledby="accounts-heading" className="flex flex-col gap-4">
               <div className="flex items-end justify-between gap-4">
                 <div className="flex flex-col gap-1">
-                  <h2 id="accounts-heading" className="text-label-sm">
+                  <h2 id="accounts-heading" className="kicker">
                     Accounts
                   </h2>
                   <p className="text-paragraph-xs text-text-sub-600">

@@ -62,6 +62,8 @@ Users should not need to understand prospecting databases, enrichment providers,
 
 ### Step 2: Receive a curated Shortlist
 
+**The first drop lands immediately after activation.** Users must see who to contact next before they leave onboarding. A multi-day empty state is a churn risk — never ship one as the default.
+
 Shortlist matches each user's ICP against curated account libraries (see Section 4), using company intelligence, lookalike matching, and buying signals.
 
 Potential signals include:
@@ -131,7 +133,7 @@ We are not building a complex machine-learning platform.
 
 ### Step 5: Repeat consistently
 
-Shortlist delivers a small, manageable set of new accounts on a recurring schedule according to the user's subscription:
+After the immediate first drop, Shortlist delivers a small, manageable set of new accounts on a recurring schedule according to the user's subscription:
 
 - Starter: monthly.
 - Pro and Growth: weekly.
@@ -155,7 +157,8 @@ Shortlist does not run fresh discovery for each user on each drop. That would be
 ### Sector requests
 
 - When a user's ICP requires a sector with no library, or too little inventory, Shortlist records a sector request and alerts the Revlo team.
-- The user is told their first drop will arrive within 2–3 days.
+- Still deliver a first drop immediately: use the best available matches (even if fewer than the plan target), say so plainly, and carry the shortfall forward. Do not make the user wait days with an empty product.
+- If inventory is so thin that zero quality accounts can ship, say that once — then expand the library on a 2–3 day ops SLA. That path is an exception, not the default signup experience.
 - New sectors start small (roughly 100–200 accounts) and grow with demand. Do not build large libraries speculatively.
 
 ### Account caps

@@ -1,6 +1,5 @@
 import { RiArrowLeftLine, RiArrowRightLine, RiCheckLine, RiCloseLine } from '@remixicon/react'
 import * as Button from '@/components/alignui/button'
-import * as StatusBadge from '@/components/alignui/status-badge'
 import { StepHeading } from '@/components/shortlist/step-heading'
 import { cn } from '@/lib/utils'
 import type { SampleAccount, Verdict } from '@/lib/shortlist/schemas'
@@ -118,10 +117,7 @@ export function MatchStep({
 
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between gap-3">
-          <StatusBadge.Root variant="stroke" status="completed" className="gap-1.5">
-            <StatusBadge.Dot />
-            Ocean
-          </StatusBadge.Root>
+          <p className="kicker">Ocean</p>
           <p className="text-paragraph-xs tabular-nums text-text-sub-600" aria-live="polite">
             {reviewed}/{accounts.length} rated · {fits} fit
           </p>
@@ -132,7 +128,7 @@ export function MatchStep({
           </p>
         ) : null}
 
-        <div className="overflow-hidden rounded-20 bg-bg-white-0 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200">
+        <div className="surface-group">
           <ul className="divide-y divide-stroke-soft-200">
             {accounts.map((account) => (
               <AccountRow

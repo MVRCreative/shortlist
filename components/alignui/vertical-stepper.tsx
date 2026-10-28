@@ -50,27 +50,27 @@ VerticalStepperArrow.displayName = VERTICAL_STEPPER_ARROW_NAME;
 const verticalStepperItemVariants = tv({
   slots: {
     root: [
-      // base
-      'grid w-full auto-cols-auto grid-flow-col grid-cols-[auto,minmax(0,1fr)] items-center gap-2.5 rounded-10 p-2 text-left text-paragraph-sm',
+      // base — items-start keeps number column flush with the title line
+      'grid w-full grid-cols-[1.25rem_minmax(0,1fr)] items-start gap-x-2.5 rounded-10 px-2 py-2 text-left text-paragraph-sm',
     ],
     indicator: [
       // base
-      'flex size-5 shrink-0 items-center justify-center rounded-full text-label-xs',
+      'mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full text-label-xs tabular-nums',
     ],
   },
   variants: {
     state: {
       completed: {
-        root: 'bg-bg-weak-50 text-text-sub-600',
-        indicator: 'bg-success-base text-static-white',
-      },
-      active: {
-        root: 'bg-bg-white-0 text-text-strong-950 shadow-regular-xs',
+        root: 'text-text-sub-600',
         indicator: 'bg-primary-base text-static-white',
       },
+      active: {
+        root: 'text-text-strong-950',
+        indicator: 'bg-bg-strong-950 text-static-white',
+      },
       default: {
-        root: 'bg-bg-weak-50 text-text-sub-600',
-        indicator: 'bg-bg-white-0 text-text-sub-600 shadow-regular-xs',
+        root: 'text-text-sub-600',
+        indicator: 'border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600',
       },
     },
   },

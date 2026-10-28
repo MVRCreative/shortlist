@@ -1,7 +1,9 @@
 'use client'
 
+import { useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { Dashboard } from '@/components/shortlist/dashboard'
+import { StepHeading } from '@/components/shortlist/step-heading'
 import { useShortlist } from '@/components/shortlist/shortlist-provider'
 import { Button } from '@/components/ui/button'
 import { ErrorState } from '@/components/ui/error-state'
@@ -28,33 +30,60 @@ export default function DigestPage() {
     handleGenerateDigest,
   } = useShortlist()
 
+  const requestedFirstDrop = useRef(false)
+
+  useEffect(() => {
+    if (!hydrated || digest || pending === 'digest' || requestedFirstDrop.current) return
+    requestedFirstDrop.current = true
+    handleGenerateDigest(0)
+  }, [hydrated, digest, pending, handleGenerateDigest])
+
   if (!hydrated) return <div className="min-h-dvh" aria-busy="true" />
 
-  if (authenticated && !digest) {
+  if (!digest) {
     return (
-      <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col justify-center gap-4 px-4">
-        <h1 className="font-[family-name:var(--font-syne)] text-2xl font-semibold">
-          Your Shortlist is being prepared
-        </h1>
-        <p className="text-paragraph-sm text-text-sub-600">
-          Signed in as {userEmail}. No delivered accounts yet. After Ocean delivery
-          runs for this account, refresh to see your digest.
-        </p>
-        <div className="flex gap-3">
-          <Button
-            type="button"
-            onClick={() => {
+      <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col justify-center gap-6 px-4">
+        <StepHeading
+          eyebrow="Shortlist"
+          title={pending === 'digest' ? 'Building your first Shortlist' : 'Your first Shortlist is ready to load'}
+          description={
+            pending === 'digest'
+              ? `Finding real lookalike accounts for ${userEmail ?? 'your profile'}. This can take up to a minute.`
+              : actionError
+                ? actionError
+                : 'Tap below to load your first drop from live company data.'
+          }
+        />
+        {actionError ? (
+          <ErrorState
+            title="Couldn’t build your Shortlist"
+            description={actionError}
+            onRetry={() => {
               clearActionError()
+              requestedFirstDrop.current = false
               handleGenerateDigest(0)
             }}
-            pending={pending === 'digest'}
-          >
-            Refresh
-          </Button>
-          <Button type="button" variant="outline" onClick={handleSignOut}>
-            Sign out
-          </Button>
-        </div>
+          />
+        ) : (
+          <div className="flex gap-3">
+            <Button
+              type="button"
+              onClick={() => {
+                clearActionError()
+                requestedFirstDrop.current = false
+                handleGenerateDigest(0)
+              }}
+              pending={pending === 'digest'}
+            >
+              {pending === 'digest' ? 'Building…' : 'Load Shortlist'}
+            </Button>
+            {authenticated ? (
+              <Button type="button" variant="outline" onClick={handleSignOut} disabled={pending === 'digest'}>
+                Sign out
+              </Button>
+            ) : null}
+          </div>
+        )}
       </div>
     )
   }

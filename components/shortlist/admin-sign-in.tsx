@@ -31,7 +31,7 @@ export function AdminSignIn({ error }: { error?: string }) {
       </div>
       <form
         action={signIn}
-        className="flex flex-col gap-4 rounded-20 border border-stroke-soft-200 bg-bg-white-0 p-4 shadow-[var(--elevation-card)] sm:p-5"
+        className="surface-group flex flex-col gap-4 p-4 sm:p-5"
       >
         <div className="flex flex-col gap-2">
           <Label htmlFor="email">Email</Label>

@@ -9,7 +9,7 @@ Full reference: `docs/design-principles.md` (from [emilkowalski/skills](https://
 
 ## Hard rules
 
-- Extend `@loople/tokens` / existing `components/ui` — do not fork motion, color, or toast systems.
+- Color and type live in `app/globals.css` semantic aliases (proposal paper / ink / deep blue / sky). `@loople/tokens` is motion-only — do not fork a second palette, toast, or button system.
 - Animate only when frequency + purpose pass the gate; never animate keyboard / 100+/day actions.
 - Prefer CSS transitions; animate `transform`/`opacity` only; never `scale(0)` or `ease-in` on UI; keep UI motion ≤300ms.
 - Gate hover with `(hover: hover) and (pointer: fine)`; honor `prefers-reduced-motion`.

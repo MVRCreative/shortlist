@@ -41,13 +41,13 @@ type ProfileCardProps = {
 
 export function ProfilePreview({ footer, ...card }: ProfileCardProps & { footer?: ReactNode }) {
   return (
-    <div className="flex flex-col gap-4 pt-6">
+    <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <p className="text-label-sm">Profile preview</p>
-        <p className="text-paragraph-xs">Updates as you go</p>
+        <p className="kicker">Profile preview</p>
+        <p className="text-paragraph-xs text-text-sub-600">Updates as you go</p>
       </div>
       <ProfileCard {...card} />
-      {footer ? <div className="sticky bottom-0 bg-bg-weak-50 pt-2 pb-6">{footer}</div> : <div className="pb-6" />}
+      {footer ? <div className="pt-2">{footer}</div> : null}
     </div>
   )
 }

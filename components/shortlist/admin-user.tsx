@@ -41,7 +41,7 @@ export function AdminUser({ user }: { user: AdminUserDetail }) {
         <h2 id="account-heading" className="text-label-md">
           Account
         </h2>
-        <dl className="grid gap-x-8 gap-y-4 rounded-20 border border-stroke-soft-200 bg-bg-white-0 px-4 py-4 shadow-[var(--elevation-card)] sm:grid-cols-2 sm:px-5">
+        <dl className="surface-group grid gap-x-8 gap-y-4 px-4 py-4 sm:grid-cols-2 sm:px-5">
           <Detail label="Email" value={user.email} />
           <Detail label="Joined" value={format(new Date(user.createdAt), "MMM d, yyyy")} />
           {user.businessName ? <Detail label="Business" value={user.businessName} /> : null}
@@ -118,7 +118,7 @@ export function AdminUser({ user }: { user: AdminUserDetail }) {
             {user.digests.map((digest) => (
               <li
                 key={digest.id}
-                className="rounded-20 border border-stroke-soft-200 bg-bg-white-0 px-4 py-4 shadow-[var(--elevation-card)] sm:px-5"
+                className="surface-group px-4 py-4 sm:px-5"
               >
                 <DigestBlock digest={digest} />
               </li>

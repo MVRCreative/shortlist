@@ -10,27 +10,36 @@ import { Label } from "@/components/ui/label";
 
 export default function SignupPage() {
   const [error, setError] = useState<string | null>(null);
+  const [pendingConfirmation, setPendingConfirmation] = useState(false);
   const [pending, startTransition] = useTransition();
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col justify-center gap-8 px-4 py-12">
       <div className="flex flex-col gap-2">
         <BrandMark />
-        <h1 className="font-[family-name:var(--font-syne)] text-2xl font-semibold tracking-tight">
+        <h1 className="text-2xl font-normal tracking-tight text-text-strong-950">
           Create your account
         </h1>
         <p className="text-paragraph-sm text-text-sub-600">
-          Sign up to receive a curated Shortlist of accounts to contact.
+          {pendingConfirmation
+            ? "Check your email and open the confirmation link to finish creating your account."
+            : "Sign up to receive a curated Shortlist of accounts to contact."}
         </p>
       </div>
 
+      {pendingConfirmation ? null : (
       <form
         className="flex flex-col gap-4"
         action={(formData) => {
           setError(null);
           startTransition(async () => {
             const result = await signUpAction(formData);
-            if (result && !result.ok) setError(result.error);
+            if (!result) return;
+            if (!result.ok) {
+              setError(result.error);
+              return;
+            }
+            if (result.pending === "confirm_email") setPendingConfirmation(true);
           });
         }}
       >
@@ -73,6 +82,7 @@ export default function SignupPage() {
           Create account
         </Button>
       </form>
+      )}
 
       <p className="text-paragraph-sm text-text-sub-600">
         Already have an account?{" "}

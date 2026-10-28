@@ -14,7 +14,7 @@ function toggleItem(list: string[], item: string) {
 }
 
 export function OptionalTag() {
-  return <span className="text-paragraph-xs font-normal">Optional</span>
+  return <span className="text-paragraph-xs font-normal text-text-soft-400">Optional</span>
 }
 
 function AddChipInput({
@@ -235,7 +235,7 @@ export function UrlListField({
           variant="ghost"
           tone="muted"
           size="xs"
-          className={cn('w-fit', showFavicons && 'ml-11')}
+          className="w-fit px-0"
           onClick={() => onChange([...values, ''])}
         >
           <Plus />

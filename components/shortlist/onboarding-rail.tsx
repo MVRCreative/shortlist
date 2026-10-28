@@ -41,30 +41,28 @@ export function OnboardingRail({
                 onClick={() => {
                   if (enabled) onSelect(item.step)
                 }}
-                className={cn(!enabled && state !== 'active' && 'cursor-default opacity-70')}
+                className={cn(!enabled && state !== 'active' && 'cursor-default')}
               >
                 <VerticalStepper.ItemIndicator>
                   {state === 'completed' ? null : index + 1}
                 </VerticalStepper.ItemIndicator>
                 <span className="flex min-w-0 flex-col gap-0.5">
-                  <span className="text-label-sm">
+                  <span
+                    className={cn(
+                      'text-label-sm',
+                      state === 'active' ? 'text-text-strong-950' : 'text-text-sub-600',
+                    )}
+                  >
                     {state === 'completed' ? <span className="sr-only">Completed: </span> : null}
                     {item.title}
                   </span>
-                  <span
-                    className={cn(
-                      'text-paragraph-xs',
-                      state === 'active' ? 'text-text-sub-600' : 'text-text-soft-400',
-                    )}
-                  >
-                    {item.description}
-                  </span>
+                  <span className="text-paragraph-xs text-text-sub-600">{item.description}</span>
                 </span>
               </VerticalStepper.Item>
             )
           })}
         </VerticalStepper.Root>
-        <p className="px-2 text-paragraph-xs text-text-soft-400">Setup takes about 3 minutes</p>
+        <p className="px-2 text-paragraph-xs text-text-sub-600">Setup takes about 3 minutes</p>
       </nav>
       <div className="flex">
         <ThemeToggle />

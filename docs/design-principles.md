@@ -1,6 +1,6 @@
 # Shortlist Design Principles
 
-Guiding design infrastructure for Shortlist. Distilled from [Emil Kowalski’s skills](https://github.com/emilkowalski/skills) (Vercel / Linear craft sensibility) and adapted to this repo’s stack: Next.js App Router, Tailwind v4, Radix / shadcn, `@loople/tokens`, and Sonner.
+Guiding design infrastructure for Shortlist. Distilled from [Emil Kowalski’s skills](https://github.com/emilkowalski/skills) (Vercel / Linear craft sensibility) and adapted to this repo’s stack: Next.js App Router, Tailwind v4, Radix / shadcn, proposal brand tokens in `app/globals.css`, and Sonner.
 
 **Upstream source:** [emilkowalski/skills](https://github.com/emilkowalski/skills) · [skills.sh](https://skills.sh/emilkowalski/skills)  
 **When in doubt:** prefer taste, restraint, and invisible correctness over novelty.
@@ -25,7 +25,9 @@ People choose tools on overall experience, not feature checklists. Good defaults
 
 ### Personality of Shortlist
 
-Shortlist is a **professional pipeline tool** for creative studios: crisp, trustworthy, calm. Motion should feel **fast and decisive**, not playful or bouncy. Reserve delight for rare moments (first digest success, onboarding completion) — never for daily chrome.
+Shortlist is a **document for studio owners**: warm paper, one Inter voice, sky used as a mark, hairline groups instead of shadowed cards. Calm and trustworthy. Motion should feel **fast and decisive**, not playful or bouncy. Reserve delight for rare moments (first digest success, onboarding completion) — never for daily chrome.
+
+**Brand palette (proposal):** paper `#f4f2ee`, ink `#0b1822`, action `#1d4f82`, sky `#58a5f9` (rules and 8% washes only), hairline `#e1e0dd`, readable secondary `#3e5c78`. Sky is never a filled button.
 
 ---
 
@@ -33,14 +35,15 @@ Shortlist is a **professional pipeline tool** for creative studios: crisp, trust
 
 | Concern | Source of truth |
 | --- | --- |
-| Color, type, radius, shadow, control density | **AlignUI only** — `app/globals.css` `@theme` |
-| Controls | `components/alignui/*` (Button, Input patterns, Badge, Stepper, StatusBadge) |
-| Feature screens | `components/shortlist/*` styled with AlignUI utilities (`text-label-sm`, `text-paragraph-xs`, `bg-bg-white-0`, `ring-stroke-soft-200`, …) |
-| Toasts | Sonner, colored with AlignUI semantic tokens |
+| Color, type, radius, surface utilities | **`app/globals.css`** semantic aliases (proposal palette) + `.kicker` / `.surface-group` / `.surface-selected` |
+| Controls | `components/alignui/*` and `components/ui/*` — keep components; do not keep AlignUI’s default electric blue / cool gray |
+| Feature screens | `components/shortlist/*` |
+| Motion tokens | `@loople/tokens` duration / easing / press only — not a second color palette |
+| Toasts | Sonner, colored with semantic status tokens |
 
 **Rules**
 
-- Do not introduce a second palette, type scale, or button. No `@loople/tokens` in product UI.
+- Do not introduce a second palette, type scale, or button. Do not put product colors in `@loople/tokens`.
 - Emil principles still gate motion (§3): frequency, purpose, `transform`/`opacity`, ≤300ms, `fine-hover`, reduced-motion.
 
 ---
@@ -190,7 +193,7 @@ Opacity and height must feel cohesive — tune by feel; review next day and in s
 
 ### Cohesion
 
-Easing, duration, naming, and visual design must share one personality. Shortlist = crisp professional dashboard, not playful marketing chrome.
+Easing, duration, naming, and visual design must share one personality. Shortlist = warm paper document for studios, not a cool-gray admin kit or a dark marketing poster.
 
 ---
 
@@ -382,3 +385,4 @@ Install locally if useful: `npx skills@latest add emilkowalski/skills`
 | --- | --- |
 | 2026-10-24 | Initial principles doc from [emilkowalski/skills](https://github.com/emilkowalski/skills), mapped to Shortlist / Loople tokens. |
 | 2026-10-24 | Restructure: URL routes, `components/shortlist`, slim UI kit, owned Toaster, viewport zoom fix. |
+| 2026-10-26 | Proposal brand: paper / ink / deep blue / sky in `globals.css`; Loople motion-only; document personality. |

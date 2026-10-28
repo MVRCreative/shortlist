@@ -594,23 +594,26 @@ export function ProfileStep({
       </form>
 
       {showEnrichAction ? (
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-4 border-t border-stroke-soft-200 pt-5">
           {!ready ? (
-            <p className="text-paragraph-xs text-pretty sm:text-right" aria-live="polite">
+            <p className="text-paragraph-xs text-pretty text-text-sub-600" aria-live="polite">
               Still needed: {missing.join(', ')}.
             </p>
           ) : null}
-          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <Button type="button" variant="ghost" tone="muted" onClick={fillSample} disabled={busy}>
-              <WandSparkles />
-              Fill with a sample
-            </Button>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end sm:gap-4">
+            {process.env.NODE_ENV === 'development' ? (
+              <Button type="button" variant="ghost" tone="muted" onClick={fillSample} disabled={busy}>
+                <WandSparkles />
+                Fill with a sample
+              </Button>
+            ) : null}
             <Button
               type="submit"
               form="profile-form"
               size="lg"
               pending={pendingEnrich}
               disabled={pendingMatch || !ready}
+              className="w-full sm:w-auto"
             >
               {pendingEnrich ? null : <Sparkles />}
               {pendingEnrich ? 'Building profile' : enriched ? 'Update profile' : 'Build my profile'}

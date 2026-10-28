@@ -19,7 +19,7 @@ export const buttonVariants = tv({
       // focus
       "focus:outline-none",
       // disabled
-      "disabled:pointer-events-none disabled:bg-bg-weak-50 disabled:text-text-disabled-300 disabled:ring-transparent",
+      "disabled:pointer-events-none disabled:bg-bg-soft-200 disabled:text-text-disabled-300 disabled:ring-transparent",
     ],
     icon: [
       // base
@@ -70,10 +70,10 @@ export const buttonVariants = tv({
       mode: "filled",
       class: {
         root: [
-          // base
-          "bg-primary-base text-static-white",
+          // base — sky fill, deep-blue label
+          "bg-sky text-on-primary",
           // hover
-          "hover:bg-primary-darker",
+          "hover:bg-sky-hover",
           // focus
           "focus-visible:shadow-button-primary-focus",
         ],

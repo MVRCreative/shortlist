@@ -27,15 +27,11 @@ function DropRow({
   index: number
 }) {
   return (
-    <li className="landing-rolodex-card flex items-baseline justify-between gap-4 border-b border-stroke-soft-200/40 py-4">
+    <li className="landing-rolodex-card flex items-baseline justify-between gap-4 border-b border-stroke-soft-200 py-4">
       <div className="min-w-0">
         <p className="flex items-baseline gap-3">
-          <span className="font-mono text-paragraph-xs tabular-nums text-text-sub-600">
-            {String((index % DROP.length) + 1).padStart(2, '0')}
-          </span>
-          <span className="truncate font-display text-xl font-medium tracking-tight md:text-2xl">
-            {company}
-          </span>
+          <span className="kicker tabular-nums">{String((index % DROP.length) + 1).padStart(2, '0')}</span>
+          <span className="truncate text-xl font-normal tracking-tight md:text-2xl">{company}</span>
         </p>
         <p className="truncate pl-9 text-paragraph-xs text-text-sub-600">{title}</p>
       </div>
@@ -55,7 +51,7 @@ export function LandingRolodex({ className }: { className?: string }) {
 
   return (
     <div className={cn('landing-rolodex relative', className)} aria-hidden="true">
-      <p className="mb-4 text-paragraph-xs uppercase tracking-caps text-text-sub-600">This week</p>
+      <p className="kicker mb-4">This week</p>
       <div className="landing-rolodex-window relative h-[min(62vh,28rem)] overflow-hidden md:h-[min(70vh,34rem)]">
         <ul className="landing-rolodex-track flex flex-col will-change-transform">
           {loop.map((row, i) => (

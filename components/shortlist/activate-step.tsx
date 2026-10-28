@@ -9,7 +9,7 @@ import { Separator } from '@/components/ui/separator'
 import { DeliveryEmail } from '@/components/shortlist/delivery-email'
 import { DigestPreview } from '@/components/shortlist/digest-preview'
 import { PlanSelector } from '@/components/shortlist/plan-selector'
-import { PlanSummaryBar } from '@/components/shortlist/plan-summary'
+import { PlanSummaryBar, PlanSummaryPanel } from '@/components/shortlist/plan-summary'
 import { StepHeading } from '@/components/shortlist/step-heading'
 import { deliveryFor, deliveryLine } from '@/lib/shortlist/pricing'
 import type { DigestSettings } from '@/lib/shortlist/schemas'
@@ -17,7 +17,7 @@ import type { DigestSettings } from '@/lib/shortlist/schemas'
 function MobileProfile({ name, children }: { name: string; children: ReactNode }) {
   return (
     <Collapsible className="lg:hidden">
-      <CollapsibleTrigger className="group flex w-full items-center justify-between gap-3 rounded-20 bg-bg-white-0 px-4 py-3 text-left shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200 transition duration-200 ease-out fine-hover:bg-bg-weak-50 focus-visible:shadow-button-important-focus">
+      <CollapsibleTrigger className="group flex w-full items-center justify-between gap-3 surface-group px-4 py-3 text-left transition duration-200 ease-out fine-hover:bg-bg-soft-200/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-base">
         <span className="flex min-w-0 flex-col gap-0.5">
           <span className="text-label-sm">Your profile</span>
           <span className="truncate text-paragraph-xs">{name}</span>
@@ -58,7 +58,7 @@ export function ActivateStep({
       <StepHeading
         eyebrow="Almost there"
         title="Turn on Shortlist"
-        description={`Tuned on ${fitCount} account${fitCount === 1 ? '' : 's'} you marked as a fit. Pick a plan and see what lands in your inbox.`}
+        description={`Tuned on ${fitCount} account${fitCount === 1 ? '' : 's'} you marked as a fit. Pick a plan — your first Shortlist loads right away.`}
       />
 
       <MobileProfile name={profileName}>{profile}</MobileProfile>
@@ -66,7 +66,7 @@ export function ActivateStep({
       <Card>
         <CardContent className="flex flex-col gap-6">
           <section className="flex flex-col gap-3">
-            <h2 id="plan-label" className="text-label-sm">
+            <h2 id="plan-label" className="kicker">
               Plan
             </h2>
             <PlanSelector
@@ -93,6 +93,10 @@ export function ActivateStep({
           <ArrowLeft />
           Back to accounts
         </Button>
+      </div>
+
+      <div className="hidden lg:block">
+        <PlanSummaryPanel settings={settings} pending={pending} onActivate={onActivate} />
       </div>
 
       <PlanSummaryBar settings={settings} pending={pending} onActivate={onActivate} />
