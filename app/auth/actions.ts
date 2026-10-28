@@ -1,6 +1,5 @@
 "use server";
 
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { getServerEnv } from "@/lib/env";
@@ -15,157 +14,51 @@ import { normalizeDomain } from "@/lib/shortlist/url";
 import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 
 export type AuthResult =
-  | { ok: true; pending?: "confirm_email" | "reset_email" }
+  | { ok: true; pending?: "code" }
   | { ok: false; error: string };
 
-async function requestOrigin(): Promise<string> {
-  const headerList = await headers();
-  const host = headerList.get("x-forwarded-host") ?? headerList.get("host");
-  if (!host) {
-    throw new Error("Could not determine the app URL.");
-  }
-  const forwarded = headerList.get("x-forwarded-proto");
-  const proto =
-    forwarded ??
-    (host.startsWith("localhost") || host.startsWith("127.0.0.1")
-      ? "http"
-      : "https");
-  return `${proto}://${host}`;
-}
-
-export async function signUpAction(formData: FormData): Promise<AuthResult> {
-  const email = String(formData.get("email") ?? "")
+function readEmail(formData: FormData): string {
+  return String(formData.get("email") ?? "")
     .trim()
     .toLowerCase();
-  const password = String(formData.get("password") ?? "");
-  const fullName = String(formData.get("fullName") ?? "").trim();
-
-  if (!email.includes("@") || password.length < 8) {
-    return {
-      ok: false,
-      error: "Use a valid email and a password of at least 8 characters.",
-    };
-  }
-
-  let origin: string;
-  try {
-    origin = await requestOrigin();
-  } catch (err) {
-    return {
-      ok: false,
-      error: err instanceof Error ? err.message : "Could not create account.",
-    };
-  }
-
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: { full_name: fullName || undefined },
-      emailRedirectTo: `${origin}/auth/confirm?next=/digest`,
-    },
-  });
-
-  if (error) {
-    return { ok: false, error: error.message };
-  }
-  if (!data.user) {
-    return { ok: false, error: "Could not create account." };
-  }
-
-  // Hosted Supabase sends the confirm-signup email when confirmations are on.
-  // The account is created after the user opens that link.
-  if (!data.session) {
-    return { ok: true, pending: "confirm_email" };
-  }
-
-  try {
-    await ensureMemberAccount(await createClient(), data.user);
-  } catch (err) {
-    return {
-      ok: false,
-      error: err instanceof Error ? err.message : "Account setup failed.",
-    };
-  }
-
-  redirect("/digest");
 }
 
-export async function requestPasswordResetAction(
+export async function sendLoginCodeAction(
   formData: FormData,
 ): Promise<AuthResult> {
-  const email = String(formData.get("email") ?? "")
-    .trim()
-    .toLowerCase();
-
+  const email = readEmail(formData);
   if (!email.includes("@")) {
-    return { ok: false, error: "Enter the email on your account." };
-  }
-
-  let origin: string;
-  try {
-    origin = await requestOrigin();
-  } catch (err) {
-    return {
-      ok: false,
-      error: err instanceof Error ? err.message : "Could not send reset email.",
-    };
+    return { ok: false, error: "Enter a valid email." };
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${origin}/auth/confirm?next=/auth/update-password`,
+  const { error } = await supabase.auth.signInWithOtp({
+    email,
+    options: { shouldCreateUser: true },
   });
 
   if (error) {
     return { ok: false, error: error.message };
   }
 
-  return { ok: true, pending: "reset_email" };
+  return { ok: true, pending: "code" };
 }
 
-export async function updatePasswordAction(
+export async function verifyLoginCodeAction(
   formData: FormData,
 ): Promise<AuthResult> {
-  const password = String(formData.get("password") ?? "");
-  if (password.length < 8) {
-    return { ok: false, error: "Use a password of at least 8 characters." };
+  const email = readEmail(formData);
+  const token = String(formData.get("token") ?? "").replace(/\s/g, "");
+
+  if (!email.includes("@") || !/^\d{6}$/.test(token)) {
+    return { ok: false, error: "Enter the 6-digit code from your email." };
   }
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    return {
-      ok: false,
-      error: "This reset link has expired. Request a new one.",
-    };
-  }
-
-  const { error } = await supabase.auth.updateUser({ password });
-  if (error) {
-    return { ok: false, error: error.message };
-  }
-
-  redirect("/digest");
-}
-
-export async function signInAction(formData: FormData): Promise<AuthResult> {
-  const email = String(formData.get("email") ?? "")
-    .trim()
-    .toLowerCase();
-  const password = String(formData.get("password") ?? "");
-
-  if (!email || !password) {
-    return { ok: false, error: "Email and password are required." };
-  }
-
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.signInWithPassword({
+  const { data, error } = await supabase.auth.verifyOtp({
     email,
-    password,
+    token,
+    type: "email",
   });
 
   if (error) {
@@ -193,7 +86,11 @@ export async function signInAction(formData: FormData): Promise<AuthResult> {
   }
 
   const next = String(formData.get("next") ?? "/digest");
-  redirect(next.startsWith("/") ? next : "/digest");
+  const safeNext =
+    next.startsWith("/") && !next.startsWith("//") && !next.startsWith("/\\")
+      ? next
+      : "/digest";
+  redirect(safeNext);
 }
 
 export async function signOutAction(): Promise<void> {

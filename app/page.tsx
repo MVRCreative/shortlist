@@ -38,20 +38,12 @@ export default function HomePage() {
             Open Shortlist
           </Link>
         ) : (
-          <span className="flex items-center gap-3">
-            <Link
-              href="/login"
-              className="text-paragraph-xs text-text-sub-600 fine-hover:text-text-strong-950"
-            >
-              Sign in
-            </Link>
-            <Link
-              href="/signup"
-              className="text-paragraph-xs text-text-strong-950 fine-hover:underline"
-            >
-              Create account
-            </Link>
-          </span>
+          <Link
+            href="/login"
+            className="text-paragraph-xs text-text-strong-950 fine-hover:underline"
+          >
+            Sign in
+          </Link>
         )
       }
     />

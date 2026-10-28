@@ -1,9 +1,11 @@
 "use client";
 
 import { Suspense, useState, useTransition } from "react";
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { signInAction } from "@/app/auth/actions";
+import {
+  sendLoginCodeAction,
+  verifyLoginCodeAction,
+} from "@/app/auth/actions";
 import { BrandMark } from "@/components/shortlist/brand-mark";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,10 +14,10 @@ import { Label } from "@/components/ui/label";
 function LoginForm() {
   const searchParams = useSearchParams();
   const next = searchParams.get("next") ?? "/digest";
-  const linkError = searchParams.get("error") === "link";
-  const [error, setError] = useState<string | null>(
-    linkError ? "That link is invalid or has expired. Request a new one." : null,
-  );
+  const [email, setEmail] = useState("");
+  const [step, setStep] = useState<"email" | "code">("email");
+  const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
   return (
@@ -26,67 +28,131 @@ function LoginForm() {
           Sign in
         </h1>
         <p className="text-paragraph-sm text-text-sub-600">
-          Access your Shortlist digest and account history.
+          {step === "code"
+            ? `Enter the 6-digit code we sent to ${email}.`
+            : "We’ll email you a code. New here? This creates your account."}
         </p>
       </div>
 
-      <form
-        className="flex flex-col gap-4"
-        action={(formData) => {
-          setError(null);
-          startTransition(async () => {
-            const result = await signInAction(formData);
-            if (result && !result.ok) setError(result.error);
-          });
-        }}
-      >
-        <input type="hidden" name="next" value={next} />
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            name="email"
-            type="email"
-            autoComplete="email"
-            required
-          />
-        </div>
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="password">Password</Label>
-          <Input
-            id="password"
-            name="password"
-            type="password"
-            autoComplete="current-password"
-            required
-            minLength={8}
-          />
-        </div>
-        {error ? (
-          <p className="text-paragraph-sm text-error-base" role="alert">
-            {error}
-          </p>
-        ) : null}
-        <Button type="submit" size="lg" pending={pending}>
-          Sign in
-        </Button>
-        <Link
-          href="/forgot-password"
-          className="text-paragraph-sm text-text-sub-600 underline-offset-4 hover:underline"
+      {step === "email" ? (
+        <form
+          className="flex flex-col gap-4"
+          action={(formData) => {
+            setError(null);
+            setNotice(null);
+            startTransition(async () => {
+              const result = await sendLoginCodeAction(formData);
+              if (!result.ok) {
+                setError(result.error);
+                return;
+              }
+              setEmail(
+                String(formData.get("email") ?? "")
+                  .trim()
+                  .toLowerCase(),
+              );
+              setStep("code");
+            });
+          }}
         >
-          Forgot password
-        </Link>
-      </form>
-
-      <p className="text-paragraph-sm text-text-sub-600">
-        No account yet?{" "}
-        <Link
-          href="/signup"
-          className="text-text-strong-950 underline-offset-4 hover:underline"
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              required
+              defaultValue={email}
+            />
+          </div>
+          {error ? (
+            <p className="text-paragraph-sm text-error-base" role="alert">
+              {error}
+            </p>
+          ) : null}
+          <Button type="submit" size="lg" pending={pending}>
+            Email me a code
+          </Button>
+        </form>
+      ) : (
+        <form
+          className="flex flex-col gap-4"
+          action={(formData) => {
+            setError(null);
+            setNotice(null);
+            startTransition(async () => {
+              const result = await verifyLoginCodeAction(formData);
+              if (result && !result.ok) setError(result.error);
+            });
+          }}
         >
-          Create one
-        </Link>
-      </p>
+          <input type="hidden" name="email" value={email} />
+          <input type="hidden" name="next" value={next} />
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="token">Code</Label>
+            <Input
+              id="token"
+              name="token"
+              type="text"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              pattern="[0-9]{6}"
+              maxLength={6}
+              required
+              autoFocus
+              className="text-center text-base tracking-widest"
+            />
+          </div>
+          {error ? (
+            <p className="text-paragraph-sm text-error-base" role="alert">
+              {error}
+            </p>
+          ) : null}
+          {notice ? (
+            <p className="text-paragraph-sm text-text-sub-600" role="status">
+              {notice}
+            </p>
+          ) : null}
+          <Button type="submit" size="lg" pending={pending}>
+            Sign in
+          </Button>
+          <div className="flex items-center justify-between gap-4">
+            <button
+              type="button"
+              className="text-paragraph-sm text-text-sub-600 underline-offset-4 hover:underline"
+              onClick={() => {
+                setStep("email");
+                setError(null);
+                setNotice(null);
+              }}
+            >
+              Use a different email
+            </button>
+            <button
+              type="button"
+              className="text-paragraph-sm text-text-sub-600 underline-offset-4 hover:underline"
+              disabled={pending}
+              onClick={() => {
+                setError(null);
+                setNotice(null);
+                const formData = new FormData();
+                formData.set("email", email);
+                startTransition(async () => {
+                  const result = await sendLoginCodeAction(formData);
+                  if (!result.ok) {
+                    setError(result.error);
+                    return;
+                  }
+                  setNotice("Sent a new code.");
+                });
+              }}
+            >
+              Resend code
+            </button>
+          </div>
+        </form>
+      )}
     </>
   );
 }

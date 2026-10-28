@@ -223,6 +223,12 @@ otp_expiry = 3600
 # admin_email = "admin@email.com"
 # sender_name = "Admin"
 
+# Magic Link template is the email OTP. Include {{ .Token }} and omit
+# {{ .ConfirmationURL }} so Supabase sends a code instead of a link.
+[auth.email.template.magic_link]
+subject = "Your Shortlist sign-in code"
+content_path = "./supabase/templates/magic_link.html"
+
 # Uncomment to customize email template
 # [auth.email.template.invite]
 # subject = "You have been invited"
