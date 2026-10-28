@@ -6,7 +6,7 @@ import { Separator } from '@/components/ui/separator'
 import type { EnrichedProfile, ProfileInput } from '@/lib/shortlist/schemas'
 import { describeSizeRange } from '@/lib/shortlist/profile-options'
 import { TONES, toneFor } from '@/lib/shortlist/tones'
-import { faviconUrl, normalizeDomain, studioName } from '@/lib/shortlist/url'
+import { normalizeDomain, studioName } from '@/lib/shortlist/url'
 
 function Placeholder({ className }: { className: string }) {
   return <span aria-hidden="true" className={`block rounded-full bg-bg-weak-50 ${className}`} />
@@ -91,8 +91,9 @@ export function ProfileCard({ input, enriched, fitCount, missCount }: ProfileCar
                   <ul className="flex flex-wrap gap-1.5">
                     {input.seedClients.map((client) => (
                       <li key={client} className="flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-paragraph-xs">
-                        {/* eslint-disable-next-line @next/next/no-img-element -- remote favicon */}
-                        <img src={faviconUrl(client)} alt="" width={12} height={12} className="size-3 rounded-sm" />
+                        <span className="text-paragraph-xs text-text-soft-400" aria-hidden="true">
+                          {client.slice(0, 1).toUpperCase()}
+                        </span>
                         {client}
                       </li>
                     ))}

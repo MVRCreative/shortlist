@@ -19,8 +19,6 @@ import {
   type SampleAccount,
 } from '@/lib/shortlist/schemas'
 
-const MODEL = 'google/gemini-3.5-flash'
-
 export type DataSource = 'ai' | 'demo' | 'ocean'
 type Result<T> = { ok: true; data: T; source: DataSource } | { ok: false; error: string }
 
@@ -116,7 +114,7 @@ export async function generateDigest(raw: z.infer<typeof digestRequestSchema>): 
 
   try {
     const { output } = await generateText({
-      model: MODEL,
+      model: profileModel(),
       output: Output.object({ schema: digestSchema }),
       system: [
         'You write a weekly pipeline digest for a founder or sales leader.',
@@ -139,7 +137,10 @@ export async function generateDigest(raw: z.infer<typeof digestRequestSchema>): 
     // Guest preview only — never invent a member-facing drop.
     return {
       ok: false,
-      error: "Couldn't build a preview digest. Check your connection and try again.",
+      error: aiErrorMessage(
+        error,
+        "Couldn't build a preview digest. Check your connection and try again.",
+      ),
     }
   }
 }

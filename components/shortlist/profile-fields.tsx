@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { FieldDescription, FieldError, FieldLegend, FieldSet } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { ChoiceChip } from '@/components/shortlist/choice-chip'
-import { faviconUrl, normalizeDomain, normalizeUrl } from '@/lib/shortlist/url'
+import { normalizeDomain, normalizeUrl } from '@/lib/shortlist/url'
 import { cn } from '@/lib/utils'
 
 function toggleItem(list: string[], item: string) {
@@ -184,8 +184,9 @@ export function UrlListField({
                     aria-hidden="true"
                   >
                     {domain ? (
-                      // eslint-disable-next-line @next/next/no-img-element -- remote favicon, no optimization needed
-                      <img src={faviconUrl(domain)} alt="" width={16} height={16} className="size-4 rounded-sm" />
+                      <span className="text-paragraph-xs text-text-sub-600">
+                        {domain.slice(0, 1).toUpperCase()}
+                      </span>
                     ) : (
                       <Globe className="size-4 text-text-sub-600" />
                     )}

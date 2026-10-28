@@ -28,10 +28,6 @@ export function normalizeUrl(raw: string) {
   return `${host}${rest}`
 }
 
-export function faviconUrl(domain: string) {
-  return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=64`
-}
-
 const PLACEHOLDER_NAMES = new Set([
   'website',
   'yourwebsite',
