@@ -272,7 +272,9 @@ export function ShortlistProvider({ children }: { children: ReactNode }) {
   function run(kind: Exclude<Pending, null>, task: () => Promise<void>) {
     setPending(kind)
     setActionError(null)
-    startTransition(async () => {
+    // Not a transition: router.push inside a long async transition is held until the
+    // whole action resolves, which froze the page with no loading state.
+    void (async () => {
       try {
         await task()
       } catch (error) {
@@ -283,7 +285,7 @@ export function ShortlistProvider({ children }: { children: ReactNode }) {
       } finally {
         setPending(null)
       }
-    })
+    })()
   }
 
   function handleEnrich(profile: ProfileInput) {

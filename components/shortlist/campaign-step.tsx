@@ -31,6 +31,8 @@ export function CampaignStep({
   const [objective, setObjective] = useState(initial?.objective ?? '')
   const [supportingUrl, setSupportingUrl] = useState(initial?.supportingUrl ?? '')
 
+  const [action, setAction] = useState<'skip' | 'save' | null>(null)
+
   const ready = title.trim().length > 0 && objective.trim().length > 0
 
   return (
@@ -84,21 +86,32 @@ export function CampaignStep({
           <ArrowLeft className="size-4" aria-hidden="true" />
           Back
         </Button>
-        <Button type="button" variant="ghost" onClick={onSkip} disabled={pending}>
-          Skip for now
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={() => {
+            setAction('skip')
+            onSkip()
+          }}
+          disabled={pending && action !== 'skip'}
+          pending={pending && action === 'skip'}
+        >
+          {pending && action === 'skip' ? 'Building your Shortlist…' : 'Skip for now'}
         </Button>
         <Button
           type="button"
-          disabled={!ready || pending}
-          onClick={() =>
+          disabled={!ready || (pending && action !== 'save')}
+          pending={pending && action === 'save'}
+          onClick={() => {
+            setAction('save')
             onContinue({
               title: title.trim(),
               objective: objective.trim(),
               supportingUrl: supportingUrl.trim(),
             })
-          }
+          }}
         >
-          {pending ? 'Saving…' : 'Save campaign'}
+          {pending && action === 'save' ? 'Saving…' : 'Save campaign'}
           <ArrowRight className="size-4" aria-hidden="true" />
         </Button>
       </div>

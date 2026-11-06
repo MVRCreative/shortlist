@@ -1,3 +1,5 @@
+import Link from 'next/link'
+import { ArrowUpRight } from 'lucide-react'
 import * as VerticalStepper from '@/components/alignui/vertical-stepper'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { BrandMark } from '@/components/shortlist/brand-mark'
@@ -66,7 +68,14 @@ export function OnboardingRail({
         </VerticalStepper.Root>
         <p className="px-2 text-paragraph-xs text-text-soft-400">About 3 minutes</p>
       </nav>
-      <div className="flex">
+      <div className="flex flex-col items-start gap-4">
+        <Link
+          href="/profile"
+          className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-label-sm text-text-sub-600 transition-colors focus-ring fine-hover:hover:text-text-strong-950"
+        >
+          Exit setup
+          <ArrowUpRight className="size-3.5" aria-hidden="true" />
+        </Link>
         <ThemeToggle />
       </div>
     </div>

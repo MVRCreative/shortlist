@@ -4,6 +4,8 @@ import { STEPS, type Step } from '@/lib/shortlist/steps'
 
 const ONBOARDING = STEPS.filter((s) => s !== 'Digest')
 
+import Link from 'next/link'
+
 export function AppHeader({ step, isDemo }: { step: Step; isDemo: boolean }) {
   const index = ONBOARDING.indexOf(step as (typeof ONBOARDING)[number])
   const n = String(Math.max(index, 0) + 1).padStart(2, '0')
@@ -20,6 +22,14 @@ export function AppHeader({ step, isDemo }: { step: Step; isDemo: boolean }) {
         ) : (
           <span className="kicker">Live</span>
         )}
+        {step !== 'Digest' ? (
+          <Link
+            href="/profile"
+            className="rounded-md px-1.5 py-1 text-label-sm text-text-sub-600 focus-ring fine-hover:hover:text-text-strong-950"
+          >
+            Exit
+          </Link>
+        ) : null}
         <ThemeToggle />
       </div>
     </header>
