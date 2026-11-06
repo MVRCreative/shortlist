@@ -75,7 +75,7 @@ export function DeliveryEmail({ email, onChange }: { email: string; onChange: (e
           setDraft(email)
           setEditing(true)
         }}
-        className="rounded-sm text-primary-base underline-offset-4 fine-hover:underline focus-ring"
+        className="rounded-sm text-primary-base underline-offset-4 fine-hover:hover:underline focus-ring"
       >
         Change
       </button>

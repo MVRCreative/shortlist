@@ -16,12 +16,10 @@ export default function HomePage() {
     setSession(loadSession())
   }, [hydrated])
 
-  if (!hydrated) {
-    return <div className="min-h-dvh bg-bg-weak-50" aria-busy="true" />
-  }
-
   const devPreview = process.env.NODE_ENV === 'development'
-  const continueHref = authenticated
+  const continueHref = !hydrated
+    ? undefined
+    : authenticated
     ? '/digest'
     : session
       ? pathForStep(session.step)
@@ -31,24 +29,24 @@ export default function HomePage() {
     <Landing
       continueHref={continueHref}
       continueSlot={
-        authenticated || digest ? (
+        !hydrated ? undefined : authenticated || digest ? (
           <Link
             href="/digest"
-            className="text-paragraph-xs text-text-sub-600 fine-hover:text-text-strong-950"
+            className="text-paragraph-xs text-text-sub-600 transition-colors duration-150 fine-hover:hover:text-text-strong-950"
           >
             Open Shortlist
           </Link>
         ) : devPreview ? (
           <Link
             href="/onboarding/profile"
-            className="text-paragraph-xs text-text-sub-600 fine-hover:text-text-strong-950"
+            className="text-paragraph-xs text-text-sub-600 transition-colors duration-150 fine-hover:hover:text-text-strong-950"
           >
             Open Shortlist
           </Link>
         ) : (
           <Link
             href="/login"
-            className="text-paragraph-xs text-text-strong-950 fine-hover:underline"
+            className="text-paragraph-xs text-text-sub-600 transition-colors duration-150 fine-hover:hover:text-text-strong-950"
           >
             Sign in
           </Link>

@@ -22,7 +22,7 @@ export function AdminSignIn({ error }: { error?: string }) {
   return (
     <section aria-labelledby="admin-sign-in-heading" className="flex max-w-sm flex-col gap-6">
       <div className="flex flex-col gap-2">
-        <h1 id="admin-sign-in-heading" className="text-title-h5 tracking-tight">
+        <h1 id="admin-sign-in-heading" className="page-title">
           Admin
         </h1>
         <p className="text-paragraph-sm text-text-sub-600">

@@ -19,7 +19,7 @@ function ActionLink({
       rel={external ? 'noopener noreferrer' : undefined}
       className={cn(
         'inline-flex min-w-0 max-w-full items-center gap-1.5 text-paragraph-xs text-text-strong-950',
-        'underline-offset-2 fine-hover:underline',
+        'underline-offset-2 fine-hover:hover:underline',
         'focus-ring',
       )}
     >

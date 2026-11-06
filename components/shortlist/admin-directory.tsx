@@ -25,7 +25,7 @@ export function AdminDirectory({ users }: { users: AdminUserSummary[] }) {
   return (
     <section aria-labelledby="users-heading" className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
-        <h1 id="users-heading" className="text-title-h5 tracking-tight">
+        <h1 id="users-heading" className="page-title">
           Users
         </h1>
         <p className="text-paragraph-sm text-text-sub-600">
@@ -75,7 +75,7 @@ function UserRow({ user }: { user: AdminUserSummary }) {
   return (
     <Link
       href={`/admin/users/${user.id}`}
-      className="surface-group flex items-start justify-between gap-3 px-4 py-3.5 focus-ring fine-hover:bg-bg-soft-200/40 sm:px-5"
+      className="surface-group flex items-start justify-between gap-3 px-4 py-3.5 focus-ring fine-hover:hover:bg-bg-soft-200/40 sm:px-5"
     >
       <span className="min-w-0">
         <span className="block truncate text-label-md">{name}</span>

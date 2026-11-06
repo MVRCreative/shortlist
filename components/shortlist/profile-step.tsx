@@ -629,7 +629,7 @@ export function ProfileStep({
           className="flex scroll-mt-6 flex-col gap-4 pt-4"
         >
           <div className="flex items-baseline justify-between gap-4">
-            <h2 id="shortlist-profile-heading" className="text-label-sm">
+            <h2 id="shortlist-profile-heading" className="section-title">
               Your GTM profile
             </h2>
             <p className="text-paragraph-xs">{isStale ? 'Inputs changed. Update to refresh.' : 'Drives every lead and post'}</p>

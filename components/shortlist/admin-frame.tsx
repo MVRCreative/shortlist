@@ -18,7 +18,7 @@ export function AdminFrame({
             <form action={signOut}>
               <button
                 type="submit"
-                className="text-paragraph-xs text-text-sub-600 fine-hover:text-text-strong-950"
+                className="text-paragraph-xs text-text-sub-600 fine-hover:hover:text-text-strong-950"
               >
                 Sign out
               </button>

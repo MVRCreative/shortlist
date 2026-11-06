@@ -7,6 +7,7 @@ import type { EnrichedProfile, ProfileInput } from '@/lib/shortlist/schemas'
 import { describeSizeRange } from '@/lib/shortlist/profile-options'
 import { TONES, toneFor } from '@/lib/shortlist/tones'
 import { normalizeDomain, studioName } from '@/lib/shortlist/url'
+import { initialOf } from '@/lib/utils'
 
 function Placeholder({ className }: { className: string }) {
   return <span aria-hidden="true" className={`block rounded-full bg-bg-weak-50 ${className}`} />
@@ -55,7 +56,7 @@ export function ProfilePreview({ footer, ...card }: ProfileCardProps & { footer?
 export function ProfileCard({ input, enriched, fitCount, missCount }: ProfileCardProps) {
   const domain = normalizeDomain(input.website)
   const name = domain ? studioName(input) : ''
-  const initial = name.charAt(0).toUpperCase()
+  const initial = initialOf(name)
 
   return (
       <Card className="gap-0 py-0">

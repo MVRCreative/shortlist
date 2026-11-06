@@ -67,13 +67,13 @@ export function Dashboard({
         {menu === 'profile' ? (
           <section aria-labelledby="profile-heading" className="flex max-w-md flex-col gap-4 px-4 pt-8 sm:px-6 lg:px-8">
             <div className="flex items-baseline justify-between gap-3">
-              <h1 id="profile-heading" className="text-title-h5 tracking-tight">
+              <h1 id="profile-heading" className="page-title">
                 Profile
               </h1>
               <button
                 type="button"
                 onClick={() => setMenu('none')}
-                className="text-paragraph-xs text-text-sub-600 fine-hover:text-text-strong-950"
+                className="text-paragraph-xs text-text-sub-600 fine-hover:hover:text-text-strong-950"
               >
                 Back to digest
               </button>
@@ -83,11 +83,11 @@ export function Dashboard({
         ) : menu === 'settings' ? (
           <section className="flex max-w-md flex-col gap-4 px-4 pt-8 sm:px-6 lg:px-8">
             <div className="flex items-baseline justify-between gap-3">
-              <h1 className="text-title-h5 tracking-tight">Plan</h1>
+              <h1 className="page-title">Plan</h1>
               <button
                 type="button"
                 onClick={() => setMenu('none')}
-                className="text-paragraph-xs text-text-sub-600 fine-hover:text-text-strong-950"
+                className="text-paragraph-xs text-text-sub-600 fine-hover:hover:text-text-strong-950"
               >
                 Back to digest
               </button>
@@ -100,7 +100,7 @@ export function Dashboard({
               <p className="kicker">
                 {cadenceLabel} digest · {format(new Date(), 'MMM d')}
               </p>
-              <h1 className="text-2xl font-normal text-balance tracking-tight text-text-strong-950">
+              <h1 className="page-title">
                 {digest ? digest.theme : 'Writing your first digest'}
               </h1>
               <NextDigestCountdown
@@ -113,7 +113,7 @@ export function Dashboard({
             <section aria-labelledby="accounts-heading" className="flex flex-col">
               <div className="flex items-end justify-between gap-4 px-4 pt-10 pb-4 sm:px-6 lg:px-8">
                 <div className="flex flex-col gap-1">
-                  <h2 id="accounts-heading" className="kicker">
+                  <h2 id="accounts-heading" className="section-title">
                     Accounts
                   </h2>
                   <p className="text-paragraph-xs text-text-sub-600">

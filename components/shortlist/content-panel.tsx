@@ -58,7 +58,7 @@ export function ContentPanel({
   return (
     <section id={sectionId} aria-labelledby={`${sectionId}-heading`} className="flex scroll-mt-8 flex-col">
       <div className="flex flex-col gap-1 px-4 pb-4 sm:px-6 lg:px-8 xl:px-5">
-        <h2 id={`${sectionId}-heading`} className="kicker">
+        <h2 id={`${sectionId}-heading`} className="section-title">
           Campaign content
         </h2>
         <p className="text-paragraph-xs text-pretty text-text-sub-600">{intro}</p>
@@ -265,7 +265,7 @@ function Asset({
             type="button"
             onClick={onEditToggle}
             aria-expanded={editing}
-            className="px-1 text-paragraph-xs text-text-sub-600 fine-hover:text-text-strong-950 focus-ring"
+            className="px-1 text-paragraph-xs text-text-sub-600 fine-hover:hover:text-text-strong-950 focus-ring"
           >
             {editing ? 'Done' : 'Edit'}
           </button>

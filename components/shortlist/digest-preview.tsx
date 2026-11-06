@@ -11,7 +11,7 @@ export function DigestPreview({ settings }: { settings: DigestSettings }) {
   return (
     <section aria-labelledby="digest-preview-label" className="flex flex-col gap-4">
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-        <h2 id="digest-preview-label" className="text-label-sm">
+        <h2 id="digest-preview-label" className="section-title">
           Your first digest
         </h2>
         <p className="text-paragraph-xs tabular-nums">{sendDate}</p>

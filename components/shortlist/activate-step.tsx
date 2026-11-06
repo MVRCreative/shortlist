@@ -17,7 +17,7 @@ import type { DigestSettings } from '@/lib/shortlist/schemas'
 function MobileProfile({ name, children }: { name: string; children: ReactNode }) {
   return (
     <Collapsible className="lg:hidden">
-      <CollapsibleTrigger className="group flex w-full items-center justify-between gap-3 surface-group px-4 py-3 text-left transition duration-150 ease-out fine-hover:bg-bg-soft-200/40 focus-ring">
+      <CollapsibleTrigger className="group flex w-full items-center justify-between gap-3 surface-group px-4 py-3 text-left transition duration-150 ease-out fine-hover:hover:bg-bg-soft-200/40 focus-ring">
         <span className="flex min-w-0 flex-col gap-0.5">
           <span className="text-label-sm">Your profile</span>
           <span className="truncate text-paragraph-xs">{name}</span>
@@ -64,7 +64,7 @@ export function ActivateStep({
       <Card>
         <CardContent className="flex flex-col gap-6">
           <section className="flex flex-col gap-3">
-            <h2 id="plan-label" className="kicker">
+            <h2 id="plan-label" className="section-title">
               Plan
             </h2>
             <PlanSelector

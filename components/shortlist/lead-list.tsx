@@ -189,7 +189,7 @@ export function LeadListSkeleton({ rows }: { rows: number }) {
     <div className="border-t border-stroke-soft-200" aria-busy="true" aria-label="Loading accounts">
       {Array.from({ length: Math.min(rows, 5) }).map((_, i) => (
         <div key={i} className="flex items-center gap-3 border-b border-stroke-soft-200 px-4 py-3.5 last:border-b-0 sm:px-6 lg:px-8">
-          <Skeleton className="size-4 rounded-[3px]" />
+          <Skeleton className="size-4 rounded-4" />
           <div className="flex flex-1 flex-col gap-1.5">
             <Skeleton className="h-3.5 w-2/5" />
             <Skeleton className="h-3 w-3/5" />

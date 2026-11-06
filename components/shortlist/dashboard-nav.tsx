@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { BrandMark } from '@/components/shortlist/brand-mark'
-import { cn } from '@/lib/utils'
+import { cn, initialOf } from '@/lib/utils'
 
 export type DigestMenu = 'none' | 'profile' | 'settings'
 
@@ -60,7 +60,7 @@ export function DashboardNav({
             onClick={() => setOpen((v) => !v)}
             className="flex size-7 items-center justify-center rounded-md bg-bg-strong-950 text-label-xs font-medium text-static-white focus-ring"
           >
-            {companyName.charAt(0).toUpperCase()}
+            {initialOf(companyName)}
           </button>
         </div>
       </div>
@@ -74,7 +74,7 @@ export function DashboardNav({
         <div className="mt-8 flex flex-col gap-4">
           <div className="flex items-start gap-2.5">
             <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-md bg-bg-strong-950 text-label-xs font-medium text-static-white">
-              {companyName.charAt(0).toUpperCase()}
+              {initialOf(companyName)}
             </span>
             <div className="flex min-w-0 flex-1 flex-col gap-0.5">
               <span className="truncate text-paragraph-xs font-medium text-text-strong-950">{companyName}</span>
@@ -104,7 +104,7 @@ function NavLink({
       aria-current={active ? 'page' : undefined}
       className={cn(
         'w-fit text-left text-paragraph-xs transition-colors duration-150 focus-ring',
-        active ? 'text-text-strong-950' : 'text-text-sub-600 fine-hover:text-text-strong-950',
+        active ? 'text-text-strong-950' : 'text-text-sub-600 fine-hover:hover:text-text-strong-950',
       )}
     >
       {label}
@@ -128,7 +128,7 @@ function NavButton({
       aria-current={active ? 'true' : undefined}
       className={cn(
         'w-fit text-left text-paragraph-xs transition-colors duration-150 focus-ring',
-        active ? 'text-text-strong-950' : 'text-text-sub-600 fine-hover:text-text-strong-950',
+        active ? 'text-text-strong-950' : 'text-text-sub-600 fine-hover:hover:text-text-strong-950',
       )}
     >
       {label}

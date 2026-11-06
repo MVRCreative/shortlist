@@ -39,7 +39,7 @@ export default async function AdminPage({
     return (
       <AdminFrame signedIn>
         <section className="flex max-w-md flex-col gap-2">
-          <h1 className="text-title-h5 tracking-tight">Standard account</h1>
+          <h1 className="page-title">Standard account</h1>
           <p className="text-paragraph-sm text-text-sub-600 [overflow-wrap:anywhere]">
             {session.email} is a standard user. Admin access is granted separately.
           </p>

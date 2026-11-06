@@ -25,12 +25,12 @@ export function AdminUser({ user }: { user: AdminUserDetail }) {
       <div className="flex flex-col gap-4">
         <Link
           href="/admin"
-          className="w-fit text-paragraph-xs text-text-sub-600 fine-hover:text-text-strong-950"
+          className="w-fit text-paragraph-xs text-text-sub-600 fine-hover:hover:text-text-strong-950"
         >
           Back to users
         </Link>
         <div className="flex flex-wrap items-start justify-between gap-3">
-          <h1 className="text-title-h5 tracking-tight">{name}</h1>
+          <h1 className="page-title">{name}</h1>
           <Badge variant={user.role === "admin" ? "brand" : "neutral"}>
             {roleLabel(user.role)}
           </Badge>
@@ -38,7 +38,7 @@ export function AdminUser({ user }: { user: AdminUserDetail }) {
       </div>
 
       <section aria-labelledby="account-heading" className="flex flex-col gap-4">
-        <h2 id="account-heading" className="text-label-md">
+        <h2 id="account-heading" className="section-title">
           Account
         </h2>
         <dl className="surface-group grid gap-x-8 gap-y-4 px-4 py-4 sm:grid-cols-2 sm:px-5">
@@ -51,7 +51,7 @@ export function AdminUser({ user }: { user: AdminUserDetail }) {
               <dd className="truncate text-paragraph-sm">
                 <a
                   href={`https://${user.websiteDomain}`}
-                  className="fine-hover:underline"
+                  className="fine-hover:hover:underline"
                   rel="noreferrer"
                 >
                   {user.websiteDomain}
@@ -108,7 +108,7 @@ export function AdminUser({ user }: { user: AdminUserDetail }) {
       </section>
 
       <section aria-labelledby="digests-heading" className="flex flex-col gap-4">
-        <h2 id="digests-heading" className="text-label-md">
+        <h2 id="digests-heading" className="section-title">
           Digests
         </h2>
         {user.digests.length === 0 ? (

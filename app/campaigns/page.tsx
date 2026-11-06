@@ -37,7 +37,7 @@ export default function CampaignsPage() {
       <main className="flex min-w-0 flex-col gap-6 px-4 pt-8 pb-20 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-2">
           <p className="kicker">Campaigns</p>
-          <h1 className="text-title-h5 tracking-tight">Why you’re reaching out</h1>
+          <h1 className="page-title">Why you’re reaching out</h1>
           <p className="max-w-xl text-paragraph-sm text-text-sub-600">
             A campaign is a lightweight outreach purpose. It shapes messaging and campaign content. It is
             not a sequence builder.

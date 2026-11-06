@@ -76,11 +76,11 @@ export default async function AdminUserPage({
 function MissingUser() {
   return (
     <section className="flex max-w-md flex-col gap-3">
-      <h1 className="text-title-h5 tracking-tight">User not found</h1>
+      <h1 className="page-title">User not found</h1>
       <p className="text-paragraph-sm text-text-sub-600">
         This user isn’t in Shortlist.
       </p>
-      <Link href="/admin" className="w-fit text-paragraph-xs text-text-sub-600 fine-hover:text-text-strong-950">
+      <Link href="/admin" className="w-fit text-paragraph-xs text-text-sub-600 fine-hover:hover:text-text-strong-950">
         Back to users
       </Link>
     </section>

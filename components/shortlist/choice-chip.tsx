@@ -28,7 +28,7 @@ export function ChoiceChip({
 }) {
   const tone = selected
     ? selectedClassName
-    : 'border-stroke-soft-200 text-text-sub-600 fine-hover:border-stroke-sub-300 fine-hover:text-text-strong-950'
+    : 'border-stroke-soft-200 text-text-sub-600 fine-hover:hover:border-stroke-sub-300 fine-hover:hover:text-text-strong-950'
 
   if (!onRemove) {
     return (
@@ -60,7 +60,7 @@ export function ChoiceChip({
         aria-label={removeLabel ?? 'Remove'}
         onClick={onRemove}
         disabled={disabled}
-        className="inline-flex size-5 items-center justify-center rounded-full text-text-soft-400 focus-ring fine-hover:bg-bg-white-0 fine-hover:text-text-sub-600"
+        className="inline-flex size-5 items-center justify-center rounded-full text-text-soft-400 focus-ring fine-hover:hover:bg-bg-white-0 fine-hover:hover:text-text-sub-600"
       >
         <X className="size-3.5" aria-hidden="true" />
       </button>

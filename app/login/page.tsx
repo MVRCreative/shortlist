@@ -23,8 +23,8 @@ function LoginForm() {
   return (
     <>
       <div className="flex flex-col gap-2">
-        <BrandMark />
-        <h1 className="text-2xl font-normal tracking-tight text-text-strong-950">
+        <BrandMark href="/" />
+        <h1 className="page-title">
           Sign in
         </h1>
         <p className="text-paragraph-sm text-text-sub-600">

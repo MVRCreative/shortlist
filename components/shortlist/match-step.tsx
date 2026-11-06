@@ -62,7 +62,7 @@ function AccountRow({
           onClick={() => toggle('nofit')}
           className={cn(
             'size-8 px-0',
-            verdict === 'fit' && 'text-text-disabled-300 fine-hover:bg-transparent',
+            verdict === 'fit' && 'text-text-disabled-300 fine-hover:hover:bg-transparent',
             verdict === 'nofit' && 'bg-bg-weak-50 text-text-strong-950',
             !verdict && 'text-text-soft-400',
           )}
@@ -79,7 +79,7 @@ function AccountRow({
           className={cn(
             'size-8 px-0',
             verdict === 'fit'
-              ? 'bg-success-base text-static-white fine-hover:bg-green-700'
+              ? 'bg-success-base text-static-white fine-hover:hover:bg-green-700'
               : 'text-success-base',
           )}
         >
