@@ -37,8 +37,8 @@ export function CampaignStep({
     <div className="flex flex-col gap-6 pb-28 lg:pb-0">
       <StepHeading
         eyebrow="Optional"
-        title="Add a campaign"
-        description="A campaign is why you’re reaching out — a webinar, launch, partnership, or general business development. You can skip this and still get your Shortlist."
+        title="Start a campaign"
+        description="Campaigns organize different outreach strategies, messaging, or coordination with other marketing initiatives, like a webinar, launch, or partnership. You can skip this and still get your Shortlist."
       />
 
       <FieldGroup className="gap-5">
@@ -84,7 +84,7 @@ export function CampaignStep({
           <ArrowLeft className="size-4" aria-hidden="true" />
           Back
         </Button>
-        <Button type="button" variant="secondary" onClick={onSkip} disabled={pending}>
+        <Button type="button" variant="ghost" onClick={onSkip} disabled={pending}>
           Skip for now
         </Button>
         <Button
