@@ -21,7 +21,7 @@ export default function ProfilePage() {
   if (!hydrated) return null
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-8 xl:grid xl:grid-cols-[minmax(0,1fr)_18rem] xl:items-start xl:gap-10">
       <ProfileStep
         initial={input}
         enriched={enriched}
@@ -32,9 +32,12 @@ export default function ProfilePage() {
         onDraftChange={setInput}
         onFindAccounts={() => goTo('Audience')}
       />
-      <div className="border-t border-stroke-soft-200 pt-6">
+      <aside
+        aria-label="Profile preview"
+        className="border-t border-stroke-soft-200 pt-6 xl:sticky xl:top-6 xl:border-t-0 xl:pt-0"
+      >
         <ProfilePreview input={input} enriched={enriched} fitCount={fitCount} missCount={missCount} />
-      </div>
+      </aside>
     </div>
   )
 }

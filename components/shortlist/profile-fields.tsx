@@ -38,28 +38,29 @@ function AddChipInput({
   }
 
   function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
-    if (event.key !== 'Enter' || event.nativeEvent.isComposing) return
+    if (event.key !== 'Enter' && event.key !== ',') return
+    if (event.nativeEvent.isComposing || event.keyCode === 229) return
     event.preventDefault()
     commit()
   }
 
   return (
-    <div className="flex basis-full items-center gap-2">
+    <span className="inline-flex h-8 min-w-36 items-center gap-1.5 rounded-full border border-dashed border-stroke-sub-300 pl-2.5 pr-3 text-text-soft-400 transition-colors focus-within:border-solid focus-within:border-primary-base focus-within:text-text-sub-600">
+      <Plus className="size-3.5 shrink-0" aria-hidden="true" />
       <label className="sr-only" htmlFor={id}>
-        {label}
+        {`${label}. Press Enter or comma to add.`}
       </label>
-      <Input
+      <input
         id={id}
         value={draft}
         onChange={(event) => setDraft(event.target.value)}
         onKeyDown={handleKeyDown}
+        onBlur={commit}
         placeholder={placeholder}
-        className="h-8 min-w-0 flex-1 rounded-full px-3 text-sm"
+        size={Math.max(placeholder.length, draft.length, 8)}
+        className="min-w-0 bg-transparent text-sm text-text-strong-950 outline-none placeholder:text-text-soft-400"
       />
-      <Button type="button" variant="secondary" size="sm" onMouseDown={(event) => event.preventDefault()} onClick={commit} disabled={!draft.trim()}>
-        Add
-      </Button>
-    </div>
+    </span>
   )
 }
 

@@ -23,15 +23,17 @@ export function OnboardingShell({ children }: { children: ReactNode }) {
     return <div className="min-h-dvh" aria-busy="true" />
   }
 
+  const wide = step === 'Profile'
+
   return (
-    <div className="mx-auto grid min-h-dvh w-full max-w-5xl gap-x-8 px-4 pb-[env(safe-area-inset-bottom)] sm:px-6 lg:grid-cols-[11rem_minmax(0,1fr)] xl:grid-cols-[12rem_minmax(0,1fr)] xl:gap-x-12">
+    <div className={`mx-auto grid min-h-dvh w-full ${wide ? 'max-w-6xl' : 'max-w-5xl'} gap-x-8 px-4 pb-[env(safe-area-inset-bottom)] sm:px-6 lg:grid-cols-[11rem_minmax(0,1fr)] xl:grid-cols-[12rem_minmax(0,1fr)] xl:gap-x-12`}>
       <aside className="hidden lg:sticky lg:top-0 lg:block lg:h-dvh">
         <OnboardingRail step={step} isDemo={isDemo} canVisit={canVisit} onSelect={goTo} />
       </aside>
       <div className="lg:hidden">
         <AppHeader step={step} isDemo={isDemo} />
       </div>
-      <main className="mx-auto flex w-full max-w-xl flex-col gap-4 pt-8 pb-16 lg:pt-6">
+      <main className={`mx-auto flex w-full ${wide ? 'max-w-xl xl:max-w-none' : 'max-w-xl'} flex-col gap-4 pt-8 pb-16 lg:pt-6`}>
         {isDemo ? <DemoBanner /> : null}
         {actionError ? (
           <ErrorState title="Couldn’t finish that step" description={actionError} onRetry={clearActionError} />

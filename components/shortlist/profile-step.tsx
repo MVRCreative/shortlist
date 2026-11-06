@@ -19,6 +19,8 @@ import { ChoiceChip } from '@/components/shortlist/choice-chip'
 import { EnrichedProfileCard, EnrichedProfileSkeleton } from '@/components/shortlist/enriched-profile-card'
 import { FormSection } from '@/components/shortlist/form-section'
 import { ChipField, OptionalTag, UrlListField } from '@/components/shortlist/profile-fields'
+import { RequirementsChecklist, type Requirement } from '@/components/shortlist/requirements-checklist'
+import { SiteReadStatus } from '@/components/shortlist/site-read-status'
 import { StepHeading } from '@/components/shortlist/step-heading'
 import { readStudioWebsite } from '@/app/actions'
 import { DEAL_SIZE_OPTIONS, dealSizeLabel, describeSizeRange } from '@/lib/shortlist/profile-options'
@@ -97,20 +99,17 @@ function toProfile(draft: ProfileDraft): StudioProfile {
   }
 }
 
-function listMissing(profile: StudioProfile) {
-  const missing: string[] = []
-  if (!profile.companyName?.trim()) missing.push('your company name')
-  if (!normalizeDomain(profile.website)) missing.push('your website')
-  if (profile.services.length === 0) missing.push('what you do')
-  if (profile.seedClients.length < 2) {
-    const needed = 2 - profile.seedClients.length
-    missing.push(needed === 1 ? '1 more client website' : '2 client websites')
-  }
-  if (profile.industries.length === 0) missing.push('an industry')
-  if (profile.companySizes.length === 0) missing.push('a company size')
-  if (profile.regions.length === 0) missing.push('a region')
-  if (profile.buyerTitles.length === 0) missing.push('who signs off')
-  return missing
+function listRequirements(profile: StudioProfile): Requirement[] {
+  return [
+    { key: 'website', label: 'Website', section: 'studio', done: !!normalizeDomain(profile.website) },
+    { key: 'name', label: 'Company name', section: 'studio', done: !!profile.companyName?.trim() },
+    { key: 'services', label: 'What you do', section: 'studio', done: profile.services.length > 0 },
+    { key: 'clients', label: '2 client websites', section: 'clients', done: profile.seedClients.length >= 2 },
+    { key: 'industries', label: 'An industry', section: 'clients', done: profile.industries.length > 0 },
+    { key: 'sizes', label: 'A company size', section: 'clients', done: profile.companySizes.length > 0 },
+    { key: 'regions', label: 'A region', section: 'clients', done: profile.regions.length > 0 },
+    { key: 'buyers', label: 'Who signs off', section: 'clients', done: profile.buyerTitles.length > 0 },
+  ]
 }
 
 function countLabel(list: string[], plural: string) {
@@ -157,8 +156,9 @@ export function ProfileStep({
   })
 
   const profile = toProfile(values)
-  const missing = listMissing(profile)
-  const ready = missing.length === 0
+  const requirements = listRequirements(profile)
+  const ready = requirements.every((item) => item.done)
+  const [attempted, setAttempted] = useState(false)
   const busy = pendingEnrich || pendingMatch
   const websiteDomain = normalizeDomain(values.website)
   const websiteInvalid = websiteTouched && !!values.website.trim() && !websiteDomain
@@ -320,7 +320,22 @@ export function ProfileStep({
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    if (!ready || busy) return
+    if (busy) return
+    if (!ready) {
+      const pending = requirements.filter((item) => !item.done)
+      setAttempted(true)
+      setNameTouched(true)
+      setWebsiteTouched(true)
+      setOpen((prev) => ({
+        ...prev,
+        studio: prev.studio || pending.some((item) => item.section === 'studio'),
+        clients: prev.clients || pending.some((item) => item.section === 'clients'),
+      }))
+      document
+        .getElementById(`section-${pending[0].section}`)
+        ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      return
+    }
     setOpen({ studio: false, clients: false, deal: false })
     onSubmit(profile)
   }
@@ -349,6 +364,26 @@ export function ProfileStep({
           onOpenChange={(next) => setSection('studio', next)}
         >
           <FieldGroup className="gap-6">
+            <div className="grid gap-4 sm:grid-cols-2">
+            <Field data-invalid={websiteInvalid || !!readError}>
+              <FieldLabel htmlFor="website">Website</FieldLabel>
+              <Input
+                id="website"
+                value={values.website}
+                onChange={(event) => handleWebsiteChange(event.target.value)}
+                onBlur={() => {
+                  setWebsiteTouched(true)
+                  void readSite()
+                }}
+                placeholder="yourstudio.com"
+                inputMode="url"
+                autoComplete="url"
+                spellCheck={false}
+                required
+                aria-invalid={websiteInvalid}
+                aria-describedby="website-status"
+              />
+            </Field>
             <Field data-invalid={nameInvalid}>
               <FieldLabel htmlFor="companyName">Company name</FieldLabel>
               <Input
@@ -371,59 +406,49 @@ export function ProfileStep({
                 </p>
               ) : null}
             </Field>
+            </div>
 
-            <Field data-invalid={websiteInvalid || !!readError}>
-              <FieldLabel htmlFor="website">Website</FieldLabel>
-              <Input
-                id="website"
-                value={values.website}
-                onChange={(event) => handleWebsiteChange(event.target.value)}
-                onBlur={() => {
-                  setWebsiteTouched(true)
-                  void readSite()
-                }}
-                placeholder="yourstudio.com"
-                inputMode="url"
-                autoComplete="url"
-                spellCheck={false}
-                required
-                aria-invalid={websiteInvalid}
-                aria-describedby="website-status"
-              />
-              <div id="website-status" aria-live="polite" className="empty:hidden">
-                {websiteInvalid ? (
-                  <p className="text-paragraph-xs text-error-base">Enter your website, like yourstudio.com</p>
-                ) : analyzing ? (
-                  <p className="flex items-center gap-1.5 text-paragraph-xs">
-                    <LoaderCircle className="size-3.5 animate-spin" aria-hidden="true" />
-                    Reading your site…
-                  </p>
-                ) : readError ? (
-                  <p className="text-paragraph-xs text-error-base">{readError}</p>
-                ) : prefilledFrom && prefilledFrom === websiteDomain ? (
-                  <div className="flex flex-col gap-0.5">
-                    <p className="text-paragraph-xs">Suggestions are in from the site. Turn off anything that doesn’t fit.</p>
-                  </div>
-                ) : (
-                  <p className="text-paragraph-xs">We’ll read the site once the name and website are filled in.</p>
-                )}
+            <div className="flex flex-col gap-3">
+              <div id="website-status" aria-live="polite">
+                <SiteReadStatus
+                  state={
+                    websiteInvalid
+                      ? 'invalid'
+                      : analyzing
+                        ? 'reading'
+                        : readError
+                          ? 'error'
+                          : prefilledFrom && prefilledFrom === websiteDomain
+                            ? 'done'
+                            : 'idle'
+                  }
+                  domain={websiteDomain}
+                  error={readError}
+                  counts={{
+                    services: values.services.length,
+                    industries: values.industries.length,
+                    buyers: values.buyerTitles.length,
+                  }}
+                />
               </div>
-              <Button
-                type="button"
-                variant="secondary"
-                size="sm"
-                onClick={() => {
-                  setNameTouched(true)
-                  setWebsiteTouched(true)
-                  void readSite(true)
-                }}
-                disabled={!canRead}
-                className="self-start"
-              >
-                {analyzing ? <LoaderCircle className="animate-spin" /> : <Sparkles />}
-                {prefilledFrom ? 'Read again' : 'Read site'}
-              </Button>
-            </Field>
+              {analyzing ? null : (
+                <Button
+                  type="button"
+                  variant={prefilledFrom ? 'ghost' : 'primary'}
+                  size="sm"
+                  onClick={() => {
+                    setNameTouched(true)
+                    setWebsiteTouched(true)
+                    void readSite(true)
+                  }}
+                  disabled={!canRead}
+                  className="self-start"
+                >
+                  {prefilledFrom ? <RefreshCw /> : <Sparkles />}
+                  {prefilledFrom ? 'Read again' : 'Read my site'}
+                </Button>
+              )}
+            </div>
 
             <ChipField
               id="services"
@@ -595,11 +620,7 @@ export function ProfileStep({
 
       {showEnrichAction ? (
         <div className="flex flex-col gap-4 border-t border-stroke-soft-200 pt-5">
-          {!ready ? (
-            <p className="text-paragraph-xs text-pretty text-text-sub-600" aria-live="polite">
-              Still needed: {missing.join(', ')}.
-            </p>
-          ) : null}
+          <RequirementsChecklist id="profile-requirements" items={requirements} highlight={attempted} />
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end sm:gap-4">
             {process.env.NODE_ENV === 'development' ? (
               <Button type="button" variant="ghost" onClick={fillSample} disabled={busy}>
@@ -611,7 +632,8 @@ export function ProfileStep({
               type="submit"
               form="profile-form"
               pending={pendingEnrich}
-              disabled={pendingMatch || !ready}
+              disabled={pendingMatch}
+              aria-describedby="profile-requirements"
               className="w-full sm:w-auto"
             >
               {pendingEnrich ? null : <Sparkles />}
