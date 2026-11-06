@@ -17,16 +17,17 @@
  */
 import { cva } from "class-variance-authority"
 
-/** 1px brand ring at 30%. The border does not change color. */
-export const fieldFocusVisible = "focus-visible:ring-1 focus-visible:ring-primary-base/30"
+/** Border switches to the brand action color plus a soft 3px halo. */
+export const fieldFocusVisible =
+  "focus-visible:border-primary-base focus-visible:ring-3 focus-visible:ring-primary-alpha-16"
 
 export const fieldSurface = [
-  "w-full min-w-0 rounded-lg border border-stroke-soft-200 bg-transparent text-paragraph-md text-text-strong-950 outline-none transition-[color,background-color,border-color,box-shadow] duration-200 placeholder:text-text-sub-600 aria-invalid:border-destructive aria-invalid:ring-destructive/20 disabled:cursor-not-allowed disabled:opacity-50 md:text-paragraph-sm dark:aria-invalid:ring-destructive/40",
+  "w-full min-w-0 rounded-10 border border-stroke-soft-200 bg-bg-white-0 text-paragraph-md text-text-strong-950 outline-none transition-[color,background-color,border-color,box-shadow] duration-150 ease-out placeholder:text-text-soft-400 aria-invalid:border-error-base aria-invalid:ring-3 aria-invalid:ring-error-base/20 disabled:cursor-not-allowed disabled:opacity-50 md:text-paragraph-sm",
   fieldFocusVisible,
 ].join(" ")
 
 export const fieldBare =
-  "w-full min-w-0 resize-none field-sizing-content border-0 bg-transparent p-0 text-paragraph-md text-text-strong-950 shadow-none outline-none placeholder:text-text-sub-600 focus-visible:ring-0 disabled:cursor-not-allowed disabled:opacity-50"
+  "w-full min-w-0 resize-none field-sizing-content border-0 bg-transparent p-0 text-paragraph-md text-text-strong-950 shadow-none outline-none placeholder:text-text-soft-400 focus-visible:ring-0 disabled:cursor-not-allowed disabled:opacity-50"
 
 export const fieldSize = cva("", {
   variants: {

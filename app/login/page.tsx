@@ -71,7 +71,7 @@ function LoginForm() {
               {error}
             </p>
           ) : null}
-          <Button type="submit" size="lg" pending={pending}>
+          <Button type="submit" pending={pending}>
             Email me a code
           </Button>
         </form>
@@ -114,7 +114,7 @@ function LoginForm() {
               {notice}
             </p>
           ) : null}
-          <Button type="submit" size="lg" pending={pending}>
+          <Button type="submit" pending={pending}>
             Sign in
           </Button>
           <div className="flex items-center justify-between gap-4">

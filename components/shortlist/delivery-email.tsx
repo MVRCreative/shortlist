@@ -54,7 +54,6 @@ export function DeliveryEmail({ email, onChange }: { email: string; onChange: (e
           type="button"
           size="sm"
           variant="ghost"
-          tone="muted"
           onClick={() => {
             setDraft(email)
             close()
@@ -76,7 +75,7 @@ export function DeliveryEmail({ email, onChange }: { email: string; onChange: (e
           setDraft(email)
           setEditing(true)
         }}
-        className="rounded-sm text-primary-base underline-offset-4 fine-hover:underline focus-visible:shadow-button-primary-focus"
+        className="rounded-sm text-primary-base underline-offset-4 fine-hover:underline focus-ring"
       >
         Change
       </button>

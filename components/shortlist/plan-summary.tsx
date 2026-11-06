@@ -9,7 +9,7 @@ const BILLING_NOTE = 'Billed monthly · cancel anytime'
 
 function StartButton({ pending, onActivate, className }: { pending: boolean; onActivate: () => void; className?: string }) {
   return (
-    <Button size="lg" onClick={onActivate} pending={pending} className={className}>
+    <Button onClick={onActivate} pending={pending} className={className}>
       {pending ? 'Building first digest' : 'Start Shortlist'}
     </Button>
   )

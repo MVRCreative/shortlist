@@ -265,7 +265,7 @@ function Asset({
             type="button"
             onClick={onEditToggle}
             aria-expanded={editing}
-            className="px-1 text-paragraph-xs text-text-sub-600 fine-hover:text-text-strong-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-base"
+            className="px-1 text-paragraph-xs text-text-sub-600 fine-hover:text-text-strong-950 focus-ring"
           >
             {editing ? 'Done' : 'Edit'}
           </button>

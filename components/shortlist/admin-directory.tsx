@@ -75,7 +75,7 @@ function UserRow({ user }: { user: AdminUserSummary }) {
   return (
     <Link
       href={`/admin/users/${user.id}`}
-      className="surface-group flex items-start justify-between gap-3 px-4 py-3.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-base fine-hover:bg-bg-soft-200/40 sm:px-5"
+      className="surface-group flex items-start justify-between gap-3 px-4 py-3.5 focus-ring fine-hover:bg-bg-soft-200/40 sm:px-5"
     >
       <span className="min-w-0">
         <span className="block truncate text-label-md">{name}</span>

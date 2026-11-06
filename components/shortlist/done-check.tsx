@@ -25,8 +25,8 @@ export function DoneCheck({
       aria-label={done ? `Mark ${label} as not ${verb}` : `Mark ${label} as ${verb}`}
       onClick={onToggle}
       className={cn(
-        'press mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-[3px] border transition-[border-color,background-color,color] duration-200',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-base focus-visible:ring-offset-2 focus-visible:ring-offset-bg-white-0',
+        'press mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-[3px] border transition-[border-color,background-color,color] duration-150',
+        'focus-ring',
         done
           ? 'border-primary-base bg-primary-base text-static-white'
           : 'border-stroke-soft-200 text-transparent fine-hover:border-stroke-sub-300',

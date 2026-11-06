@@ -94,7 +94,7 @@ export default function DigestPage() {
               </Button>
             )}
             {authenticated ? (
-              <Button type="button" variant="outline" onClick={handleSignOut} disabled={pending === 'digest'}>
+              <Button type="button" variant="secondary" onClick={handleSignOut} disabled={pending === 'digest'}>
                 Sign out
               </Button>
             ) : null}

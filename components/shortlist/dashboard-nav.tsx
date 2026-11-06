@@ -58,7 +58,7 @@ export function DashboardNav({
             aria-label="Account"
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
-            className="flex size-7 items-center justify-center rounded-md bg-bg-strong-950 text-label-xs font-medium text-static-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-base"
+            className="flex size-7 items-center justify-center rounded-md bg-bg-strong-950 text-label-xs font-medium text-static-white focus-ring"
           >
             {companyName.charAt(0).toUpperCase()}
           </button>
@@ -103,7 +103,7 @@ function NavLink({
       href={href}
       aria-current={active ? 'page' : undefined}
       className={cn(
-        'w-fit text-left text-paragraph-xs transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-base',
+        'w-fit text-left text-paragraph-xs transition-colors duration-150 focus-ring',
         active ? 'text-text-strong-950' : 'text-text-sub-600 fine-hover:text-text-strong-950',
       )}
     >
@@ -127,7 +127,7 @@ function NavButton({
       onClick={onSelect}
       aria-current={active ? 'true' : undefined}
       className={cn(
-        'w-fit text-left text-paragraph-xs transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-base',
+        'w-fit text-left text-paragraph-xs transition-colors duration-150 focus-ring',
         active ? 'text-text-strong-950' : 'text-text-sub-600 fine-hover:text-text-strong-950',
       )}
     >

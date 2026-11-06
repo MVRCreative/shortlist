@@ -20,7 +20,7 @@ function ActionLink({
       className={cn(
         'inline-flex min-w-0 max-w-full items-center gap-1.5 text-paragraph-xs text-text-strong-950',
         'underline-offset-2 fine-hover:underline',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-base',
+        'focus-ring',
       )}
     >
       <span className="shrink-0 text-text-sub-600" aria-hidden="true">

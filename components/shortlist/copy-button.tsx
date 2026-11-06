@@ -27,7 +27,6 @@ export function CopyButton({
     try {
       await navigator.clipboard.writeText(text)
       setCopied(true)
-      toast.success('Copied')
       setTimeout(() => setCopied(false), 1500)
     } catch {
       toast.error('Could not copy')
@@ -37,8 +36,8 @@ export function CopyButton({
   return (
     <Button
       variant="ghost"
-      size={iconOnly ? 'icon-xs' : 'xs'}
-      tone="muted"
+      size="sm"
+      icon={iconOnly}
       aria-label={copied ? 'Copied' : label}
       onClick={handleCopy}
       className={cn('text-paragraph-xs', className)}

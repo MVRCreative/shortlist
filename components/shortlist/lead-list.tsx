@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils'
 type Lead = Digest['leads'][number]
 
 /** Emphasized ease-out from the motion tokens. Dropdowns stay inside 200ms. */
-const openEase = 'duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none'
+const openEase = 'duration-(--duration-collapse) ease-(--ease-out-soft) motion-reduce:transition-none'
 
 function LeadRow({
   lead,
@@ -71,7 +71,7 @@ function LeadRow({
           aria-expanded={expanded}
           aria-controls={panelId}
           onClick={onToggleExpanded}
-          className="flex min-w-0 flex-1 items-start gap-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-base"
+          className="flex min-w-0 flex-1 items-start gap-3 text-left focus-ring"
         >
           <span className="kicker mt-0.5 tabular-nums">{n}</span>
           <div className="flex min-w-0 flex-1 flex-col gap-1">

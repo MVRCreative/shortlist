@@ -73,7 +73,7 @@ export function ErrorState({
       </div>
       {retry ? (
         <div className="shrink-0 pl-8 sm:pt-0.5 sm:pl-0">
-          <Button type="button" variant="outline" onClick={retry}>
+          <Button type="button" variant="secondary" onClick={retry}>
             Try again
           </Button>
         </div>

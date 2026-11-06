@@ -911,9 +911,31 @@ body {
   --font-mono: "Geist Mono", "Geist Mono Fallback", ui-monospace, monospace;
 }
 
+:root {
+  /* Motion tokens: one duration per job so paired animations stay in sync. */
+  --duration-fast: 150ms;
+  --duration-collapse: 200ms;
+  --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* The single focus treatment for every interactive control. */
+@utility focus-ring {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  &:focus-visible {
+    outline-color: var(--color-primary-base);
+  }
+}
+
 @layer base {
   html {
     -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Fallback so links and plain buttons never lose a visible focus state. */
+  :focus-visible {
+    outline: 2px solid var(--color-primary-base);
+    outline-offset: 2px;
   }
 
   button,
@@ -931,6 +953,7 @@ body {
     *::after {
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
       scroll-behavior: auto !important;
     }
     .press:active {
@@ -954,7 +977,7 @@ body {
   }
 
   .press {
-    @apply transition-transform duration-150 ease-out active:scale-[0.99];
+    @apply active:scale-[0.97];
   }
 
   .tabular {

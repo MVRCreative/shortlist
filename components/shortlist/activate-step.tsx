@@ -17,14 +17,14 @@ import type { DigestSettings } from '@/lib/shortlist/schemas'
 function MobileProfile({ name, children }: { name: string; children: ReactNode }) {
   return (
     <Collapsible className="lg:hidden">
-      <CollapsibleTrigger className="group flex w-full items-center justify-between gap-3 surface-group px-4 py-3 text-left transition duration-200 ease-out fine-hover:bg-bg-soft-200/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-base">
+      <CollapsibleTrigger className="group flex w-full items-center justify-between gap-3 surface-group px-4 py-3 text-left transition duration-150 ease-out fine-hover:bg-bg-soft-200/40 focus-ring">
         <span className="flex min-w-0 flex-col gap-0.5">
           <span className="text-label-sm">Your profile</span>
           <span className="truncate text-paragraph-xs">{name}</span>
         </span>
         <ChevronDown
           aria-hidden="true"
-          className="size-4 shrink-0 text-text-sub-600 transition-transform duration-200 ease-out group-data-[state=open]:rotate-180"
+          className="size-4 shrink-0 text-text-sub-600 transition-transform duration-150 ease-out group-data-[state=open]:rotate-180"
         />
       </CollapsibleTrigger>
       <CollapsibleContent className="pt-3">{children}</CollapsibleContent>
@@ -87,7 +87,7 @@ export function ActivateStep({
       </Card>
 
       <div>
-        <Button variant="ghost" tone="muted" onClick={onBack} disabled={pending}>
+        <Button variant="ghost" onClick={onBack} disabled={pending}>
           <ArrowLeft />
           Back to accounts
         </Button>

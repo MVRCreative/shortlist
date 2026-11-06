@@ -51,7 +51,7 @@ export function Landing({
           <div className="landing-enter landing-enter-delay-4 mt-8 flex flex-wrap items-center gap-x-5 gap-y-3">
             <Link
               href={ctaHref}
-              className="press inline-flex h-10 items-center rounded-10 bg-sky px-3.5 text-label-sm text-on-primary transition duration-200 ease-out fine-hover:bg-sky-hover"
+              className="press inline-flex h-10 items-center rounded-10 bg-sky px-3.5 text-label-sm text-on-primary transition duration-150 ease-out fine-hover:bg-sky-hover"
             >
               {ctaLabel}
             </Link>

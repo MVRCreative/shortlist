@@ -27,9 +27,9 @@ export function PlanSelector({
           key={tier.id}
           value={tier.id}
           className={cn(
-            'press group flex flex-col items-start gap-2 p-4 text-left transition-[background-color,border-color] duration-200 ease-out',
+            'press group flex flex-col items-start gap-2 p-4 text-left transition-[background-color,border-color] duration-150 ease-out',
             'border-b border-stroke-soft-200 sm:border-b-0 sm:border-r sm:last:border-r-0',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-base',
+            'focus-ring',
             'data-[state=checked]:surface-selected data-[state=checked]:surface-selected-top',
           )}
         >

@@ -44,12 +44,12 @@ export function FormSection({
     <Collapsible open={open} onOpenChange={onOpenChange} asChild>
       <Card
         className={cn(
-          "gap-0 py-0 transition-colors",
-          invalid && "border-destructive/50",
+          "gap-0 py-0 transition-colors duration-150",
+          invalid && "border-error-base",
         )}
       >
         <CollapsibleTrigger
-          className="group flex w-full items-center gap-4 rounded-25 px-5 py-4 text-left outline-none focus-visible:ring-2 focus-visible:ring-primary-base/50"
+          className="group focus-ring flex w-full items-center gap-4 rounded-25 px-5 py-4 text-left"
           aria-controls={`${id}-content`}
         >
           <span
@@ -74,12 +74,12 @@ export function FormSection({
               <span className="text-label-sm text-text-strong-950">{title}</span>
               {complete ? <span className="sr-only">(complete)</span> : null}
             </span>
-            <span className="truncate text-paragraph-sm text-text-soft-400">
+            <span className="truncate text-paragraph-sm text-text-sub-600">
               {showSummary ? summary : description}
             </span>
           </span>
           <ChevronDown
-            className="size-4 shrink-0 text-text-sub-600 transition-transform duration-200 group-data-[state=open]:rotate-180"
+            className="size-4 shrink-0 text-text-sub-600 transition-transform duration-(--duration-collapse) ease-out group-data-[state=open]:rotate-180"
             aria-hidden="true"
           />
         </CollapsibleTrigger>

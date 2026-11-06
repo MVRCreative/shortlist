@@ -76,7 +76,7 @@ export default function AudiencePage() {
             </div>
           </dl>
           <div className="flex flex-wrap gap-3 pt-2">
-            <Button type="button" variant="outline" asChild>
+            <Button type="button" variant="secondary" asChild>
               <Link href="/onboarding/profile">Edit in setup</Link>
             </Button>
             <Button

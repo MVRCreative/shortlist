@@ -54,8 +54,8 @@ function TooltipContent({
         data-slot="tooltip-content"
         sideOffset={sideOffset}
         className={cn(
-          "z-50 w-fit max-w-xs origin-(--radix-tooltip-content-transform-origin) rounded-lg bg-bg-strong-950 px-3 py-1.5 text-paragraph-xs text-balance text-background shadow-floating",
-          "animate-in fade-in-0 zoom-in-95 duration-200 ease-out",
+          "z-50 w-fit max-w-xs origin-(--radix-tooltip-content-transform-origin) rounded-lg bg-bg-strong-950 px-3 py-1.5 text-paragraph-xs text-balance text-text-white-0 shadow-regular-md",
+          "animate-in fade-in-0 zoom-in-95 duration-150 ease-out",
           "data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
           "data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95",
           "motion-reduce:animate-none motion-reduce:transition-none",
@@ -65,7 +65,7 @@ function TooltipContent({
       >
         {children}
         {/* 2px is a geometric mark on the arrow, not radius-xs. See DESIGN_LANGUAGE. */}
-        <TooltipPrimitive.Arrow className="z-50 size-2.5 translate-y-[calc(-50%_-_2px)] rotate-45 rounded-[2px] bg-bg-strong-950 fill-foreground" />
+        <TooltipPrimitive.Arrow className="z-50 size-2.5 translate-y-[calc(-50%_-_2px)] rotate-45 rounded-[2px] bg-bg-strong-950 fill-bg-strong-950" />
       </TooltipPrimitive.Content>
     </TooltipPrimitive.Portal>
   )

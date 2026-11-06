@@ -410,7 +410,7 @@ export function ProfileStep({
               </div>
               <Button
                 type="button"
-                variant="outline"
+                variant="secondary"
                 size="sm"
                 onClick={() => {
                   setNameTouched(true)
@@ -602,7 +602,7 @@ export function ProfileStep({
           ) : null}
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end sm:gap-4">
             {process.env.NODE_ENV === 'development' ? (
-              <Button type="button" variant="ghost" tone="muted" onClick={fillSample} disabled={busy}>
+              <Button type="button" variant="ghost" onClick={fillSample} disabled={busy}>
                 <WandSparkles />
                 Fill with a sample
               </Button>
@@ -610,7 +610,6 @@ export function ProfileStep({
             <Button
               type="submit"
               form="profile-form"
-              size="lg"
               pending={pendingEnrich}
               disabled={pendingMatch || !ready}
               className="w-full sm:w-auto"
@@ -650,14 +649,13 @@ export function ProfileStep({
                 type="submit"
                 form="profile-form"
                 variant="ghost"
-                tone="muted"
                 pending={pendingEnrich}
                 disabled={pendingMatch || !ready}
               >
                 {pendingEnrich ? null : <RefreshCw />}
                 Regenerate
               </Button>
-              <Button size="lg" onClick={onFindAccounts} pending={pendingMatch} disabled={pendingEnrich}>
+              <Button onClick={onFindAccounts} pending={pendingMatch} disabled={pendingEnrich}>
                 {pendingMatch ? 'Opening audience' : 'Continue to audience'}
                 {pendingMatch ? null : <ArrowRight />}
               </Button>

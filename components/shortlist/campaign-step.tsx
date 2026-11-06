@@ -84,7 +84,7 @@ export function CampaignStep({
           <ArrowLeft className="size-4" aria-hidden="true" />
           Back
         </Button>
-        <Button type="button" variant="outline" onClick={onSkip} disabled={pending}>
+        <Button type="button" variant="secondary" onClick={onSkip} disabled={pending}>
           Skip for now
         </Button>
         <Button

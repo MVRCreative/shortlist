@@ -28,7 +28,7 @@ function AccountRow({
   return (
     <li
       className={cn(
-        'flex flex-col gap-3 px-4 py-3 transition-opacity duration-200 ease-out sm:flex-row sm:items-start sm:justify-between sm:gap-6 sm:px-5',
+        'flex flex-col gap-3 px-4 py-3 transition-opacity duration-150 ease-out sm:flex-row sm:items-start sm:justify-between sm:gap-6 sm:px-5',
         verdict === 'nofit' && 'opacity-50',
       )}
     >
@@ -37,7 +37,7 @@ function AccountRow({
           href={`https://${account.domain}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="group inline-flex max-w-full flex-wrap items-baseline gap-x-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-base"
+          className="group inline-flex max-w-full flex-wrap items-baseline gap-x-2 rounded-md focus-ring"
         >
           <span className="text-label-sm text-text-strong-950">{account.name}</span>
           <span className="text-paragraph-xs text-text-soft-400 underline decoration-current/30 underline-offset-2 fine-hover:group-hover:decoration-current">

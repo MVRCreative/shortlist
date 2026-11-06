@@ -56,7 +56,7 @@ function AddChipInput({
         placeholder={placeholder}
         className="h-8 min-w-0 flex-1 rounded-full px-3 text-sm"
       />
-      <Button type="button" variant="outline" size="sm" onMouseDown={(event) => event.preventDefault()} onClick={commit} disabled={!draft.trim()}>
+      <Button type="button" variant="secondary" size="sm" onMouseDown={(event) => event.preventDefault()} onClick={commit} disabled={!draft.trim()}>
         Add
       </Button>
     </div>
@@ -212,8 +212,7 @@ export function UrlListField({
                   <Button
                     type="button"
                     variant="ghost"
-                    tone="muted"
-                    size="icon-sm"
+                    size="sm" icon
                     aria-label={`Remove row ${index + 1}`}
                     onClick={() => removeRow(index)}
                   >
@@ -234,9 +233,8 @@ export function UrlListField({
         <Button
           type="button"
           variant="ghost"
-          tone="muted"
-          size="xs"
-          className="w-fit px-0"
+          size="sm"
+          className="w-fit"
           onClick={() => onChange([...values, ''])}
         >
           <Plus />

@@ -57,10 +57,10 @@ export default function CampaignsPage() {
               <span className="rounded-full bg-bg-weak-50 px-2 py-0.5 text-paragraph-xs">Draft</span>
             </div>
             <div className="flex flex-wrap gap-3">
-              <Button type="button" variant="outline" onClick={() => setCampaignDraft(null)}>
+              <Button type="button" variant="secondary" onClick={() => setCampaignDraft(null)}>
                 Clear draft
               </Button>
-              <Button type="button" variant="outline" asChild>
+              <Button type="button" variant="secondary" asChild>
                 <Link href="/digest">Open digest</Link>
               </Button>
             </div>
