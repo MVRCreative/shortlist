@@ -7,131 +7,118 @@ import { ThemeToggle } from '@/components/theme-toggle'
 import { BrandMark } from '@/components/shortlist/brand-mark'
 import { cn, initialOf } from '@/lib/utils'
 
-export type DigestMenu = 'none' | 'profile' | 'settings'
+const NAV_ITEMS = [
+  { label: 'Digest', href: '/digest' },
+  { label: 'Audience', href: '/audience' },
+  { label: 'Campaigns', href: '/campaigns' },
+  { label: 'Profile', href: '/profile' },
+  { label: 'Plan', href: '/plan' },
+] as const
 
-/**
- * Digest chrome: brand + account. Profile / Audience / Campaigns / Plan / Sign out
- * are plain text actions — not padded buttons competing with the digest.
- */
+const MOBILE_MENU_ID = 'dashboard-mobile-menu'
+
 export function DashboardNav({
   isDemo,
   companyName,
   website,
-  menu,
-  onMenuChange,
   onSignOut,
 }: {
   isDemo: boolean
   companyName: string
   website: string
-  menu: DigestMenu
-  onMenuChange: (menu: DigestMenu) => void
   onSignOut: () => void
 }) {
-  const [open, setOpen] = useState(false)
   const pathname = usePathname()
-
-  function pick(next: DigestMenu) {
-    onMenuChange(menu === next ? 'none' : next)
-    setOpen(false)
-  }
+  // Tracking the path the menu was opened on closes it on navigation without an effect.
+  const [openOnPath, setOpenOnPath] = useState<string | null>(null)
+  const open = openOnPath === pathname
 
   const links = (
-    <nav aria-label="Account" className="flex flex-col gap-1.5">
-      <NavLink label="Digest" href="/digest" active={pathname === '/digest' && menu === 'none'} />
-      <NavLink label="Audience" href="/audience" active={pathname === '/audience'} />
-      <NavLink label="Campaigns" href="/campaigns" active={pathname === '/campaigns'} />
-      <NavButton label="Profile" active={menu === 'profile'} onSelect={() => pick('profile')} />
-      <NavButton label="Plan" active={menu === 'settings'} onSelect={() => pick('settings')} />
-      <NavButton label="Sign out" onSelect={onSignOut} />
+    <nav aria-label="Main" className="flex flex-col gap-0.5">
+      {NAV_ITEMS.map((item) => (
+        <NavLink key={item.href} {...item} active={pathname === item.href} />
+      ))}
     </nav>
+  )
+
+  const footer = (
+    <div className="flex items-center justify-between gap-2 border-t border-stroke-soft-200 pt-3">
+      <button
+        type="button"
+        onClick={onSignOut}
+        className="-mx-2 rounded-lg px-2 py-1.5 text-paragraph-xs text-text-soft-400 transition-colors duration-150 ease-out focus-ring fine-hover:hover:text-text-strong-950"
+      >
+        Sign out
+      </button>
+      <ThemeToggle />
+    </div>
   )
 
   return (
     <>
-      <div className="flex items-center justify-between gap-2 py-4 pt-[max(1rem,env(safe-area-inset-top))] lg:hidden">
+      <div className="flex items-center justify-between gap-2 px-4 pt-[max(0.5rem,env(safe-area-inset-top))] pb-2 sm:px-6 lg:hidden">
         <BrandMark isDemo={isDemo} />
-        <div className="flex items-center gap-3">
-          <ThemeToggle />
-          <button
-            type="button"
-            aria-label="Account"
-            aria-expanded={open}
-            onClick={() => setOpen((v) => !v)}
-            className="flex size-7 items-center justify-center rounded-md bg-bg-strong-950 text-label-xs font-medium text-static-white focus-ring"
-          >
+        <button
+          type="button"
+          aria-label={open ? 'Close menu' : 'Open menu'}
+          aria-expanded={open}
+          aria-controls={MOBILE_MENU_ID}
+          onClick={() => setOpenOnPath(open ? null : pathname)}
+          className="-mr-2 flex size-11 items-center justify-center rounded-lg focus-ring"
+        >
+          <span className="flex size-7 items-center justify-center rounded-md bg-bg-strong-950 text-label-xs font-medium text-static-white">
             {initialOf(companyName)}
-          </button>
-        </div>
+          </span>
+        </button>
       </div>
 
       {open ? (
-        <div className="mb-4 border-b border-stroke-soft-200 pb-4 lg:hidden">{links}</div>
+        <div id={MOBILE_MENU_ID} className="flex flex-col gap-3 border-b border-stroke-soft-200 px-4 pb-4 sm:px-6 lg:hidden">
+          <CompanyCard companyName={companyName} website={website} />
+          {links}
+          {footer}
+        </div>
       ) : null}
 
-      <div className="hidden flex-col px-4 pt-8 pb-10 lg:flex">
+      <div className="hidden min-h-dvh flex-col px-4 pt-8 pb-6 lg:flex">
         <BrandMark isDemo={isDemo} />
-        <div className="mt-8 flex flex-col gap-4">
-          <div className="flex items-start gap-2.5">
-            <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-md bg-bg-strong-950 text-label-xs font-medium text-static-white">
-              {initialOf(companyName)}
-            </span>
-            <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-              <span className="truncate text-paragraph-xs font-medium text-text-strong-950">{companyName}</span>
-              {website ? <span className="truncate text-paragraph-xs text-text-sub-600">{website}</span> : null}
-            </div>
-            <ThemeToggle />
-          </div>
+        <div className="mt-8 flex flex-1 flex-col gap-6">
+          <CompanyCard companyName={companyName} website={website} />
           {links}
         </div>
+        {footer}
       </div>
     </>
   )
 }
 
-function NavLink({
-  label,
-  href,
-  active,
-}: {
-  label: string
-  href: string
-  active?: boolean
-}) {
+function CompanyCard({ companyName, website }: { companyName: string; website: string }) {
+  return (
+    <div className="flex items-start gap-2.5">
+      <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-md bg-bg-strong-950 text-label-xs font-medium text-static-white">
+        {initialOf(companyName)}
+      </span>
+      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+        <span className="truncate text-paragraph-xs font-medium text-text-strong-950">{companyName}</span>
+        {website ? <span className="truncate text-paragraph-xs text-text-sub-600">{website}</span> : null}
+      </div>
+    </div>
+  )
+}
+
+function NavLink({ label, href, active }: { label: string; href: string; active: boolean }) {
   return (
     <Link
       href={href}
       aria-current={active ? 'page' : undefined}
       className={cn(
-        'w-fit text-left text-paragraph-xs transition-colors duration-150 focus-ring',
-        active ? 'text-text-strong-950' : 'text-text-sub-600 fine-hover:hover:text-text-strong-950',
+        '-mx-2 rounded-lg px-2 py-1.5 text-paragraph-xs transition-colors duration-150 ease-out focus-ring',
+        active
+          ? 'bg-bg-weak-50 font-medium text-text-strong-950'
+          : 'text-text-sub-600 fine-hover:hover:text-text-strong-950',
       )}
     >
       {label}
     </Link>
-  )
-}
-
-function NavButton({
-  label,
-  active,
-  onSelect,
-}: {
-  label: string
-  active?: boolean
-  onSelect: () => void
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onSelect}
-      aria-current={active ? 'true' : undefined}
-      className={cn(
-        'w-fit text-left text-paragraph-xs transition-colors duration-150 focus-ring',
-        active ? 'text-text-strong-950' : 'text-text-sub-600 fine-hover:hover:text-text-strong-950',
-      )}
-    >
-      {label}
-    </button>
   )
 }

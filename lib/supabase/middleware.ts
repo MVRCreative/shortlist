@@ -42,7 +42,9 @@ export async function updateSession(request: NextRequest) {
     path.startsWith("/digest") ||
     path.startsWith("/onboarding") ||
     path.startsWith("/audience") ||
-    path.startsWith("/campaigns");
+    path.startsWith("/campaigns") ||
+    path.startsWith("/profile") ||
+    path.startsWith("/plan");
   // Temporary: local product testing skips the sign-in gate while auth and
   // the database are rebuilt. Production still requires a session.
   const skipAuthGate = process.env.NODE_ENV === "development";

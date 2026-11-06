@@ -2,7 +2,7 @@
 
 import { PageSkeleton } from '@/components/shortlist/page-skeleton'
 import Link from 'next/link'
-import { DashboardNav } from '@/components/shortlist/dashboard-nav'
+import { AppShell } from '@/components/shortlist/app-shell'
 import { CampaignStep } from '@/components/shortlist/campaign-step'
 import { useShortlist } from '@/components/shortlist/shortlist-provider'
 import { Button } from '@/components/ui/button'
@@ -22,20 +22,13 @@ export default function CampaignsPage() {
   if (!hydrated) return <PageSkeleton />
 
   return (
-    <div className="mx-auto grid min-h-dvh w-full max-w-5xl lg:grid-cols-[11rem_minmax(0,1fr)]">
-      <aside className="lg:border-r lg:border-stroke-soft-200">
-        <div className="lg:sticky lg:top-0 lg:max-h-dvh lg:overflow-y-auto">
-          <DashboardNav
-            isDemo={isDemo}
-            companyName={studioName(input)}
-            website={input.website}
-            menu="none"
-            onMenuChange={() => {}}
-            onSignOut={handleSignOut}
-          />
-        </div>
-      </aside>
-      <main className="flex min-w-0 flex-col gap-6 px-4 pt-8 pb-20 sm:px-6 lg:px-8">
+    <AppShell
+      isDemo={isDemo}
+      companyName={studioName(input)}
+      website={input.website}
+      onSignOut={handleSignOut}
+      mainClassName="max-w-3xl gap-6 px-4 pt-8 sm:px-6 lg:px-8"
+    >
         <div className="flex flex-col gap-2">
           <p className="kicker">Campaigns</p>
           <h1 className="page-title">Why you’re reaching out</h1>
@@ -74,7 +67,6 @@ export default function CampaignsPage() {
             onContinue={(values) => setCampaignDraft(values)}
           />
         )}
-      </main>
-    </div>
+      </AppShell>
   )
 }

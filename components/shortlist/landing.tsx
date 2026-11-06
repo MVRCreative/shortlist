@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { BrandMark } from '@/components/shortlist/brand-mark'
 import { LandingRolodex } from '@/components/shortlist/landing-rolodex'
+import { ThemeToggle } from '@/components/theme-toggle'
 
 const BEATS = [
   { n: '01', label: 'Who', body: 'Ten accounts that look like your best clients.' },
@@ -22,14 +23,17 @@ export function Landing({
     <div className="relative min-h-dvh bg-bg-weak-50 text-text-strong-950">
       <header className="landing-enter relative z-10 flex items-center justify-between px-6 py-5 md:px-10">
         <BrandMark href="/" />
-        {continueSlot ?? (
-          <Link
-            href="/login"
-            className="text-paragraph-xs text-text-sub-600 transition-colors duration-150 fine-hover:hover:text-text-strong-950"
-          >
-            Sign in
-          </Link>
-        )}
+        <div className="flex items-center gap-3">
+          {continueSlot ?? (
+            <Link
+              href="/login"
+              className="rounded-md px-1 text-paragraph-xs text-text-sub-600 transition-colors duration-150 ease-out focus-ring fine-hover:hover:text-text-strong-950"
+            >
+              Sign in
+            </Link>
+          )}
+          <ThemeToggle />
+        </div>
       </header>
 
       <section className="relative z-10 grid min-h-[calc(100dvh-4.5rem)] grid-cols-1 items-end gap-12 px-6 pb-16 pt-10 md:grid-cols-12 md:items-center md:gap-8 md:px-10 md:pb-20 md:pt-0">

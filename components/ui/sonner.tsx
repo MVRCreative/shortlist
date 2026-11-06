@@ -6,10 +6,9 @@
  * Toasts confirm or report something transient; persistent state belongs in
  * StatusBanner and load failures in ErrorState.
  *
- * Styling: Sonner's rich-color variables are pointed at Loople's status tokens
- * (the same trios Badge and StatusBanner use), the neutral toast at `popover`,
- * and the radius and elevation at the `floating` role. No Sonner default color
- * reaches the screen.
+ * Styling: Sonner's rich-color variables point at the status tokens Badge and
+ * StatusBanner use, and the radius matches cards (rounded-xl). No Sonner
+ * default color reaches the screen.
  */
 'use client'
 
@@ -33,7 +32,7 @@ const TOKEN_VARS = {
   '--error-bg': 'var(--color-error-lighter)',
   '--error-text': 'var(--color-error-base)',
   '--error-border': 'var(--color-error-light)',
-  '--border-radius': '0.625rem',
+  '--border-radius': '0.75rem',
 } as CSSProperties
 
 function Toaster(props: ToasterProps) {

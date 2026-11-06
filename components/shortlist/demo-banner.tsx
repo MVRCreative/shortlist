@@ -6,7 +6,7 @@ export function DemoBanner({ className }: { className?: string }) {
     <StatusBanner
       tone="info"
       title="Demo output"
-      description="AI Gateway isn’t available on this team yet, so results are templated from your inputs."
+      description="Live research is off in this preview, so results are templated from your inputs."
       className={className}
     />
   )

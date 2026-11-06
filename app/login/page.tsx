@@ -18,6 +18,7 @@ function LoginForm() {
   const [step, setStep] = useState<"email" | "code">("email");
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [resendLockedUntil, setResendLockedUntil] = useState(0);
   const [pending, startTransition] = useTransition();
 
   return (
@@ -101,7 +102,7 @@ function LoginForm() {
               maxLength={6}
               required
               autoFocus
-              className="text-center text-base tracking-widest"
+              className="text-center text-label-md tabular-nums tracking-[0.3em]"
             />
           </div>
           {error ? (
@@ -131,8 +132,8 @@ function LoginForm() {
             </button>
             <button
               type="button"
-              className="text-paragraph-sm text-text-sub-600 underline-offset-4 hover:underline"
-              disabled={pending}
+              className="rounded-sm text-paragraph-sm text-text-sub-600 underline-offset-4 focus-ring disabled:text-text-disabled-300 fine-hover:hover:underline disabled:hover:no-underline"
+              disabled={pending || resendLockedUntil > 0}
               onClick={() => {
                 setError(null);
                 setNotice(null);
@@ -144,7 +145,9 @@ function LoginForm() {
                     setError(result.error);
                     return;
                   }
-                  setNotice("Sent a new code.");
+                  setNotice("Sent a new code. You can request another in 30 seconds.");
+                  setResendLockedUntil(Date.now() + 30_000);
+                  setTimeout(() => setResendLockedUntil(0), 30_000);
                 });
               }}
             >
