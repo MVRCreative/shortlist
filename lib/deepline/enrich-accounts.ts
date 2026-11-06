@@ -1,4 +1,5 @@
 import { spawn } from 'node:child_process'
+import { existsSync } from 'node:fs'
 import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { delimiter, join } from 'node:path'
 import { homedir, tmpdir } from 'node:os'
@@ -418,9 +419,23 @@ function parseReceipt(stdout: string): Record<string, unknown> | null {
   }
 }
 
+const LOCAL_DEEPLINE_CLI = join(process.cwd(), 'node_modules', 'deepline', 'dist', 'cli', 'index.mjs')
+
+const ENRICHMENT_UNAVAILABLE =
+  'We couldn’t look up contacts for these companies right now. Try again in a few minutes.'
+
+function deeplineCommand(args: string[]): { command: string; args: string[] } {
+  // Prefer the project-installed CLI so it works without a global install (and on Vercel).
+  if (existsSync(LOCAL_DEEPLINE_CLI)) {
+    return { command: process.execPath, args: [LOCAL_DEEPLINE_CLI, ...args] }
+  }
+  return { command: 'deepline', args }
+}
+
 function runDeepline(args: string[], cwd: string): Promise<{ code: number; stdout: string; stderr: string }> {
   return new Promise((resolve, reject) => {
-    const child = spawn('deepline', args, {
+    const invocation = deeplineCommand(args)
+    const child = spawn(invocation.command, invocation.args, {
       cwd,
       env: {
         ...process.env,
@@ -479,6 +494,11 @@ async function runPlay(
   maxCredits: number,
   directory: string,
 ): Promise<PlayRunResult> {
+  if (!process.env.DEEPLINE_API_KEY) {
+    console.error('[deepline] DEEPLINE_API_KEY is not set; skipping enrichment.')
+    return { ok: false, error: ENRICHMENT_UNAVAILABLE }
+  }
+
   let result: { code: number; stdout: string; stderr: string }
   try {
     result = await runDeepline(
@@ -499,10 +519,8 @@ async function runPlay(
     )
   } catch (error) {
     const detail = error instanceof Error ? error.message : 'Deepline failed to start.'
-    if (detail.includes('ENOENT')) {
-      return { ok: false, error: 'Deepline CLI is not on PATH. Install it with npm install -g deepline, then retry.' }
-    }
-    return { ok: false, error: detail }
+    console.error('[deepline] CLI failed to start:', detail)
+    return { ok: false, error: ENRICHMENT_UNAVAILABLE }
   }
 
   const receipt = parseReceipt(result.stdout)
@@ -521,7 +539,8 @@ async function runPlay(
   }
   if (payload === null) {
     const detail = receiptError || clip(result.stderr) || clip(result.stdout) || `exit ${result.code}`
-    return { ok: false, error: `Deepline enrichment failed: ${detail}` }
+    console.error('[deepline] enrichment failed:', detail)
+    return { ok: false, error: ENRICHMENT_UNAVAILABLE }
   }
   const warning =
     result.code !== 0 || (status !== null && status !== 'completed' && status !== 'dry_run')

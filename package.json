@@ -26,6 +26,7 @@
     "clsx": "^2.1.1",
     "culori": "^4.0.2",
     "date-fns": "4.1.0",
+    "deepline": "^0.3.477",
     "lucide-react": "^0.564.0",
     "next": "16.2.6",
     "next-themes": "^0.4.6",

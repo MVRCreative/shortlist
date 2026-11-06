@@ -1,6 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   transpilePackages: ['@loople/tokens'],
+  serverExternalPackages: ['deepline'],
+  // Deepline is spawned as a CLI, so it isn't traced from imports; ship it with server functions.
+  outputFileTracingIncludes: {
+    '/**': ['./node_modules/deepline/**', './node_modules/.pnpm/deepline@*/**'],
+  },
   allowedDevOrigins: ['*.vercel.run', '*.vusercontent.net', '*.v0.app', '*.v0.dev', '*.vercel.app'],
   async headers() {
     return [
