@@ -1,5 +1,6 @@
 'use client'
 
+import { PageSkeleton } from '@/components/shortlist/page-skeleton'
 import Link from 'next/link'
 import { DashboardNav } from '@/components/shortlist/dashboard-nav'
 import { CampaignStep } from '@/components/shortlist/campaign-step'
@@ -18,7 +19,7 @@ export default function CampaignsPage() {
     pending,
   } = useShortlist()
 
-  if (!hydrated) return <div className="min-h-dvh" aria-busy="true" />
+  if (!hydrated) return <PageSkeleton />
 
   return (
     <div className="mx-auto grid min-h-dvh w-full max-w-5xl lg:grid-cols-[11rem_minmax(0,1fr)]">

@@ -1,5 +1,6 @@
 'use client'
 
+import { PageSkeleton } from '@/components/shortlist/page-skeleton'
 import Link from 'next/link'
 import { DashboardNav } from '@/components/shortlist/dashboard-nav'
 import { MatchStep } from '@/components/shortlist/match-step'
@@ -21,7 +22,7 @@ export default function AudiencePage() {
     enriched,
   } = useShortlist()
 
-  if (!hydrated) return <div className="min-h-dvh" aria-busy="true" />
+  if (!hydrated) return <PageSkeleton />
 
   return (
     <div className="mx-auto grid min-h-dvh w-full max-w-5xl lg:grid-cols-[11rem_minmax(0,1fr)]">

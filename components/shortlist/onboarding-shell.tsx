@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 import { AppHeader } from '@/components/shortlist/app-header'
 import { DemoBanner } from '@/components/shortlist/demo-banner'
 import { OnboardingRail } from '@/components/shortlist/onboarding-rail'
+import { StepSkeleton } from '@/components/shortlist/page-skeleton'
 import { useShortlist } from '@/components/shortlist/shortlist-provider'
 import { ErrorState } from '@/components/ui/error-state'
 
@@ -18,7 +19,7 @@ export function OnboardingShell({ children }: { children: ReactNode }) {
     clearActionError,
   } = useShortlist()
 
-  if (!hydrated || !step || step === 'Digest') {
+  if (!step || step === 'Digest') {
     return <div className="min-h-dvh" aria-busy="true" />
   }
 
@@ -35,7 +36,7 @@ export function OnboardingShell({ children }: { children: ReactNode }) {
         {actionError ? (
           <ErrorState title="Couldn’t finish that step" description={actionError} onRetry={clearActionError} />
         ) : null}
-        {children}
+        {hydrated ? children : <StepSkeleton />}
       </main>
     </div>
   )

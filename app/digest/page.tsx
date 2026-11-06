@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { Dashboard } from '@/components/shortlist/dashboard'
+import { PageSkeleton } from '@/components/shortlist/page-skeleton'
 import { StepHeading } from '@/components/shortlist/step-heading'
 import { useShortlist } from '@/components/shortlist/shortlist-provider'
 import { Button } from '@/components/ui/button'
@@ -40,7 +41,7 @@ export default function DigestPage() {
     handleGenerateDigest(0)
   }, [hydrated, digest, pending, handleGenerateDigest, enriched, fitCount])
 
-  if (!hydrated) return <div className="min-h-dvh" aria-busy="true" />
+  if (!hydrated) return <PageSkeleton />
 
   if (!digest) {
     return (
