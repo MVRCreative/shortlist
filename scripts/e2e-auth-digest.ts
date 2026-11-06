@@ -73,8 +73,11 @@ async function main() {
     .from("icps")
     .insert({
       business_id: business.id,
+      lineage_id: crypto.randomUUID(),
       version: 1,
       is_active: true,
+      is_primary: true,
+      name: "Primary audience",
       industry_slugs: ["b2b_saas"],
       employee_ranges: ["11-50", "51-200", "201-500"],
       regions: ["north_america"],

@@ -133,16 +133,36 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
-                },"businesses": {
+                },"audience_reviews": {
                   Row: {
-                    "attio_record_id": string | null,"attio_synced_at": string | null,"case_study_urls": (string)[],"created_at": string,"deal_size": Database["public"]['Enums']["deal_size"] | null,"description": string | null,"id": string,"name": string | null,"onboarding_completed_at": string | null,"owner_id": string,"prefill": Json | null,"prefilled_at": string | null,"services": (string)[],"stripe_customer_id": string | null,"updated_at": string,"website_domain": string
+                    "business_id": string,"company_name": string | null,"domain": string,"id": string,"lineage_id": string,"reviewed_at": string,"snapshot": Json | null,"verdict": Database["public"]["Enums"]["audience_review_verdict"]
                   }
                   ComputedFields: never
                   Insert: {
-                    "attio_record_id"?: string | null,"attio_synced_at"?: string | null,"case_study_urls"?: (string)[],"created_at"?: string,"deal_size"?: Database["public"]['Enums']["deal_size"] | null,"description"?: string | null,"id"?: string,"name"?: string | null,"onboarding_completed_at"?: string | null,"owner_id": string,"prefill"?: Json | null,"prefilled_at"?: string | null,"services"?: (string)[],"stripe_customer_id"?: string | null,"updated_at"?: string,"website_domain": string
+                    "business_id": string,"company_name"?: string | null,"domain": string,"id"?: string,"lineage_id": string,"reviewed_at"?: string,"snapshot"?: Json | null,"verdict": Database["public"]["Enums"]["audience_review_verdict"]
                   }
                   Update: {
-                    "attio_record_id"?: string | null,"attio_synced_at"?: string | null,"case_study_urls"?: (string)[],"created_at"?: string,"deal_size"?: Database["public"]['Enums']["deal_size"] | null,"description"?: string | null,"id"?: string,"name"?: string | null,"onboarding_completed_at"?: string | null,"owner_id"?: string,"prefill"?: Json | null,"prefilled_at"?: string | null,"services"?: (string)[],"stripe_customer_id"?: string | null,"updated_at"?: string,"website_domain"?: string
+                    "business_id"?: string,"company_name"?: string | null,"domain"?: string,"id"?: string,"lineage_id"?: string,"reviewed_at"?: string,"snapshot"?: Json | null,"verdict"?: Database["public"]["Enums"]["audience_review_verdict"]
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "audience_reviews_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"businesses": {
+                  Row: {
+                    "attio_record_id": string | null,"attio_synced_at": string | null,"case_study_urls": (string)[],"created_at": string,"deal_size": Database["public"]['Enums']["deal_size"] | null,"description": string | null,"enriched_at": string | null,"enriched_profile": Json | null,"id": string,"linkedin_url": string | null,"name": string | null,"onboarding_completed_at": string | null,"owner_id": string,"prefill": Json | null,"prefilled_at": string | null,"services": (string)[],"stripe_customer_id": string | null,"updated_at": string,"website_domain": string,"x_url": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "attio_record_id"?: string | null,"attio_synced_at"?: string | null,"case_study_urls"?: (string)[],"created_at"?: string,"deal_size"?: Database["public"]['Enums']["deal_size"] | null,"description"?: string | null,"enriched_at"?: string | null,"enriched_profile"?: Json | null,"id"?: string,"linkedin_url"?: string | null,"name"?: string | null,"onboarding_completed_at"?: string | null,"owner_id": string,"prefill"?: Json | null,"prefilled_at"?: string | null,"services"?: (string)[],"stripe_customer_id"?: string | null,"updated_at"?: string,"website_domain": string,"x_url"?: string | null
+                  }
+                  Update: {
+                    "attio_record_id"?: string | null,"attio_synced_at"?: string | null,"case_study_urls"?: (string)[],"created_at"?: string,"deal_size"?: Database["public"]['Enums']["deal_size"] | null,"description"?: string | null,"enriched_at"?: string | null,"enriched_profile"?: Json | null,"id"?: string,"linkedin_url"?: string | null,"name"?: string | null,"onboarding_completed_at"?: string | null,"owner_id"?: string,"prefill"?: Json | null,"prefilled_at"?: string | null,"services"?: (string)[],"stripe_customer_id"?: string | null,"updated_at"?: string,"website_domain"?: string,"x_url"?: string | null
                   }
                   Relationships: [
                     {
@@ -295,16 +315,62 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
-                },"drops": {
+                },"campaign_assets": {
                   Row: {
-                    "business_id": string,"created_at": string,"delivered_at": string | null,"delivered_count": number,"error": string | null,"icp_id": string,"id": string,"notified_at": string | null,"plan_id": string,"scheduled_for": string,"shortfall": number,"shortfall_note": string | null,"status": Database["public"]['Enums']["drop_status"],"target_count": number,"updated_at": string
+                    "body": string,"business_id": string,"campaign_id": string | null,"created_at": string,"edited_at": string | null,"id": string,"input_hash": string,"outline": Json | null,"title": string | null,"type": Database["public"]["Enums"]["content_type"],"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "business_id": string,"created_at"?: string,"delivered_at"?: string | null,"delivered_count"?: number,"error"?: string | null,"icp_id": string,"id"?: string,"notified_at"?: string | null,"plan_id": string,"scheduled_for": string,"shortfall"?: number,"shortfall_note"?: string | null,"status"?: Database["public"]['Enums']["drop_status"],"target_count": number,"updated_at"?: string
+                    "body": string,"business_id": string,"campaign_id"?: string | null,"created_at"?: string,"edited_at"?: string | null,"id"?: string,"input_hash": string,"outline"?: Json | null,"title"?: string | null,"type": Database["public"]["Enums"]["content_type"],"updated_at"?: string
                   }
                   Update: {
-                    "business_id"?: string,"created_at"?: string,"delivered_at"?: string | null,"delivered_count"?: number,"error"?: string | null,"icp_id"?: string,"id"?: string,"notified_at"?: string | null,"plan_id"?: string,"scheduled_for"?: string,"shortfall"?: number,"shortfall_note"?: string | null,"status"?: Database["public"]['Enums']["drop_status"],"target_count"?: number,"updated_at"?: string
+                    "body"?: string,"business_id"?: string,"campaign_id"?: string | null,"created_at"?: string,"edited_at"?: string | null,"id"?: string,"input_hash"?: string,"outline"?: Json | null,"title"?: string | null,"type"?: Database["public"]["Enums"]["content_type"],"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "campaign_assets_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "campaign_assets_campaign_id_fkey"
+      columns: ["campaign_id"]
+isOneToOne: false
+      referencedRelation: "campaigns"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"campaigns": {
+                  Row: {
+                    "audience_lineage_id": string,"business_id": string,"created_at": string,"id": string,"interpreted": Json | null,"objective": string,"status": Database["public"]["Enums"]["campaign_status"],"supporting_url": string | null,"title": string,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "audience_lineage_id": string,"business_id": string,"created_at"?: string,"id"?: string,"interpreted"?: Json | null,"objective": string,"status"?: Database["public"]["Enums"]["campaign_status"],"supporting_url"?: string | null,"title": string,"updated_at"?: string
+                  }
+                  Update: {
+                    "audience_lineage_id"?: string,"business_id"?: string,"created_at"?: string,"id"?: string,"interpreted"?: Json | null,"objective"?: string,"status"?: Database["public"]["Enums"]["campaign_status"],"supporting_url"?: string | null,"title"?: string,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "campaigns_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"drops": {
+                  Row: {
+                    "audience_snapshot": Json | null,"business_id": string,"campaign_id": string | null,"campaign_snapshot": Json | null,"created_at": string,"delivered_at": string | null,"delivered_count": number,"error": string | null,"icp_id": string,"id": string,"notified_at": string | null,"plan_id": string,"scheduled_for": string,"shortfall": number,"shortfall_note": string | null,"status": Database["public"]['Enums']["drop_status"],"target_count": number,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "audience_snapshot"?: Json | null,"business_id": string,"campaign_id"?: string | null,"campaign_snapshot"?: Json | null,"created_at"?: string,"delivered_at"?: string | null,"delivered_count"?: number,"error"?: string | null,"icp_id": string,"id"?: string,"notified_at"?: string | null,"plan_id": string,"scheduled_for": string,"shortfall"?: number,"shortfall_note"?: string | null,"status"?: Database["public"]['Enums']["drop_status"],"target_count": number,"updated_at"?: string
+                  }
+                  Update: {
+                    "audience_snapshot"?: Json | null,"business_id"?: string,"campaign_id"?: string | null,"campaign_snapshot"?: Json | null,"created_at"?: string,"delivered_at"?: string | null,"delivered_count"?: number,"error"?: string | null,"icp_id"?: string,"id"?: string,"notified_at"?: string | null,"plan_id"?: string,"scheduled_for"?: string,"shortfall"?: number,"shortfall_note"?: string | null,"status"?: Database["public"]["Enums"]["drop_status"],"target_count"?: number,"updated_at"?: string
                   }
                   Relationships: [
                     {
@@ -330,6 +396,26 @@ isOneToOne: false
       columns: ["plan_id"]
 isOneToOne: false
       referencedRelation: "plans"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"icp_reference_accounts": {
+                  Row: {
+                    "created_at": string,"domain": string,"icp_id": string,"id": string,"label": string | null,"url": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"domain": string,"icp_id": string,"id"?: string,"label"?: string | null,"url"?: string | null
+                  }
+                  Update: {
+                    "created_at"?: string,"domain"?: string,"icp_id"?: string,"id"?: string,"label"?: string | null,"url"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "icp_reference_accounts_icp_id_fkey"
+      columns: ["icp_id"]
+isOneToOne: false
+      referencedRelation: "icps"
       referencedColumns: ["id"]
     }
                   ]
@@ -361,14 +447,14 @@ isOneToOne: false
                   ]
                 },"icps": {
                   Row: {
-                    "business_id": string,"buyer_titles": (string)[],"created_at": string,"custom_industries": (string)[],"employee_ranges": (Database["public"]['Enums']["employee_range"])[],"id": string,"industry_slugs": (string)[],"is_active": boolean,"regions": (Database["public"]['Enums']["region_code"])[],"signal_types": (Database["public"]['Enums']["signal_type"])[],"updated_at": string,"version": number
+                    "business_id": string,"buyer_titles": (string)[],"created_at": string,"custom_industries": (string)[],"description": string | null,"employee_ranges": (Database["public"]['Enums']["employee_range"])[],"id": string,"industry_slugs": (string)[],"is_active": boolean,"is_primary": boolean,"lineage_id": string,"name": string,"regions": (Database["public"]['Enums']["region_code"])[],"signal_types": (Database["public"]['Enums']["signal_type"])[],"updated_at": string,"version": number
                   }
                   ComputedFields: never
                   Insert: {
-                    "business_id": string,"buyer_titles"?: (string)[],"created_at"?: string,"custom_industries"?: (string)[],"employee_ranges"?: (Database["public"]['Enums']["employee_range"])[],"id"?: string,"industry_slugs"?: (string)[],"is_active"?: boolean,"regions"?: (Database["public"]['Enums']["region_code"])[],"signal_types"?: (Database["public"]['Enums']["signal_type"])[],"updated_at"?: string,"version": number
+                    "business_id": string,"buyer_titles"?: (string)[],"created_at"?: string,"custom_industries"?: (string)[],"description"?: string | null,"employee_ranges"?: (Database["public"]['Enums']["employee_range"])[],"id"?: string,"industry_slugs"?: (string)[],"is_active"?: boolean,"is_primary"?: boolean,"lineage_id": string,"name"?: string,"regions"?: (Database["public"]['Enums']["region_code"])[],"signal_types"?: (Database["public"]['Enums']["signal_type"])[],"updated_at"?: string,"version": number
                   }
                   Update: {
-                    "business_id"?: string,"buyer_titles"?: (string)[],"created_at"?: string,"custom_industries"?: (string)[],"employee_ranges"?: (Database["public"]['Enums']["employee_range"])[],"id"?: string,"industry_slugs"?: (string)[],"is_active"?: boolean,"regions"?: (Database["public"]['Enums']["region_code"])[],"signal_types"?: (Database["public"]['Enums']["signal_type"])[],"updated_at"?: string,"version"?: number
+                    "business_id"?: string,"buyer_titles"?: (string)[],"created_at"?: string,"custom_industries"?: (string)[],"description"?: string | null,"employee_ranges"?: (Database["public"]['Enums']["employee_range"])[],"id"?: string,"industry_slugs"?: (string)[],"is_active"?: boolean,"is_primary"?: boolean,"lineage_id"?: string,"name"?: string,"regions"?: (Database["public"]['Enums']["region_code"])[],"signal_types"?: (Database["public"]['Enums']["signal_type"])[],"updated_at"?: string,"version"?: number
                   }
                   Relationships: [
                     {
@@ -656,7 +742,7 @@ isOneToOne: true
           }
           Functions: {
             "deliverable_companies":
-{ Args: { "p_business_id": string,"result_limit"?: number }; Returns: {
+{ Args: { "p_business_id": string,"result_limit"?: number,"p_audience_lineage_id"?: string }; Returns: {
               "company_id": string,"score": number,"score_breakdown": Json
             }[]
                            },
@@ -700,7 +786,7 @@ isOneToOne: true
       } }
           }
           Enums: {
-            "account_event_type": "delivered"|"viewed"|"marked_fit"|"marked_not_fit"|"contacted"|"replied"|"booked_call","billing_interval": "monthly"|"yearly","content_type": "linkedin_post"|"x_post"|"blog_idea","data_source": "ocean"|"predictleads"|"csv"|"manual","deal_size": "under_10k"|"10k_25k"|"25k_75k"|"75k_plus","drop_status": "scheduled"|"building"|"delivered"|"failed"|"skipped","email_status": "verified"|"risky"|"invalid"|"unknown","employee_range": "1-10"|"11-50"|"51-200"|"201-500"|"501-1000"|"1000+","fit_status": "fit"|"not_fit","import_status": "pending"|"processing"|"completed"|"failed","library_status": "building"|"active"|"paused"|"archived","not_fit_reason": "too_small"|"too_big"|"wrong_industry"|"wrong_region"|"already_client","plan_cadence": "weekly"|"monthly","region_code": "north_america"|"uk_ireland"|"europe"|"apac"|"latin_america","sector_request_status": "open"|"in_progress"|"fulfilled"|"declined","signal_type": "funding"|"hiring"|"leadership_change"|"product_launch"|"expansion"|"news"|"other","subscription_status": "trialing"|"active"|"past_due"|"canceled"|"incomplete"|"incomplete_expired"|"unpaid"|"paused","suppression_type": "company_domain"|"person_linkedin"|"email","user_role": "standard"|"admin"
+            "account_event_type": "delivered"|"viewed"|"marked_fit"|"marked_not_fit"|"contacted"|"replied"|"booked_call","audience_review_verdict": "fit"|"not_fit","billing_interval": "monthly"|"yearly","campaign_status": "draft"|"active"|"completed"|"archived","content_type": "linkedin_post"|"x_post"|"blog_idea","data_source": "ocean"|"predictleads"|"csv"|"manual","deal_size": "under_10k"|"10k_25k"|"25k_75k"|"75k_plus","drop_status": "scheduled"|"building"|"delivered"|"failed"|"skipped","email_status": "verified"|"risky"|"invalid"|"unknown","employee_range": "1-10"|"11-50"|"51-200"|"201-500"|"501-1000"|"1000+","fit_status": "fit"|"not_fit","import_status": "pending"|"processing"|"completed"|"failed","library_status": "building"|"active"|"paused"|"archived","not_fit_reason": "too_small"|"too_big"|"wrong_industry"|"wrong_region"|"already_client","plan_cadence": "weekly"|"monthly","region_code": "north_america"|"uk_ireland"|"europe"|"apac"|"latin_america","sector_request_status": "open"|"in_progress"|"fulfilled"|"declined","signal_type": "funding"|"hiring"|"leadership_change"|"product_launch"|"expansion"|"news"|"other","subscription_status": "trialing"|"active"|"past_due"|"canceled"|"incomplete"|"incomplete_expired"|"unpaid"|"paused","suppression_type": "company_domain"|"person_linkedin"|"email","user_role": "standard"|"admin"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -820,7 +906,7 @@ export const Constants = {
           }
         },"public": {
           Enums: {
-            "account_event_type": ["delivered", "viewed", "marked_fit", "marked_not_fit", "contacted", "replied", "booked_call"],"billing_interval": ["monthly", "yearly"],"content_type": ["linkedin_post", "x_post", "blog_idea"],"data_source": ["ocean", "predictleads", "csv", "manual"],"deal_size": ["under_10k", "10k_25k", "25k_75k", "75k_plus"],"drop_status": ["scheduled", "building", "delivered", "failed", "skipped"],"email_status": ["verified", "risky", "invalid", "unknown"],"employee_range": ["1-10", "11-50", "51-200", "201-500", "501-1000", "1000+"],"fit_status": ["fit", "not_fit"],"import_status": ["pending", "processing", "completed", "failed"],"library_status": ["building", "active", "paused", "archived"],"not_fit_reason": ["too_small", "too_big", "wrong_industry", "wrong_region", "already_client"],"plan_cadence": ["weekly", "monthly"],"region_code": ["north_america", "uk_ireland", "europe", "apac", "latin_america"],"sector_request_status": ["open", "in_progress", "fulfilled", "declined"],"signal_type": ["funding", "hiring", "leadership_change", "product_launch", "expansion", "news", "other"],"subscription_status": ["trialing", "active", "past_due", "canceled", "incomplete", "incomplete_expired", "unpaid", "paused"],"suppression_type": ["company_domain", "person_linkedin", "email"],"user_role": ["standard", "admin"]
+            "account_event_type": ["delivered", "viewed", "marked_fit", "marked_not_fit", "contacted", "replied", "booked_call"],"audience_review_verdict": ["fit", "not_fit"],"billing_interval": ["monthly", "yearly"],"campaign_status": ["draft", "active", "completed", "archived"],"content_type": ["linkedin_post", "x_post", "blog_idea"],"data_source": ["ocean", "predictleads", "csv", "manual"],"deal_size": ["under_10k", "10k_25k", "25k_75k", "75k_plus"],"drop_status": ["scheduled", "building", "delivered", "failed", "skipped"],"email_status": ["verified", "risky", "invalid", "unknown"],"employee_range": ["1-10", "11-50", "51-200", "201-500", "501-1000", "1000+"],"fit_status": ["fit", "not_fit"],"import_status": ["pending", "processing", "completed", "failed"],"library_status": ["building", "active", "paused", "archived"],"not_fit_reason": ["too_small", "too_big", "wrong_industry", "wrong_region", "already_client"],"plan_cadence": ["weekly", "monthly"],"region_code": ["north_america", "uk_ireland", "europe", "apac", "latin_america"],"sector_request_status": ["open", "in_progress", "fulfilled", "declined"],"signal_type": ["funding", "hiring", "leadership_change", "product_launch", "expansion", "news", "other"],"subscription_status": ["trialing", "active", "past_due", "canceled", "incomplete", "incomplete_expired", "unpaid", "paused"],"suppression_type": ["company_domain", "person_linkedin", "email"],"user_role": ["standard", "admin"]
           }
         }
 } as const

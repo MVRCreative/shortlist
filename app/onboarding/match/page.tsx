@@ -1,20 +1,13 @@
 'use client'
 
-import { MatchStep } from '@/components/shortlist/match-step'
-import { useShortlist } from '@/components/shortlist/shortlist-provider'
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 
-export default function MatchPage() {
-  const { hydrated, accounts, verdicts, handleVerdict, goTo } = useShortlist()
-
-  if (!hydrated) return null
-
-  return (
-    <MatchStep
-      accounts={accounts}
-      verdicts={verdicts}
-      onVerdict={handleVerdict}
-      onBack={() => goTo('Profile')}
-      onContinue={() => goTo('Turn on')}
-    />
-  )
+/** Legacy route — Audience replaced Match. */
+export default function MatchRedirectPage() {
+  const router = useRouter()
+  useEffect(() => {
+    router.replace('/onboarding/audience')
+  }, [router])
+  return null
 }

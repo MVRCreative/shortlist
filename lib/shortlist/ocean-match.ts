@@ -122,7 +122,10 @@ function domainsFrom(values: string[]) {
   return domains
 }
 
-export function buildCompanySearch(input: ProfileInput): { body: CompanySearchBody; seeds: string[] } | { error: string } {
+export function buildCompanySearch(
+  input: ProfileInput,
+  options?: { size?: number; extraExcludeDomains?: readonly string[] },
+): { body: CompanySearchBody; seeds: string[]; blocked: string[] } | { error: string } {
   const seeds = domainsFrom(input.seedClients)
   if (seeds.length === 0) {
     return { error: 'Add example client websites so Ocean can find similar accounts.' }
@@ -132,10 +135,12 @@ export function buildCompanySearch(input: ProfileInput): { body: CompanySearchBo
   const own = normalizeDomain(input.website)
   if (own) blocked.add(own)
   for (const domain of domainsFrom(input.excludedDomains)) blocked.add(domain)
+  for (const domain of domainsFrom([...(options?.extraExcludeDomains ?? [])])) blocked.add(domain)
+  const blockedList = [...blocked]
 
   const companiesFilters: Record<string, unknown> = {
     lookalikeDomains: seeds,
-    excludeDomains: [...blocked].slice(0, 50),
+    excludeDomains: blockedList.slice(0, 50),
     companyMatchingMode: 'precise',
   }
   const companySizes = oceanCompanySizes(input.companySizes)
@@ -145,8 +150,9 @@ export function buildCompanySearch(input: ProfileInput): { body: CompanySearchBo
 
   return {
     seeds,
+    blocked: blockedList,
     body: {
-      size: MATCH_SIZE,
+      size: options?.size ?? MATCH_SIZE,
       fields: [...COMPANY_SEARCH_FIELDS],
       companiesFilters,
     },
@@ -219,7 +225,25 @@ function oceanDescription(company: OceanCompany) {
   return `${trimmed}…`
 }
 
-export function toSampleAccounts(companies: OceanCompany[], blocked: Set<string>): SampleAccount[] {
+function companyLinkedInUrl(company: OceanCompany): string | null {
+  const raw = company.medias?.linkedin?.url?.trim()
+  if (!raw) return null
+  try {
+    const url = new URL(raw.startsWith('http') ? raw : `https://${raw}`)
+    const host = url.hostname.toLowerCase()
+    if (host !== 'linkedin.com' && !host.endsWith('.linkedin.com')) return null
+    if (!url.pathname.startsWith('/company/')) return null
+    return url.toString()
+  } catch {
+    return null
+  }
+}
+
+export function toSampleAccounts(
+  companies: OceanCompany[],
+  blocked: Set<string>,
+  limit = MATCH_SIZE,
+): SampleAccount[] {
   const seen = new Set<string>()
   const accounts: SampleAccount[] = []
   for (const company of companies) {
@@ -235,8 +259,9 @@ export function toSampleAccounts(companies: OceanCompany[], blocked: Set<string>
       location: locationLabel(company),
       signal: realSignal(company),
       fitReason: oceanDescription(company),
+      linkedinCompanyUrl: companyLinkedInUrl(company),
     })
-    if (accounts.length >= MATCH_SIZE) break
+    if (accounts.length >= limit) break
   }
   return accounts
 }
@@ -249,10 +274,11 @@ function oceanErrorMessage(error: unknown) {
     if (error.status === 402) return 'Ocean is out of credits for this search.'
     if (error.status === 401 || error.status === 403) return 'Ocean rejected the API token. Check OCEAN_API_TOKEN.'
     console.warn('[shortlist] ocean match', error.status, error.message)
-    return "Ocean couldn't search companies. Try again."
+    return `Ocean couldn't search companies (${error.status}): ${error.message}`
   }
-  console.warn('[shortlist] ocean match', error instanceof Error ? error.message : error)
-  return "Couldn't find accounts. Try again."
+  const detail = error instanceof Error ? error.message : 'Unknown error'
+  console.warn('[shortlist] ocean match', detail)
+  return `Couldn't find accounts: ${detail}`
 }
 
 /** One company search for onboarding calibration. No contacts, no mock fill. */
@@ -268,12 +294,7 @@ export async function matchAccountsFromOcean(
   try {
     const response = await new OceanClient(token).searchCompanies(built.body)
     const companies = response.companies.map((row) => unwrapOceanCompany(row))
-    const blocked = new Set(
-      ((built.body.companiesFilters.excludeDomains as string[] | undefined) ?? []).map((domain) =>
-        domain.toLowerCase(),
-      ),
-    )
-    const accounts = toSampleAccounts(companies, blocked)
+    const accounts = toSampleAccounts(companies, new Set(built.blocked))
     if (accounts.length === 0) {
       const missing = Object.keys(response.missingDomains ?? {})
       if (missing.length > 0) {
@@ -285,6 +306,61 @@ export async function matchAccountsFromOcean(
       return {
         ok: false,
         error: 'Ocean returned no accounts for this size and region. Broaden those filters and try again.',
+      }
+    }
+    return { ok: true, accounts }
+  } catch (error) {
+    return { ok: false, error: oceanErrorMessage(error) }
+  }
+}
+
+/**
+ * Weekly discovery. Returns accounts the caller has not already shown.
+ * Does not look up people. Callers enrich only the accounts they keep.
+ */
+export async function findNewAccountsFromOcean(
+  input: ProfileInput,
+  options: { target: number; extraExcludeDomains?: readonly string[] },
+): Promise<{ ok: true; accounts: SampleAccount[] } | { ok: false; error: string }> {
+  const target = Math.min(Math.max(Math.trunc(options.target), 1), MATCH_SIZE)
+  const built = buildCompanySearch(input, {
+    size: target,
+    extraExcludeDomains: options.extraExcludeDomains,
+  })
+  if ('error' in built) return { ok: false, error: built.error }
+
+  const token = process.env.OCEAN_API_TOKEN?.trim()
+  if (!token) return { ok: false, error: 'Add OCEAN_API_TOKEN to the server environment, then try again.' }
+
+  try {
+    const client = new OceanClient(token)
+    const blocked = new Set(built.blocked)
+    const collected: OceanCompany[] = []
+    let searchAfter: string | string[] | undefined
+    let missing: string[] = []
+
+    for (let page = 0; page < 3; page += 1) {
+      const body: Record<string, unknown> = { ...built.body, size: target }
+      if (searchAfter) body.searchAfter = searchAfter
+      const response = await client.searchCompanies(body)
+      missing = Object.keys(response.missingDomains ?? {})
+      collected.push(...response.companies.map((row) => unwrapOceanCompany(row)))
+      const selected = toSampleAccounts(collected, blocked, target)
+      searchAfter = response.searchAfter
+      if (selected.length >= target || !searchAfter || response.companies.length === 0) break
+    }
+
+    const accounts = toSampleAccounts(collected, blocked, target)
+    if (accounts.length === 0) {
+      if (missing.length > 0) {
+        return {
+          ok: false,
+          error: `Ocean doesn't have enough data on ${missing.slice(0, 3).join(', ')} to find similar accounts.`,
+        }
+      }
+      return {
+        ok: false,
+        error: 'Ocean returned no new accounts after excluding accounts you have already seen.',
       }
     }
     return { ok: true, accounts }

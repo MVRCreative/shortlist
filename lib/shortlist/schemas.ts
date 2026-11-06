@@ -11,7 +11,11 @@ export const studioProfileSchema = z.object({
   companyName: z.string().trim().max(120).optional(),
   services: z.array(label).min(1).max(12),
   caseStudies: z.array(z.string().trim().max(500)).max(3),
+  linkedinUrl: z.string().trim().max(500).optional(),
+  xUrl: z.string().trim().max(500).optional(),
   seedClients: z.array(domain).min(2).max(3),
+  /** Extra reference companies. Stored on the audience; never sent as Ocean lookalike seeds. */
+  referenceClients: z.array(domain).max(20).default([]),
   industries: z.array(label).min(1).max(12),
   companySizes: z.array(z.string().max(40)).min(1).max(6),
   regions: z.array(z.string().max(40)).min(1).max(6),
@@ -21,6 +25,18 @@ export const studioProfileSchema = z.object({
   excludedDomains: z.array(domain).max(200),
 })
 export type StudioProfile = z.infer<typeof studioProfileSchema>
+
+export const campaignStatusSchema = z.enum(['draft', 'active', 'completed', 'archived'])
+export type CampaignStatus = z.infer<typeof campaignStatusSchema>
+
+export const campaignDraftSchema = z.object({
+  title: z.string().trim().min(1).max(120),
+  objective: z.string().trim().min(1).max(2000),
+  audienceLineageId: z.string().uuid(),
+  supportingUrl: z.string().trim().max(500).optional(),
+  activate: z.boolean().default(false),
+})
+export type CampaignDraft = z.infer<typeof campaignDraftSchema>
 
 export const profileInputSchema = studioProfileSchema
 export type ProfileInput = StudioProfile
@@ -50,6 +66,12 @@ export const sampleAccountSchema = z.object({
   location: z.string().describe('City, Country'),
   signal: z.string().describe('A short, recent buying signal, under 10 words'),
   fitReason: z.string().describe('Company description from Ocean. Empty when Ocean has none'),
+  linkedinCompanyUrl: z
+    .string()
+    .url()
+    .nullable()
+    .optional()
+    .describe('Ocean LinkedIn company page when present'),
 })
 export const sampleAccountsSchema = z.object({
   accounts: z.array(sampleAccountSchema).describe('Exactly 10 accounts'),
@@ -88,9 +110,13 @@ export const digestSchema = z.object({
       domain: z.string().describe('Company website domain, e.g. acme.com'),
       /** Verified work email at delivery time. Null when verification failed — omit in UI. */
       email: z.string().email().nullable(),
-      linkedinUrl: z.string().url().describe('Decision-maker LinkedIn profile URL'),
+      linkedinUrl: z.string().url().nullable().describe('Decision-maker LinkedIn profile URL, or null when Deepline did not return one'),
       signal: z.string().describe('Recent buying signal, under 10 words'),
       angle: z.string().describe('Suggested outreach angle, under 20 words'),
+      fitReason: z
+        .string()
+        .optional()
+        .describe('Why this account matches the audience, using only known company facts'),
       message: z
         .string()
         .describe(

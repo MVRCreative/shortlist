@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { buildCampaignContent } from "@/lib/shortlist/campaign-content";
 import type { Digest } from "@/lib/shortlist/schemas";
 import type { Database, Json } from "@/lib/supabase/database.types";
 
@@ -26,6 +27,43 @@ function asSnapshot(raw: Json): Snapshot {
   return raw as Snapshot;
 }
 
+const REGION_LABELS: Record<Database["public"]["Enums"]["region_code"], string> = {
+  north_america: "North America",
+  uk_ireland: "UK & Ireland",
+  europe: "Europe",
+  apac: "APAC",
+  latin_america: "Latin America",
+};
+
+async function audienceFor(client: Client, businessId: string) {
+  const empty = { industries: [] as string[], buyerTitles: [] as string[], regions: [] as string[] };
+  const { data: icp, error } = await client
+    .from("icps")
+    .select("custom_industries, industry_slugs, buyer_titles, regions")
+    .eq("business_id", businessId)
+    .eq("is_active", true)
+    .maybeSingle();
+  if (error || !icp) return empty;
+
+  const labels = new Map<string, string>();
+  if (icp.industry_slugs.length > 0) {
+    const { data: industries } = await client
+      .from("industries")
+      .select("slug, label")
+      .in("slug", icp.industry_slugs);
+    for (const industry of industries ?? []) labels.set(industry.slug, industry.label);
+  }
+
+  return {
+    industries: [
+      ...icp.industry_slugs.map((slug) => labels.get(slug) ?? slug.replaceAll("_", " ")),
+      ...icp.custom_industries,
+    ],
+    buyerTitles: icp.buyer_titles,
+    regions: icp.regions.map((region) => REGION_LABELS[region]),
+  };
+}
+
 function placeholderLinkedIn(name: string, company: string): string {
   const q = encodeURIComponent(`${name} ${company}`);
   return `https://www.linkedin.com/search/results/all/?keywords=${q}`;
@@ -49,7 +87,7 @@ export async function loadDigestForUser(client: Client): Promise<{
 
   const { data: business, error: businessError } = await client
     .from("businesses")
-    .select("id, name, services")
+    .select("id, name, services, website_domain, description, case_study_urls")
     .eq("owner_id", user.id)
     .maybeSingle();
   if (businessError) {
@@ -105,42 +143,42 @@ export async function loadDigestForUser(client: Client): Promise<{
       linkedinUrl,
       signal: snap.signal?.title ?? "ICP lookalike match",
       angle: row.outreach_angle,
+      fitReason: row.fit_reason,
       message: row.linkedin_message,
     };
   });
 
   const studio = business.name ?? "your studio";
-  const services = (business.services ?? []).slice(0, 2).join(" and ");
+  const audience = await audienceFor(client, business.id);
   const theme =
     drop.shortfall && drop.shortfall > 0
       ? `Strong matches this week (${leads.length})`
       : "Your Shortlist this week";
+  const content = buildCampaignContent({
+    profile: {
+      companyName: studio,
+      website: business.website_domain,
+      description: business.description ?? "",
+      services: business.services ?? [],
+      industries: audience.industries,
+      buyerTitles: audience.buyerTitles,
+      regions: audience.regions,
+      caseStudies: business.case_study_urls ?? [],
+    },
+  });
 
   const digest: Digest = {
     theme,
     leads,
     linkedinPost: {
-      hook: `Most studios wait for referrals. ${studio} doesn't have to.`,
-      body: [
-        `This week we queued ${leads.length} accounts that look like your best-fit clients.`,
-        services
-          ? `Each one is a plausible buyer for ${services}.`
-          : "Each one is ranked to your ICP.",
-        "Open Shortlist, pick one, and send the draft note. Consistency beats volume.",
-      ].join("\n\n"),
+      hook: content.linkedinPost.hook,
+      body: content.linkedinPost.body,
     },
-    xPost: `New Shortlist drop: ${leads.length} accounts worth a note this week. Who to contact, why, and what to say — without the research slog.`,
+    xPost: content.xPost.body,
     blogIdea: {
-      title: "How we pick who to contact next",
-      angle:
-        "A short explanation of lookalike + ICP matching for studio founders building an outbound habit.",
-      outline: [
-        "Start from customers you already love",
-        "Filter by size, region, and buyer role",
-        "Prefer dated signals when they exist",
-        "Ship a small weekly list, not a database",
-        "Track replies, not vanity metrics",
-      ],
+      title: content.blogIdea.title,
+      angle: content.blogIdea.angle,
+      outline: content.blogIdea.outline,
     },
   };
 

@@ -73,26 +73,17 @@ export function buildDropCopy(input: {
     ? `Reference the recent ${input.fundingTitle} and connect it to the work you do for companies like ${seeds || "your best customers"}.`
     : `Lead with relevance to ${seeds || "your seed accounts"} and ask about their current priorities. Do not invent a buying signal.`;
 
-  const greeting = input.contactName
-    ? `Hi ${input.contactName.split(" ")[0]},`
-    : "Hi,";
-  const titleClause = input.contactTitle
+  const firstName = input.contactName?.split(/\s+/)[0]?.trim() || null;
+  const signalBit = input.fundingTitle
+    ? `Saw the ${input.fundingTitle} — curious how that shapes priorities for the next few months.`
+    : `Curious whether outbound or positioning support is on your radar right now.`;
+  const titleBit = input.contactTitle
     ? ` Your role as ${input.contactTitle} stood out.`
     : "";
-
-  const linkedin_message = `${greeting}
-
-I work with companies similar to ${seeds || input.domain}.${titleClause} ${input.companyName} fits the profile of teams we help most (${industryBit}, ${sizeBit}).
-
-${
-  input.fundingTitle
-    ? `Saw the ${input.fundingTitle} — curious how that shapes priorities for the next few months.`
-    : `Curious whether outbound or positioning support is on your radar right now.`
-}
-
-Happy to share a short relevant example if useful.
-
-`.trim();
+  const body = `I work with companies similar to ${seeds || input.domain}.${titleBit} ${input.companyName} fits the profile of teams we help most (${industryBit}, ${sizeBit}). ${signalBit} Happy to share a short relevant example if useful.`;
+  const linkedin_message = firstName
+    ? `Hey ${firstName} — ${body}`
+    : body;
 
   return { fit_reason, outreach_angle, linkedin_message };
 }

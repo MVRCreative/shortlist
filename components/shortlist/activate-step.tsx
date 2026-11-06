@@ -38,7 +38,6 @@ export function ActivateStep({
   pending,
   profileName,
   profile,
-  industries,
   onChange,
   onBack,
   onActivate,
@@ -48,7 +47,6 @@ export function ActivateStep({
   pending: boolean
   profileName: string
   profile: ReactNode
-  industries: string[]
   onChange: (settings: DigestSettings) => void
   onBack: () => void
   onActivate: () => void
@@ -84,7 +82,7 @@ export function ActivateStep({
 
           <Separator />
 
-          <DigestPreview settings={settings} industries={industries} />
+          <DigestPreview settings={settings} />
         </CardContent>
       </Card>
 

@@ -1,26 +1,29 @@
 /**
- * Deliver a real first Shortlist drop for a business.
- * Uses Ocean for lookalike companies + decision-makers; never fabricates emails.
- * Shared by the activate server action and the `pnpm ocean:deliver` CLI.
+ * Deliver a Shortlist drop for a business.
+ * Ocean finds lookalike companies. Deepline enriches contacts once (max plan size / 10).
+ * Never fabricates emails or buying signals.
  */
-import { OceanApiError, OceanClient } from "@/lib/ocean/client";
+import { enrichAccountsWithDeepline } from "@/lib/deepline/enrich-accounts";
+import { OceanClient } from "@/lib/ocean/client";
 import {
   COMPANY_SEARCH_FIELDS,
   exactIndustryOceanValues,
 } from "@/lib/ocean/map-company";
-import { buildDropCopy, mapOceanPerson } from "@/lib/ocean/map-person";
 import {
   ensureTestLibrary,
   loadOceanValuesBySlug,
   logProviderCall,
   persistCompanySearch,
   syncIndustryOceanValues,
-  upsertContact,
   type ServiceClient,
 } from "@/lib/ocean/persist";
-import { creditTotal } from "@/lib/ocean/schemas";
-import { buildCompanySearch } from "@/lib/shortlist/ocean-match";
-import type { ProfileInput } from "@/lib/shortlist/schemas";
+import { creditTotal, unwrapOceanCompany } from "@/lib/ocean/schemas";
+import { buildCampaignAwareCopy, type CampaignCopyContext } from "@/lib/shortlist/campaign-copy";
+import { buildCampaignContent } from "@/lib/shortlist/campaign-content";
+import { deeplineBatchSize } from "@/lib/shortlist/entitlements";
+import { isDeliverableAccount, signalFromAccount } from "@/lib/shortlist/live-digest";
+import { buildCompanySearch, toSampleAccounts } from "@/lib/shortlist/ocean-match";
+import type { EnrichedProfile, ProfileInput } from "@/lib/shortlist/schemas";
 import { normalizeDomain } from "@/lib/shortlist/url";
 import type { Json } from "@/lib/supabase/database.types";
 
@@ -34,10 +37,26 @@ export type DeliverFirstDropInput = {
   /** Optional ICP filters; when set, drives Ocean company search. */
   profile?: Pick<
     ProfileInput,
-    "website" | "seedClients" | "companySizes" | "regions" | "excludedDomains"
+    | "website"
+    | "seedClients"
+    | "companySizes"
+    | "regions"
+    | "excludedDomains"
+    | "buyerTitles"
+    | "industries"
+    | "services"
   >;
+  buyerTitles?: string[];
+  campaign?: CampaignCopyContext;
+  campaignId?: string | null;
+  audienceSnapshot?: Json | null;
+  campaignSnapshot?: Json | null;
+  enriched?: EnrichedProfile | null;
+  planId?: string;
   targetCount?: number;
   oceanToken: string;
+  /** Domains already delivered or reviewed as not-a-fit. */
+  extraExcludeDomains?: string[];
 };
 
 export type DeliverFirstDropResult = {
@@ -102,11 +121,22 @@ export async function resolveCustomerByUserId(
     .select("id")
     .eq("business_id", business.id)
     .eq("is_active", true)
+    .eq("is_primary", true)
     .maybeSingle();
   if (iErr) throw new Error(iErr.message);
-  if (!icp) throw new Error("No active ICP for this account.");
 
-  return { businessId: business.id, icpId: icp.id };
+  if (icp) return { businessId: business.id, icpId: icp.id };
+
+  const { data: anyIcp, error: anyErr } = await client
+    .from("icps")
+    .select("id")
+    .eq("business_id", business.id)
+    .eq("is_active", true)
+    .maybeSingle();
+  if (anyErr) throw new Error(anyErr.message);
+  if (!anyIcp) throw new Error("No active audience for this account.");
+
+  return { businessId: business.id, icpId: anyIcp.id };
 }
 
 export async function resolveCustomerByEmail(
@@ -128,11 +158,77 @@ export async function resolveCustomerByEmail(
   return { userId: user.id, ...resolved };
 }
 
+async function upsertDeeplineContact(
+  client: ServiceClient,
+  companyId: string,
+  enrichment: {
+    contactName: string;
+    firstName: string | null;
+    lastName: string | null;
+    title: string | null;
+    linkedinUrl: string | null;
+    email: string | null;
+  },
+): Promise<string> {
+  const sourceId = enrichment.linkedinUrl ?? `${companyId}:${enrichment.contactName}`;
+
+  const { data: byLinkedIn } = enrichment.linkedinUrl
+    ? await client
+        .from("contacts")
+        .select("id")
+        .eq("linkedin_url", enrichment.linkedinUrl)
+        .maybeSingle()
+    : { data: null };
+
+  if (byLinkedIn) {
+    const { data, error } = await client
+      .from("contacts")
+      .update({
+        company_id: companyId,
+        full_name: enrichment.contactName,
+        first_name: enrichment.firstName,
+        last_name: enrichment.lastName,
+        title: enrichment.title,
+        linkedin_url: enrichment.linkedinUrl,
+        email: enrichment.email,
+        email_status: enrichment.email ? "verified" : "unknown",
+        email_verified_at: enrichment.email ? new Date().toISOString() : null,
+        source: "manual",
+        source_id: sourceId,
+      })
+      .eq("id", byLinkedIn.id)
+      .select("id")
+      .single();
+    if (error || !data) throw new Error(error?.message ?? "contact update failed");
+    return data.id;
+  }
+
+  const { data, error } = await client
+    .from("contacts")
+    .insert({
+      company_id: companyId,
+      full_name: enrichment.contactName,
+      first_name: enrichment.firstName,
+      last_name: enrichment.lastName,
+      title: enrichment.title,
+      linkedin_url: enrichment.linkedinUrl,
+      email: enrichment.email,
+      email_status: enrichment.email ? "verified" : "unknown",
+      email_verified_at: enrichment.email ? new Date().toISOString() : null,
+      source: "manual",
+      source_id: sourceId,
+    })
+    .select("id")
+    .single();
+  if (error || !data) throw new Error(error?.message ?? "contact insert failed");
+  return data.id;
+}
+
 export async function deliverFirstDrop(
   client: ServiceClient,
   input: DeliverFirstDropInput,
 ): Promise<DeliverFirstDropResult> {
-  const target = input.targetCount ?? DEFAULT_TARGET;
+  const target = deeplineBatchSize(input.targetCount ?? DEFAULT_TARGET);
   const seeds = normalizeSeeds(input.seeds);
   if (seeds.length < 2) {
     throw new Error(
@@ -171,17 +267,21 @@ export async function deliverFirstDrop(
 
   const profileForSearch: ProfileInput = {
     website: input.profile?.website ?? "",
-    services: [],
+    services: input.profile?.services ?? [],
     caseStudies: [],
     seedClients: seeds,
-    industries: [],
+    referenceClients: [],
+    industries: input.profile?.industries ?? [],
     companySizes: input.profile?.companySizes ?? [],
     regions: input.profile?.regions ?? ["North America"],
-    buyerTitles: [],
+    buyerTitles: input.buyerTitles ?? input.profile?.buyerTitles ?? [],
     signals: [],
     excludedDomains: input.profile?.excludedDomains ?? [],
   };
-  const search = buildCompanySearch(profileForSearch);
+  const search = buildCompanySearch(profileForSearch, {
+    size: target,
+    extraExcludeDomains: input.extraExcludeDomains,
+  });
   if ("error" in search) throw new Error(search.error);
 
   const companySearchBody = {
@@ -250,15 +350,44 @@ export async function deliverFirstDrop(
     );
   }
 
+  const blocked = new Set(search.blocked);
+  const sampleAccounts = toSampleAccounts(
+    allCompanyRows.map((row) => unwrapOceanCompany(row)),
+    blocked,
+    target,
+  ).filter((account) => persistResult.companyIdsByDomain.has(account.domain));
+
+  // One Deepline pass. Do not refill with a second paid enrichment.
+  const selected = sampleAccounts.slice(0, target);
+  const buyerTitles =
+    input.buyerTitles ??
+    input.profile?.buyerTitles ??
+    ["Founder", "CEO", "Owner"];
+
+  const enriched = await enrichAccountsWithDeepline(
+    selected.map((account) => ({
+      name: account.name,
+      domain: account.domain,
+      linkedinCompanyUrl: account.linkedinCompanyUrl ?? null,
+    })),
+    buyerTitles,
+  );
+  if (!enriched.ok) {
+    throw new Error(enriched.error);
+  }
+
   type Finalist = {
     companyId: string;
     domain: string;
     contactId: string;
+    account: (typeof selected)[number];
   };
   const finalists: Finalist[] = [];
 
-  for (const [domain, companyId] of persistResult.companyIdsByDomain) {
+  for (const account of selected) {
     if (finalists.length >= target) break;
+    const companyId = persistResult.companyIdsByDomain.get(account.domain);
+    if (!companyId) continue;
 
     const { data: already } = await client
       .from("drop_accounts")
@@ -268,33 +397,23 @@ export async function deliverFirstDrop(
       .maybeSingle();
     if (already) continue;
 
-    try {
-      const people = await ocean.searchPeople(
-        {
-          size: 1,
-          peopleFilters: {
-            seniorities: ["C-Level", "VP", "Director", "Head", "Owner"],
-          },
-          companiesFilters: { includeDomains: [domain] },
-        },
-        log(input.businessId),
-      );
-      const person = people.people[0];
-      if (!person) continue;
-      const contactId = await upsertContact(
-        client,
-        mapOceanPerson(person, companyId),
-      );
-      finalists.push({ companyId, domain, contactId });
-    } catch (err) {
-      if (err instanceof OceanApiError && err.status === 402) break;
-      throw err;
-    }
+    const person = enriched.byDomain.get(account.domain) ?? null;
+    if (!isDeliverableAccount(account, person) || !person?.contactName) continue;
+
+    const contactId = await upsertDeeplineContact(client, companyId, {
+      contactName: person.contactName,
+      firstName: person.firstName,
+      lastName: person.lastName,
+      title: person.title,
+      linkedinUrl: person.linkedinUrl,
+      email: person.email,
+    });
+    finalists.push({ companyId, domain: account.domain, contactId, account });
   }
 
   if (finalists.length === 0) {
     throw new Error(
-      "Found companies, but no decision-makers yet. Try again in a moment.",
+      "Found companies, but none had a decision-maker with a LinkedIn profile yet.",
     );
   }
 
@@ -315,13 +434,36 @@ export async function deliverFirstDrop(
       ? `Found ${finalists.length} strong matches with decision-makers, not ${target}.`
       : null;
 
+  const campaign = input.campaign ?? null;
+  const content = buildCampaignContent({
+    profile: {
+      website: input.profile?.website ?? "",
+      services: input.profile?.services ?? [],
+      industries: input.profile?.industries ?? [],
+      buyerTitles: input.buyerTitles ?? input.profile?.buyerTitles ?? [],
+      regions: input.profile?.regions ?? [],
+      caseStudies: [],
+    },
+    enriched: input.enriched ?? null,
+    campaign: campaign
+      ? {
+          name: campaign.title,
+          objective: campaign.objective,
+          resourceUrl: campaign.supportingUrl,
+        }
+      : null,
+  });
+
   if (!dropId) {
     const { data: drop, error } = await client
       .from("drops")
       .insert({
         business_id: input.businessId,
         icp_id: input.icpId,
-        plan_id: "starter",
+        campaign_id: input.campaignId ?? null,
+        audience_snapshot: input.audienceSnapshot ?? null,
+        campaign_snapshot: input.campaignSnapshot ?? null,
+        plan_id: input.planId ?? "starter",
         scheduled_for: scheduledFor.toISOString(),
         status: "delivered",
         target_count: target,
@@ -340,6 +482,9 @@ export async function deliverFirstDrop(
       .from("drops")
       .update({
         status: "delivered",
+        campaign_id: input.campaignId ?? null,
+        audience_snapshot: input.audienceSnapshot ?? null,
+        campaign_snapshot: input.campaignSnapshot ?? null,
         target_count: target,
         delivered_count: finalists.length,
         shortfall,
@@ -348,6 +493,25 @@ export async function deliverFirstDrop(
         notified_at: null,
       })
       .eq("id", dropId);
+  }
+
+  // Persist reusable campaign content on the drop for this delivery.
+  for (const [type, body, title, outline] of [
+    ["linkedin_post", `${content.linkedinPost.hook}\n\n${content.linkedinPost.body}`, content.linkedinPost.hook, null],
+    ["x_post", content.xPost.body, content.xPost.title, null],
+    ["blog_idea", content.blogIdea.angle, content.blogIdea.title, content.blogIdea.outline],
+  ] as const) {
+    await client.from("drop_content").upsert(
+      {
+        drop_id: dropId,
+        business_id: input.businessId,
+        type,
+        title,
+        body,
+        outline: outline as Json | null,
+      },
+      { onConflict: "drop_id,type" },
+    );
   }
 
   const { data: ranked } = await client.rpc("deliverable_companies", {
@@ -391,7 +555,11 @@ export async function deliverFirstDrop(
       .eq("id", finalist.contactId)
       .single();
 
-    const copy = buildDropCopy({
+    const fundingTitle =
+      signal?.title ??
+      (finalist.account.signal.trim() ? finalist.account.signal.trim() : null);
+
+    const copy = buildCampaignAwareCopy({
       companyName: company.name,
       domain: company.domain,
       industryRaw: company.industry_raw,
@@ -399,8 +567,9 @@ export async function deliverFirstDrop(
       region: company.region,
       contactName: contact?.full_name ?? null,
       contactTitle: contact?.title ?? null,
-      fundingTitle: signal?.title ?? null,
+      fundingTitle,
       seedDomains: seeds,
+      campaign,
     });
 
     const snapshot: Json = {
@@ -414,7 +583,9 @@ export async function deliverFirstDrop(
       },
       signal: signal
         ? { id: signal.id, title: signal.title, type: "funding" }
-        : null,
+        : fundingTitle
+          ? { title: fundingTitle, type: "other" }
+          : null,
       contact: contact
         ? {
             fullName: contact.full_name,
@@ -428,6 +599,7 @@ export async function deliverFirstDrop(
       fitReason: copy.fit_reason,
       outreachAngle: copy.outreach_angle,
       linkedinMessage: copy.linkedin_message,
+      signalLabel: signalFromAccount(finalist.account, seeds),
     };
 
     const rankedRow = (ranked ?? []).find(

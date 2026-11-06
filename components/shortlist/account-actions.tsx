@@ -31,6 +31,21 @@ function ActionLink({
   )
 }
 
+function profileUrl(value: string | null | undefined) {
+  const trimmed = value?.trim()
+  if (!trimmed) return null
+  try {
+    const url = new URL(trimmed)
+    const host = url.hostname.toLowerCase()
+    if (host !== 'linkedin.com' && !host.endsWith('.linkedin.com')) return null
+    if (url.pathname.startsWith('/search')) return null
+    if (!url.pathname.startsWith('/in/') && !url.pathname.startsWith('/pub/')) return null
+    return url.toString()
+  } catch {
+    return null
+  }
+}
+
 function siteHref(domain: string) {
   const trimmed = domain.trim()
   if (!trimmed) return null
@@ -45,8 +60,8 @@ export function AccountActions({
   email,
   domain,
   linkedinUrl,
-  contactName,
-  company,
+  contactName: _contactName,
+  company: _company,
   className,
 }: {
   email?: string | null
@@ -57,13 +72,7 @@ export function AccountActions({
   className?: string
 }) {
   const site = domain ? siteHref(domain) : null
-  const linkedin =
-    linkedinUrl?.trim() ||
-    (contactName
-      ? `https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(
-          [contactName, company].filter(Boolean).join(' '),
-        )}`
-      : null)
+  const linkedin = profileUrl(linkedinUrl)
 
   if (!email && !site && !linkedin) return null
 

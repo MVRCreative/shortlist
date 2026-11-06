@@ -163,8 +163,11 @@ async function ensureFixture(
       .from("icps")
       .insert({
         business_id: businessId,
+        lineage_id: crypto.randomUUID(),
         version: 1,
         is_active: true,
+        is_primary: true,
+        name: "Primary audience",
         industry_slugs: ["b2b_saas"],
         employee_ranges: ["11-50", "51-200", "201-500"],
         regions: ["north_america"],

@@ -110,21 +110,21 @@ export function MatchStep({
   return (
     <div className="flex flex-col gap-6">
       <StepHeading
-        eyebrow="Matchmaking"
+        eyebrow="Audience"
         title="Good fit, or not?"
-        description={`These companies come from one Ocean search of your example clients, size, and region. Mark at least one as a fit. Rating ${RECOMMENDED_REVIEWED} or more helps us tune who shows up next.`}
+        description={`These are real companies Ocean found from your lookalike seeds, filtered by size and region. Mark at least one as a fit before continuing. Rating ${RECOMMENDED_REVIEWED} or more helps tune who shows up next.`}
       />
 
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between gap-3">
-          <p className="kicker">Ocean</p>
+          <p className="kicker">Accounts</p>
           <p className="text-paragraph-xs tabular-nums text-text-sub-600" aria-live="polite">
             {reviewed}/{accounts.length} rated · {fits} fit
           </p>
         </div>
         {accounts.length < 10 ? (
           <p className="text-paragraph-sm text-text-sub-600">
-            Ocean returned {accounts.length} {accounts.length === 1 ? 'account' : 'accounts'} for this profile.
+            Found {accounts.length} {accounts.length === 1 ? 'account' : 'accounts'} for this profile.
           </p>
         ) : null}
 
@@ -145,10 +145,10 @@ export function MatchStep({
       <div className="sticky bottom-0 -mx-4 flex flex-col-reverse gap-3 border-t border-stroke-soft-200 bg-bg-weak-50/90 px-4 py-4 backdrop-blur sm:-mx-6 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <Button.Root variant="neutral" mode="ghost" size="medium" onClick={onBack}>
           <Button.Icon as={RiArrowLeftLine} />
-          Back to profile
+          Back
         </Button.Root>
         <Button.Root size="medium" onClick={onContinue} disabled={!canContinue}>
-          {canContinue ? 'Set up my digest' : 'Mark one as a fit'}
+          {canContinue ? 'Continue' : 'Mark one as a fit'}
           <Button.Icon as={RiArrowRightLine} />
         </Button.Root>
       </div>

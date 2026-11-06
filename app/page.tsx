@@ -20,6 +20,7 @@ export default function HomePage() {
     return <div className="min-h-dvh bg-bg-weak-50" aria-busy="true" />
   }
 
+  const devPreview = process.env.NODE_ENV === 'development'
   const continueHref = authenticated
     ? '/digest'
     : session
@@ -33,6 +34,13 @@ export default function HomePage() {
         authenticated || digest ? (
           <Link
             href="/digest"
+            className="text-paragraph-xs text-text-sub-600 fine-hover:text-text-strong-950"
+          >
+            Open Shortlist
+          </Link>
+        ) : devPreview ? (
+          <Link
+            href="/onboarding/profile"
             className="text-paragraph-xs text-text-sub-600 fine-hover:text-text-strong-950"
           >
             Open Shortlist

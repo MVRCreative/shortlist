@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { BrandMark } from '@/components/shortlist/brand-mark'
 import { cn } from '@/lib/utils'
@@ -8,8 +10,8 @@ import { cn } from '@/lib/utils'
 export type DigestMenu = 'none' | 'profile' | 'settings'
 
 /**
- * Digest chrome: brand + account. Profile / Plan / Sign out are plain text
- * actions — not padded buttons competing with the digest.
+ * Digest chrome: brand + account. Profile / Audience / Campaigns / Plan / Sign out
+ * are plain text actions — not padded buttons competing with the digest.
  */
 export function DashboardNav({
   isDemo,
@@ -27,6 +29,7 @@ export function DashboardNav({
   onSignOut: () => void
 }) {
   const [open, setOpen] = useState(false)
+  const pathname = usePathname()
 
   function pick(next: DigestMenu) {
     onMenuChange(menu === next ? 'none' : next)
@@ -35,9 +38,12 @@ export function DashboardNav({
 
   const links = (
     <nav aria-label="Account" className="flex flex-col gap-1.5">
-      <NavLink label="Profile" active={menu === 'profile'} onSelect={() => pick('profile')} />
-      <NavLink label="Plan" active={menu === 'settings'} onSelect={() => pick('settings')} />
-      <NavLink label="Sign out" onSelect={onSignOut} />
+      <NavLink label="Digest" href="/digest" active={pathname === '/digest' && menu === 'none'} />
+      <NavLink label="Audience" href="/audience" active={pathname === '/audience'} />
+      <NavLink label="Campaigns" href="/campaigns" active={pathname === '/campaigns'} />
+      <NavButton label="Profile" active={menu === 'profile'} onSelect={() => pick('profile')} />
+      <NavButton label="Plan" active={menu === 'settings'} onSelect={() => pick('settings')} />
+      <NavButton label="Sign out" onSelect={onSignOut} />
     </nav>
   )
 
@@ -63,12 +69,9 @@ export function DashboardNav({
         <div className="mb-4 border-b border-stroke-soft-200 pb-4 lg:hidden">{links}</div>
       ) : null}
 
-      <div className="hidden h-full flex-col py-6 lg:flex">
-        <div className="px-1">
-          <BrandMark isDemo={isDemo} />
-        </div>
-
-        <div className="mt-auto flex flex-col gap-4 px-1 pb-2">
+      <div className="hidden flex-col px-4 pt-8 pb-10 lg:flex">
+        <BrandMark isDemo={isDemo} />
+        <div className="mt-8 flex flex-col gap-4">
           <div className="flex items-start gap-2.5">
             <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-md bg-bg-strong-950 text-label-xs font-medium text-static-white">
               {companyName.charAt(0).toUpperCase()}
@@ -87,6 +90,29 @@ export function DashboardNav({
 }
 
 function NavLink({
+  label,
+  href,
+  active,
+}: {
+  label: string
+  href: string
+  active?: boolean
+}) {
+  return (
+    <Link
+      href={href}
+      aria-current={active ? 'page' : undefined}
+      className={cn(
+        'w-fit text-left text-paragraph-xs transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-base',
+        active ? 'text-text-strong-950' : 'text-text-sub-600 fine-hover:text-text-strong-950',
+      )}
+    >
+      {label}
+    </Link>
+  )
+}
+
+function NavButton({
   label,
   active,
   onSelect,

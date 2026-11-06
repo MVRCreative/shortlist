@@ -15,7 +15,7 @@ export default function ProfilePage() {
     missCount,
     handleEnrich,
     setInput,
-    handleFindAccounts,
+    goTo,
   } = useShortlist()
 
   if (!hydrated) return null
@@ -30,7 +30,7 @@ export default function ProfilePage() {
         pendingMatch={pending === 'match'}
         onSubmit={handleEnrich}
         onDraftChange={setInput}
-        onFindAccounts={handleFindAccounts}
+        onFindAccounts={() => goTo('Audience')}
       />
       <div className="border-t border-stroke-soft-200 pt-6">
         <ProfilePreview input={input} enriched={enriched} fitCount={fitCount} missCount={missCount} />

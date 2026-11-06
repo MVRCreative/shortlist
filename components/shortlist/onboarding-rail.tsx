@@ -5,9 +5,9 @@ import type { Step } from '@/lib/shortlist/steps'
 import { cn } from '@/lib/utils'
 
 const ONBOARDING_STEPS: { step: Step; title: string; description: string }[] = [
-  { step: 'Profile', title: 'Your profile', description: 'What you do, for whom' },
-  { step: 'Match', title: 'Calibrate accounts', description: 'Mark fits and misses' },
-  { step: 'Turn on', title: 'Turn on Shortlist', description: 'Pick a plan' },
+  { step: 'Profile', title: 'Your profile', description: 'Company, website, plan' },
+  { step: 'Audience', title: 'Your audience', description: 'Who to reach, and approve examples' },
+  { step: 'Campaign', title: 'Campaign', description: 'Optional outreach purpose' },
 ]
 
 export function OnboardingRail({

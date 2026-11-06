@@ -658,7 +658,7 @@ export function ProfileStep({
                 Regenerate
               </Button>
               <Button size="lg" onClick={onFindAccounts} pending={pendingMatch} disabled={pendingEnrich}>
-                {pendingMatch ? 'Finding accounts' : 'Find accounts'}
+                {pendingMatch ? 'Opening audience' : 'Continue to audience'}
                 {pendingMatch ? null : <ArrowRight />}
               </Button>
             </div>

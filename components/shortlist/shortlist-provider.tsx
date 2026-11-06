@@ -11,8 +11,9 @@ import {
 } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { enrichProfile, findSampleAccounts, generateDigest } from '@/app/actions'
-import { getSessionDigest, requestFirstDrop, signOutAction } from '@/app/auth/actions'
+import { enrichProfile, findSampleAccounts, generateDigest, persistOnboardingState } from '@/app/actions'
+import { getSessionDigest, signOutAction } from '@/app/auth/actions'
+import type { CampaignStepValues } from '@/components/shortlist/campaign-step'
 import { DEFAULT_TIER, deliveryFor } from '@/lib/shortlist/pricing'
 import { emptyProfile } from '@/lib/shortlist/sample-profile'
 import {
@@ -41,11 +42,13 @@ type ShortlistContextValue = {
   settings: DigestSettings
   setSettings: (settings: DigestSettings) => void
   digest: Digest | null
+  campaignDraft: CampaignStepValues | null
+  setCampaignDraft: (draft: CampaignStepValues | null) => void
   pending: Pending
   isDemo: boolean
   authenticated: boolean
   userEmail: string | null
-  digestSource: 'supabase' | 'ai' | 'demo' | null
+  digestSource: 'supabase' | 'ocean' | 'ai' | 'demo' | null
   completed: Set<string>
   isStale: boolean
   fitCount: number
@@ -85,11 +88,12 @@ export function ShortlistProvider({ children }: { children: ReactNode }) {
   const [verdicts, setVerdicts] = useState<Record<string, Verdict>>({})
   const [settings, setSettings] = useState<DigestSettings>(initialSettings)
   const [digest, setDigest] = useState<Digest | null>(null)
+  const [campaignDraft, setCampaignDraft] = useState<CampaignStepValues | null>(null)
   const [pending, setPending] = useState<Pending>(null)
   const [isDemo, setIsDemo] = useState(false)
   const [authenticated, setAuthenticated] = useState(false)
   const [userEmail, setUserEmail] = useState<string | null>(null)
-  const [digestSource, setDigestSource] = useState<'supabase' | 'ai' | 'demo' | null>(null)
+  const [digestSource, setDigestSource] = useState<'supabase' | 'ocean' | 'ai' | 'demo' | null>(null)
   const [completed, setCompleted] = useState<Set<string>>(() => new Set())
   const [hydrated, setHydrated] = useState(false)
   const [actionError, setActionError] = useState<string | null>(null)
@@ -137,10 +141,10 @@ export function ShortlistProvider({ children }: { children: ReactNode }) {
         } else {
           setSettings({ ...saved.settings, email: session.email })
         }
-        if (!session.authenticated) {
+        if (saved.digestOrigin === 'ocean' && saved.digest) {
           setDigest(saved.digest)
-          setIsDemo(saved.isDemo)
-          setDigestSource(saved.isDemo ? 'demo' : saved.digest ? 'ai' : null)
+          setDigestSource('ocean')
+          setIsDemo(false)
           setCompleted(new Set(saved.completed))
         }
       }
@@ -166,6 +170,7 @@ export function ShortlistProvider({ children }: { children: ReactNode }) {
       verdicts,
       settings,
       digest,
+      digestOrigin: digestSource === 'ocean' ? 'ocean' : isDemo ? 'demo' : null,
       isDemo,
       completed: [...completed],
     })
@@ -188,12 +193,16 @@ export function ShortlistProvider({ children }: { children: ReactNode }) {
   const canVisit = useCallback(
     (target: Step) => {
       if (target === 'Profile') return true
+      if (target === 'Audience') return !!enriched
+      if (target === 'Campaign') {
+        return Object.values(verdicts).some((verdict) => verdict === 'fit')
+      }
       if (target === 'Digest') {
         return !!digest || pending === 'digest' || (authenticated && digestSource === 'supabase')
       }
-      return accounts.length > 0
+      return false
     },
-    [accounts.length, digest, pending, authenticated, digestSource],
+    [enriched, verdicts, digest, pending, authenticated, digestSource],
   )
 
   const goTo = useCallback(
@@ -213,16 +222,16 @@ export function ShortlistProvider({ children }: { children: ReactNode }) {
       }
       return
     }
-    if (step === 'Match' || step === 'Turn on') {
-      if (accounts.length === 0) goTo('Profile')
+    if (step === 'Audience' || step === 'Campaign') {
+      if (!enriched) goTo('Profile')
     } else if (step === 'Digest') {
       // Signed-in members can wait here before the first drop exists.
-      if (!authenticated && !digest && pending !== 'digest') goTo('Turn on')
+      if (!authenticated && !digest && pending !== 'digest') goTo('Campaign')
     }
   }, [
     hydrated,
     step,
-    accounts.length,
+    enriched,
     digest,
     pending,
     goTo,
@@ -297,10 +306,19 @@ export function ShortlistProvider({ children }: { children: ReactNode }) {
       setEnrichedFrom(JSON.stringify(profile))
       setAccounts([])
       setVerdicts({})
+      if (authenticated) {
+        const saved = await persistOnboardingState({
+          input: profile,
+          enriched: result.data,
+          reviews: [],
+          markComplete: false,
+        })
+        if (!saved.ok) {
+          toast.message(saved.error)
+        }
+      }
+      goTo('Audience')
     })
-    requestAnimationFrame(() =>
-      document.getElementById('shortlist-profile')?.scrollIntoView({ behavior: 'smooth', block: 'start' }),
-    )
   }
 
   function handleFindAccounts() {
@@ -312,7 +330,7 @@ export function ShortlistProvider({ children }: { children: ReactNode }) {
     const alreadyFromOcean =
       accounts.length > 0 &&
       accounts.every((account) => account.id.startsWith('ocean:') && !account.fitReason.startsWith('Similar to'))
-    if (alreadyFromOcean) return goTo('Match')
+    if (alreadyFromOcean) return
     run('match', async () => {
       const result = await findSampleAccounts(input, enriched)
       if (!result.ok) {
@@ -323,7 +341,6 @@ export function ShortlistProvider({ children }: { children: ReactNode }) {
       setIsDemo(false)
       setAccounts(result.data)
       setVerdicts({})
-      goTo('Match')
     })
   }
 
@@ -338,46 +355,10 @@ export function ShortlistProvider({ children }: { children: ReactNode }) {
 
   function handleGenerateDigest(nextWeek: number) {
     setCompleted(new Set())
+    setPending('digest')
+    setActionError(null)
     goTo('Digest')
     run('digest', async () => {
-      if (authenticated) {
-        const seeds = input.seedClients.filter(Boolean)
-        if (seeds.length < 2) {
-          const message =
-            'Add 2–3 example client websites in your profile so we can find lookalikes.'
-          setActionError(message)
-          toast.error(message)
-          goTo('Profile')
-          return
-        }
-
-        const result = await requestFirstDrop({
-          seeds,
-          website: input.website || undefined,
-          companySizes: input.companySizes,
-          regions: input.regions,
-          excludedDomains: input.excludedDomains,
-          targetCount: settings.leadsPerDigest,
-        })
-        if (!result.ok) {
-          setActionError(result.error)
-          toast.error(result.error)
-          return
-        }
-        setDigest(result.digest)
-        setDigestSource('supabase')
-        setIsDemo(false)
-        if (result.created) {
-          toast.success(
-            result.deliveredCount === 1
-              ? 'Your first account is ready'
-              : `Your first ${result.deliveredCount} accounts are ready`,
-          )
-        }
-        return
-      }
-
-      // Guest preview only — never used for signed-in members.
       if (!enriched) {
         const message = 'Build your profile before turning on Shortlist.'
         setActionError(message)
@@ -385,29 +366,44 @@ export function ShortlistProvider({ children }: { children: ReactNode }) {
         goTo('Profile')
         return
       }
+      const fits = accounts.filter((account) => verdicts[account.id] === 'fit')
+      if (fits.length === 0) {
+        const message = 'Mark at least one account as a fit before building the digest.'
+        setActionError(message)
+        toast.error(message)
+        goTo('Audience')
+        return
+      }
       const result = await generateDigest({
         input,
         enriched,
-        fits: accounts.filter((a) => verdicts[a.id] === 'fit'),
-        misses: accounts.filter((a) => verdicts[a.id] === 'nofit'),
+        fits,
+        misses: accounts.filter((account) => verdicts[account.id] === 'nofit'),
+        priorDomains: (digest?.leads ?? []).map((lead) => lead.domain).filter(Boolean),
         leadsPerDigest: settings.leadsPerDigest,
         channels: settings.channels,
         week: nextWeek,
+        campaign: campaignDraft
+          ? {
+              title: campaignDraft.title,
+              objective: campaignDraft.objective,
+              supportingUrl: campaignDraft.supportingUrl || null,
+            }
+          : null,
       })
       if (!result.ok) {
         setActionError(result.error)
         toast.error(result.error)
-        goTo('Turn on')
         return
       }
-      if (result.source === 'demo') {
-        setIsDemo(true)
-        setDigestSource('demo')
-      } else {
-        setIsDemo(false)
-        setDigestSource('ai')
-      }
+      setIsDemo(false)
+      setDigestSource('ocean')
       setDigest(result.data)
+      toast.success(
+        result.data.leads.length === 1
+          ? '1 account is ready'
+          : `${result.data.leads.length} accounts are ready`,
+      )
     })
   }
 
@@ -427,6 +423,8 @@ export function ShortlistProvider({ children }: { children: ReactNode }) {
     settings,
     setSettings,
     digest,
+    campaignDraft,
+    setCampaignDraft,
     pending,
     isDemo: authenticated ? false : isDemo,
     authenticated,

@@ -39,9 +39,30 @@ export async function updateSession(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const isAuthPage = path === "/login" || path === "/signup";
   const isProtected =
-    path.startsWith("/digest") || path.startsWith("/onboarding");
+    path.startsWith("/digest") ||
+    path.startsWith("/onboarding") ||
+    path.startsWith("/audience") ||
+    path.startsWith("/campaigns");
+  // Temporary: local product testing skips the sign-in gate while auth and
+  // the database are rebuilt. Production still requires a session.
+  const skipAuthGate = process.env.NODE_ENV === "development";
 
-  if (!user && isProtected) {
+  if (!user && skipAuthGate && isAuthPage) {
+    const next = request.nextUrl.searchParams.get("next");
+    const safeNext =
+      next &&
+      next.startsWith("/") &&
+      !next.startsWith("//") &&
+      !next.startsWith("/\\")
+        ? next
+        : "/onboarding/profile";
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.pathname = safeNext;
+    redirectUrl.search = "";
+    return NextResponse.redirect(redirectUrl);
+  }
+
+  if (!user && isProtected && !skipAuthGate) {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = "/login";
     redirectUrl.searchParams.set("next", path);

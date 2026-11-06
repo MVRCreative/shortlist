@@ -9,7 +9,10 @@
     "typecheck": "tsc --noEmit",
     "ocean:test": "tsx --tsconfig tsconfig.json scripts/ocean-integration-test.ts",
     "ocean:deliver": "tsx --tsconfig tsconfig.json scripts/ocean-deliver-drop.ts",
-    "e2e:auth-digest": "tsx --tsconfig tsconfig.json scripts/e2e-auth-digest.ts"
+    "e2e:auth-digest": "tsx --tsconfig tsconfig.json scripts/e2e-auth-digest.ts",
+    "attio:sync": "tsx --tsconfig tsconfig.json scripts/attio-sync.ts",
+    "test:attio": "tsx --tsconfig tsconfig.json --test lib/attio/mapping.test.ts lib/attio/sync.test.ts lib/attio/client.test.ts",
+    "test:digest": "tsx --tsconfig tsconfig.json --test lib/shortlist/live-digest.test.ts lib/shortlist/campaign-content.test.ts lib/shortlist/entitlements.test.ts lib/deepline/enrich-accounts.test.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^4.0.102",

@@ -5,13 +5,24 @@ import { cn } from '@/lib/utils'
  * Quiet done mark — hairline square, check appears in deep blue.
  * Strike on the label carries most of the state; this is the affordance.
  */
-export function DoneCheck({ done, label, onToggle }: { done: boolean; label: string; onToggle: () => void }) {
+export function DoneCheck({
+  done,
+  label,
+  verb = 'done',
+  onToggle,
+}: {
+  done: boolean
+  label: string
+  /** What the check means. Campaign content uses "published" so a check is the member's confirmation. */
+  verb?: string
+  onToggle: () => void
+}) {
   return (
     <button
       type="button"
       role="checkbox"
       aria-checked={done}
-      aria-label={done ? `Mark ${label} as not done` : `Mark ${label} as done`}
+      aria-label={done ? `Mark ${label} as not ${verb}` : `Mark ${label} as ${verb}`}
       onClick={onToggle}
       className={cn(
         'press mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-[3px] border transition-[border-color,background-color,color] duration-200',

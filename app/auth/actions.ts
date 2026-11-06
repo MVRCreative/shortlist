@@ -3,11 +3,15 @@
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { getServerEnv } from "@/lib/env";
-import { ensureMemberAccount } from "@/lib/shortlist/bootstrap-account";
+import {
+  ensureMemberAccount,
+  provisionSubscription,
+} from "@/lib/shortlist/bootstrap-account";
 import {
   deliverFirstDrop,
   resolveCustomerByUserId,
 } from "@/lib/shortlist/deliver-first-drop";
+import { assertCanRunPaidDiscovery, deeplineBatchSize } from "@/lib/shortlist/entitlements";
 import { loadDigestForUser } from "@/lib/shortlist/load-digest";
 import type { Digest } from "@/lib/shortlist/schemas";
 import { normalizeDomain } from "@/lib/shortlist/url";
@@ -215,12 +219,24 @@ export async function requestFirstDrop(
   try {
     const admin = createServiceRoleClient();
     const customer = await resolveCustomerByUserId(admin, user.id);
+
+    // Ensure a live plan before paid Ocean/Deepline work. Prefer Pro (5/drop).
+    await provisionSubscription(user.id, customer.businessId, "pro");
+
+    const entitlement = await assertCanRunPaidDiscovery(admin, customer.businessId);
+    if (!entitlement.ok) {
+      return { ok: false, error: entitlement.error };
+    }
+
     await deliverFirstDrop(admin, {
       businessId: customer.businessId,
       icpId: customer.icpId,
       seeds,
       profile: {
         website: parsed.data.website ?? "",
+        services: [],
+        industries: [],
+        buyerTitles: [],
         seedClients: seeds,
         companySizes: parsed.data.companySizes ?? [],
         regions: parsed.data.regions ?? ["North America"],
@@ -228,7 +244,10 @@ export async function requestFirstDrop(
           .map((domain) => normalizeDomain(domain))
           .filter((domain): domain is string => !!domain),
       },
-      targetCount: parsed.data.targetCount ?? 10,
+      planId: entitlement.planId,
+      targetCount: deeplineBatchSize(
+        parsed.data.targetCount ?? entitlement.accountsPerDrop,
+      ),
       oceanToken: env.OCEAN_API_TOKEN,
     });
   } catch (err) {

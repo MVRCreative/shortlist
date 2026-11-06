@@ -28,15 +28,17 @@ export default function DigestPage() {
     actionError,
     clearActionError,
     handleGenerateDigest,
+    goTo,
   } = useShortlist()
 
   const requestedFirstDrop = useRef(false)
 
   useEffect(() => {
     if (!hydrated || digest || pending === 'digest' || requestedFirstDrop.current) return
+    if (!enriched || fitCount === 0) return
     requestedFirstDrop.current = true
     handleGenerateDigest(0)
-  }, [hydrated, digest, pending, handleGenerateDigest])
+  }, [hydrated, digest, pending, handleGenerateDigest, enriched, fitCount])
 
   if (!hydrated) return <div className="min-h-dvh" aria-busy="true" />
 
@@ -45,13 +47,21 @@ export default function DigestPage() {
       <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col justify-center gap-6 px-4">
         <StepHeading
           eyebrow="Shortlist"
-          title={pending === 'digest' ? 'Building your first Shortlist' : 'Your first Shortlist is ready to load'}
+          title={
+            pending === 'digest'
+              ? 'Building your first Shortlist'
+              : !enriched || fitCount === 0
+                ? 'Calibrate the audience first'
+                : 'Your first Shortlist is ready to load'
+          }
           description={
             pending === 'digest'
-              ? `Finding real lookalike accounts for ${userEmail ?? 'your profile'}. This can take up to a minute.`
-              : actionError
-                ? actionError
-                : 'Tap below to load your first drop from live company data.'
+              ? 'Finding accounts you have not seen and adding decision-makers. This can take a few minutes.'
+              : !enriched || fitCount === 0
+                ? 'Rate at least one lookalike as a fit before the weekly digest runs.'
+                : actionError
+                  ? actionError
+                  : 'Load your weekly Shortlist of accounts, contacts, and suggested messaging.'
           }
         />
         {actionError ? (
@@ -66,17 +76,23 @@ export default function DigestPage() {
           />
         ) : (
           <div className="flex gap-3">
-            <Button
-              type="button"
-              onClick={() => {
-                clearActionError()
-                requestedFirstDrop.current = false
-                handleGenerateDigest(0)
-              }}
-              pending={pending === 'digest'}
-            >
-              {pending === 'digest' ? 'Building…' : 'Load Shortlist'}
-            </Button>
+            {!enriched || fitCount === 0 ? (
+              <Button type="button" onClick={() => goTo(!enriched ? 'Profile' : 'Audience')}>
+                {!enriched ? 'Build profile' : 'Review audience'}
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                onClick={() => {
+                  clearActionError()
+                  requestedFirstDrop.current = false
+                  handleGenerateDigest(0)
+                }}
+                pending={pending === 'digest'}
+              >
+                {pending === 'digest' ? 'Building…' : 'Load Shortlist'}
+              </Button>
+            )}
             {authenticated ? (
               <Button type="button" variant="outline" onClick={handleSignOut} disabled={pending === 'digest'}>
                 Sign out
@@ -104,7 +120,7 @@ export default function DigestPage() {
       ) : null}
       {authenticated && digestSource === 'supabase' ? (
         <div className="border-b border-stroke-soft-200 bg-bg-weak-50/40 px-4 py-2 text-center text-paragraph-xs text-text-sub-600">
-          Live Shortlist · {userEmail} · demo mode off
+          Live Shortlist · {userEmail}
         </div>
       ) : null}
       <Dashboard
@@ -124,12 +140,12 @@ export default function DigestPage() {
           Loading digest
         </span>
       ) : null}
-      {!authenticated ? (
+      {!authenticated && digestSource !== 'ocean' ? (
         <p className="pb-8 text-center text-paragraph-xs text-text-sub-600">
           <Link href="/login" className="underline-offset-4 hover:underline">
             Sign in
           </Link>{" "}
-          for your real Shortlist
+          to keep this Shortlist on your account
         </p>
       ) : null}
     </div>

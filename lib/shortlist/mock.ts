@@ -1,3 +1,4 @@
+import { buildCampaignContent } from '@/lib/shortlist/campaign-content'
 import { dealSizeLabel, describeSizeRange } from '@/lib/shortlist/profile-options'
 import type { Digest, EnrichedProfile, ProfileInput, SampleAccount } from '@/lib/shortlist/schemas'
 import { studioName } from '@/lib/shortlist/url'
@@ -133,7 +134,6 @@ export function mockDigest(args: {
   const industries = unique(fits.map((f) => f.industry)).concat(enriched.icp.industries)
   const pain = pick(rand, enriched.painsSolved)
   const differentiator = pick(rand, enriched.differentiators)
-  const title = enriched.icp.buyerTitles[0] ?? 'Head of Marketing'
 
   const leads = Array.from({ length: leadsPerDigest }, () => {
     const company = companyName(rand)
@@ -169,25 +169,20 @@ export function mockDigest(args: {
   })
 
   const themes = ['Pipeline without the guesswork', 'Fewer accounts, better conversations', 'Earn the meeting first', 'Signals beat spray-and-pray']
+  const content = buildCampaignContent({ profile: input, enriched, campaign: null })
 
   return {
-    theme: themes[week % themes.length],
+    theme: themes[week % themes.length] ?? themes[0],
     leads,
     linkedinPost: {
-      hook: `Every ${title} I talk to says some version of the same thing: “${pain}.”`,
-      body: `It’s rarely a talent issue. It’s a focus issue.\n\nAt ${studioName(input)}, we see the same pattern every week — teams trying to reach everyone, and landing with no one.\n\nWhat works instead:\n→ Pick 10 accounts that actually fit\n→ Find the trigger that makes now the right time\n→ Say one specific thing that proves you understand them\n\n${differentiator}. That’s the whole playbook.\n\nCurious how others are approaching this — what’s working for you right now?`,
+      hook: content.linkedinPost.hook,
+      body: content.linkedinPost.body,
     },
-    xPost: `${pain}? Stop adding volume. Pick 10 accounts that fit, find the trigger, say one specific thing. That’s ${studioName(input)}’s whole approach.`,
+    xPost: content.xPost.body,
     blogIdea: {
-      title: `Why ${enriched.icp.industries[0]} teams stall on growth (and the 10-account fix)`,
-      angle: `A practical breakdown of how ${pluralizeTitle(title)} can replace broad campaigns with a focused weekly account list — drawn from ${studioName(input)}’s client work.`,
-      outline: [
-        `The real cost of “${pain.toLowerCase()}”`,
-        'Why fewer, better-fit accounts outperform volume',
-        'Reading buying signals before you reach out',
-        'A weekly cadence your team can actually keep',
-        'What to measure in the first 90 days',
-      ],
+      title: content.blogIdea.title,
+      angle: content.blogIdea.angle,
+      outline: content.blogIdea.outline,
     },
   }
 }

@@ -2,6 +2,7 @@
 
 import { generateText, Output } from 'ai'
 import { z } from 'zod'
+import { buildLiveDigest } from '@/lib/shortlist/live-digest'
 import { matchAccountsFromOcean } from '@/lib/shortlist/ocean-match'
 import { aiErrorMessage, profileModel } from '@/lib/shortlist/openai'
 import { dealSizeLabel } from '@/lib/shortlist/profile-options'
@@ -9,7 +10,6 @@ import { readWebsiteProfile, type WebsiteRead } from '@/lib/shortlist/read-websi
 import { studioName } from '@/lib/shortlist/url'
 import {
   contentChannels,
-  digestSchema,
   enrichedProfileSchema,
   profileInputSchema,
   sampleAccountSchema,
@@ -39,10 +39,6 @@ function describeProfile(input: ProfileInput, enriched?: EnrichedProfile) {
   ]
     .filter(Boolean)
     .join('\n')
-}
-
-function logFallback(step: string, error: unknown) {
-  console.warn(`[shortlist] ${step}: AI unavailable, using demo output —`, error instanceof Error ? error.message : error)
 }
 
 const readRequestSchema = z.object({
@@ -99,9 +95,18 @@ const digestRequestSchema = z.object({
   enriched: enrichedProfileSchema,
   fits: z.array(sampleAccountSchema.extend({ id: z.string() })).max(10),
   misses: z.array(sampleAccountSchema.extend({ id: z.string() })).max(10),
+  priorDomains: z.array(z.string().trim().max(253)).max(200).default([]),
   leadsPerDigest: z.number().int().min(1).max(25),
   channels: z.array(z.enum(contentChannels)),
   week: z.number().int().min(0),
+  campaign: z
+    .object({
+      title: z.string().trim().min(1).max(120),
+      objective: z.string().trim().min(1).max(2000),
+      supportingUrl: z.string().trim().max(500).nullable().optional(),
+    })
+    .nullable()
+    .optional(),
 })
 
 export async function generateDigest(raw: z.infer<typeof digestRequestSchema>): Promise<Result<Digest>> {
@@ -109,38 +114,83 @@ export async function generateDigest(raw: z.infer<typeof digestRequestSchema>): 
   if (!parsed.success) return { ok: false, error: 'Invalid digest settings.' }
   const args = parsed.data
 
-  const summarize = (list: SampleAccount[]) =>
-    list.map((a) => `- ${a.name}: ${a.industry}, ${a.employees}, ${a.location}`).join('\n') || '- none'
+  try {
+    const built = await buildLiveDigest({
+      input: args.input,
+      enriched: args.enriched,
+      fits: args.fits,
+      misses: args.misses,
+      priorDomains: args.priorDomains,
+      leadsPerDigest: args.leadsPerDigest,
+      campaign: args.campaign
+        ? {
+            title: args.campaign.title,
+            objective: args.campaign.objective,
+            supportingUrl: args.campaign.supportingUrl ?? null,
+          }
+        : null,
+    })
+    if (!built.ok) return built
+    return { ok: true, data: built.digest, source: 'ocean' }
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : 'Unknown error'
+    console.warn('[shortlist] generateDigest', detail)
+    return { ok: false, error: `Couldn't build the digest: ${detail}` }
+  }
+}
+
+const audienceConfirmSchema = z.object({
+  input: profileInputSchema,
+  enriched: enrichedProfileSchema.nullable(),
+  reviews: z
+    .array(
+      z.object({
+        domain: z.string(),
+        verdict: z.enum(['fit', 'nofit']),
+        name: z.string().optional(),
+      }),
+    )
+    .max(25),
+  markComplete: z.boolean().default(true),
+})
+
+/** Persist the business profile + primary audience for the signed-in member. */
+export async function persistOnboardingState(
+  raw: z.infer<typeof audienceConfirmSchema>,
+): Promise<{ ok: true; businessId: string; icpId: string; lineageId: string } | { ok: false; error: string }> {
+  const parsed = audienceConfirmSchema.safeParse(raw)
+  if (!parsed.success) return { ok: false, error: 'Profile is incomplete.' }
+
+  const { createClient } = await import('@/lib/supabase/server')
+  const {
+    upsertBusinessProfile,
+    upsertPrimaryAudience,
+    saveAudienceReviews,
+  } = await import('@/lib/shortlist/persist-profile')
+
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return { ok: false, error: 'Sign in to save your profile.' }
 
   try {
-    const { output } = await generateText({
-      model: profileModel(),
-      output: Output.object({ schema: digestSchema }),
-      system: [
-        'You write a weekly pipeline digest for a founder or sales leader.',
-        'Accounts must be fictional people at fictional companies that resemble the accounts marked as a good fit and avoid traits of rejected accounts.',
-        'Content must sound like the brand voice, be specific to the offering, and avoid emojis, hashtag spam, and clichés.',
-        'Every account gets its own personalized LinkedIn message that names their company and signal; never reuse the same opener twice.',
-        'Always include a plausible linkedinUrl and company domain. Set email to a verified work address, or null when verification would fail — never invent an unverified email string.',
-      ].join(' '),
-      prompt: [
-        describeProfile(args.input, args.enriched),
-        `Accounts marked as GOOD fit:\n${summarize(args.fits)}`,
-        `Accounts marked as NOT a fit:\n${summarize(args.misses)}`,
-        `This is digest #${args.week + 1}; vary the theme from previous weeks.`,
-        `Generate exactly ${args.leadsPerDigest} leads.`,
-      ].join('\n\n'),
+    const { businessId } = await upsertBusinessProfile(
+      supabase,
+      user.id,
+      parsed.data.input,
+      parsed.data.enriched,
+    )
+    const { icpId, lineageId } = await upsertPrimaryAudience(supabase, businessId, parsed.data.input, {
+      markOnboardingComplete: parsed.data.markComplete,
     })
-    return { ok: true, data: { ...output, leads: output.leads.slice(0, args.leadsPerDigest) }, source: 'ai' }
-  } catch (error) {
-    logFallback('generateDigest', error)
-    // Guest preview only — never invent a member-facing drop.
-    return {
-      ok: false,
-      error: aiErrorMessage(
-        error,
-        "Couldn't build a preview digest. Check your connection and try again.",
-      ),
+    if (parsed.data.reviews.length > 0) {
+      await saveAudienceReviews(supabase, businessId, lineageId, parsed.data.reviews)
     }
+    return { ok: true, businessId, icpId, lineageId }
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : 'Unknown error'
+    console.warn('[shortlist] persistOnboardingState', detail)
+    return { ok: false, error: detail }
   }
 }
