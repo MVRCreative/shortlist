@@ -26,6 +26,7 @@ import {
   type Verdict,
 } from '@/lib/shortlist/schemas'
 import { clearSession, loadSession, saveSession } from '@/lib/shortlist/session'
+import { loadLibrary, saveLibrary, type SavedAudience, type SavedCampaign } from '@/lib/shortlist/library'
 import { defaultSettingsEmail, pathForStep, stepFromPathname, type Step } from '@/lib/shortlist/steps'
 
 type Pending = 'enrich' | 'match' | 'digest' | null
@@ -44,6 +45,12 @@ type ShortlistContextValue = {
   digest: Digest | null
   campaignDraft: CampaignStepValues | null
   setCampaignDraft: (draft: CampaignStepValues | null) => void
+  campaigns: SavedCampaign[]
+  addCampaign: (values: CampaignStepValues) => void
+  removeCampaign: (id: string) => void
+  audiences: SavedAudience[]
+  addAudience: (values: Omit<SavedAudience, 'id' | 'createdAt'>) => void
+  removeAudience: (id: string) => void
   pending: Pending
   isDemo: boolean
   authenticated: boolean
@@ -89,6 +96,8 @@ export function ShortlistProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState<DigestSettings>(initialSettings)
   const [digest, setDigest] = useState<Digest | null>(null)
   const [campaignDraft, setCampaignDraft] = useState<CampaignStepValues | null>(null)
+  const [campaigns, setCampaigns] = useState<SavedCampaign[]>([])
+  const [audiences, setAudiences] = useState<SavedAudience[]>([])
   const [pending, setPending] = useState<Pending>(null)
   const [isDemo, setIsDemo] = useState(false)
   const [authenticated, setAuthenticated] = useState(false)
@@ -104,6 +113,10 @@ export function ShortlistProvider({ children }: { children: ReactNode }) {
     ;(async () => {
       const session = await getSessionDigest()
       if (cancelled) return
+
+      const library = loadLibrary()
+      setCampaigns(library.campaigns)
+      setAudiences(library.audiences)
 
       if (session.authenticated && session.digest) {
         setAuthenticated(true)
@@ -154,6 +167,33 @@ export function ShortlistProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true
     }
+  }, [])
+
+  useEffect(() => {
+    if (hydrated) saveLibrary({ campaigns, audiences })
+  }, [hydrated, campaigns, audiences])
+
+  const addCampaign = useCallback((values: CampaignStepValues) => {
+    setCampaigns((prev) => [
+      { ...values, id: crypto.randomUUID(), createdAt: new Date().toISOString() },
+      ...prev,
+    ])
+    setCampaignDraft(values)
+  }, [])
+
+  const removeCampaign = useCallback((id: string) => {
+    setCampaigns((prev) => prev.filter((campaign) => campaign.id !== id))
+  }, [])
+
+  const addAudience = useCallback((values: Omit<SavedAudience, 'id' | 'createdAt'>) => {
+    setAudiences((prev) => [
+      { ...values, id: crypto.randomUUID(), createdAt: new Date().toISOString() },
+      ...prev,
+    ])
+  }, [])
+
+  const removeAudience = useCallback((id: string) => {
+    setAudiences((prev) => prev.filter((audience) => audience.id !== id))
   }, [])
 
   useEffect(() => {
@@ -427,6 +467,12 @@ export function ShortlistProvider({ children }: { children: ReactNode }) {
     digest,
     campaignDraft,
     setCampaignDraft,
+    campaigns,
+    addCampaign,
+    removeCampaign,
+    audiences,
+    addAudience,
+    removeAudience,
     pending,
     isDemo: authenticated ? false : isDemo,
     authenticated,

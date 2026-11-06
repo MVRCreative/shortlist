@@ -12,7 +12,7 @@ function facts(account: SampleAccount) {
   )
 }
 
-function AccountRow({
+export function AccountRow({
   account,
   verdict,
   onVerdict,
@@ -111,8 +111,8 @@ export function MatchStep({
     <div className="flex flex-col gap-6">
       <StepHeading
         eyebrow="Audience"
-        title="Good fit, or not?"
-        description={`These are real companies Ocean found from your lookalike seeds, filtered by size and region. Mark at least one as a fit before continuing. Rating ${RECOMMENDED_REVIEWED} or more helps tune who shows up next.`}
+        title="Review matches"
+        description={`Mark which companies fit. Rate ${RECOMMENDED_REVIEWED} or more for better results.`}
       />
 
       <div className="flex flex-col gap-3">

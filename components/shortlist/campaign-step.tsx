@@ -40,7 +40,7 @@ export function CampaignStep({
       <StepHeading
         eyebrow="Optional"
         title="Start a campaign"
-        description="Campaigns organize different outreach strategies, messaging, or coordination with other marketing initiatives, like a webinar, launch, or partnership. You can skip this and still get your Shortlist."
+        description="A webinar, launch, or offer to reach out about. You can skip this."
       />
 
       <FieldGroup className="gap-5">
@@ -64,9 +64,6 @@ export function CampaignStep({
             rows={4}
             disabled={pending}
           />
-          <FieldDescription>
-            Shortlist uses this for outreach angles and campaign content. It does not invent buying signals.
-          </FieldDescription>
         </Field>
         <Field>
           <FieldLabel htmlFor="campaign-url">Supporting URL</FieldLabel>
@@ -77,7 +74,6 @@ export function CampaignStep({
             placeholder="https://example.com/webinar"
             disabled={pending}
           />
-          <FieldDescription>Optional registration page, resource, or landing page.</FieldDescription>
         </Field>
       </FieldGroup>
 
