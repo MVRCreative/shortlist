@@ -24,9 +24,9 @@ export function OnboardingRail({
   const currentIndex = ONBOARDING_STEPS.findIndex((s) => s.step === step)
 
   return (
-    <div className="flex h-full flex-col gap-8 py-6">
+    <div className="flex h-full flex-col gap-8 py-6 font-[family-name:var(--font-geist)]">
       <BrandMark isDemo={isDemo} />
-      <nav aria-label="Setup steps" className="flex flex-1 flex-col gap-4">
+      <nav aria-label="Setup steps" className="flex flex-1 flex-col gap-6">
         <VerticalStepper.Root>
           {ONBOARDING_STEPS.map((item, index) => {
             const state =
@@ -46,23 +46,25 @@ export function OnboardingRail({
                 <VerticalStepper.ItemIndicator>
                   {state === 'completed' ? null : index + 1}
                 </VerticalStepper.ItemIndicator>
-                <span className="flex min-w-0 flex-col gap-0.5">
+                <span className="flex min-w-0 flex-col gap-1">
                   <span
                     className={cn(
-                      'text-label-sm',
+                      'text-label-sm leading-tight tracking-tight',
                       state === 'active' ? 'text-text-strong-950' : 'text-text-sub-600',
                     )}
                   >
                     {state === 'completed' ? <span className="sr-only">Completed: </span> : null}
                     {item.title}
                   </span>
-                  <span className="text-paragraph-xs text-text-sub-600">{item.description}</span>
+                  <span className="text-paragraph-xs leading-snug text-text-soft-400">
+                    {item.description}
+                  </span>
                 </span>
               </VerticalStepper.Item>
             )
           })}
         </VerticalStepper.Root>
-        <p className="px-2 text-paragraph-xs text-text-sub-600">Setup takes about 3 minutes</p>
+        <p className="px-2 text-paragraph-xs text-text-soft-400">About 3 minutes</p>
       </nav>
       <div className="flex">
         <ThemeToggle />
