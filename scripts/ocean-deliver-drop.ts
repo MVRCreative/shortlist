@@ -66,7 +66,7 @@ async function main() {
   console.log("2) Deliver first drop…");
   const result = await deliverFirstDrop(client, {
     businessId: customer.businessId,
-    icpId: customer.icpId,
+    audienceId: customer.audienceId,
     seeds: args.seeds,
     oceanToken: env.OCEAN_API_TOKEN,
   });

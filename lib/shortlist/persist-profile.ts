@@ -123,9 +123,9 @@ export async function upsertPrimaryAudience(
   businessId: string,
   input: ProfileInput,
   options?: { name?: string; description?: string; markOnboardingComplete?: boolean },
-): Promise<{ icpId: string; lineageId: string }> {
+): Promise<{ audienceId: string; lineageId: string }> {
   const { data: existing, error: existingError } = await client
-    .from('icps')
+    .from('audiences')
     .select('id, lineage_id, version')
     .eq('business_id', businessId)
     .eq('is_active', true)
@@ -138,14 +138,14 @@ export async function upsertPrimaryAudience(
 
   if (existing) {
     const { error: deactivateError } = await client
-      .from('icps')
+      .from('audiences')
       .update({ is_active: false, is_primary: false })
       .eq('id', existing.id)
     if (deactivateError) throw new Error(deactivateError.message)
   }
 
-  const { data: icp, error: icpError } = await client
-    .from('icps')
+  const { data: audience, error: audienceError } = await client
+    .from('audiences')
     .insert({
       business_id: businessId,
       lineage_id: lineageId,
@@ -163,15 +163,15 @@ export async function upsertPrimaryAudience(
     })
     .select('id, lineage_id')
     .single()
-  if (icpError || !icp) throw new Error(icpError?.message ?? 'icp insert failed')
+  if (audienceError || !audience) throw new Error(audienceError?.message ?? 'audience insert failed')
 
   const seeds = input.seedClients
     .map((value) => normalizeDomain(value))
     .filter((value): value is string => !!value)
     .slice(0, 3)
   for (const seed of seeds) {
-    const { error } = await client.from('icp_seed_accounts').insert({
-      icp_id: icp.id,
+    const { error } = await client.from('audience_seeds').insert({
+      audience_id: audience.id,
       domain: seed,
     })
     if (error && !error.message.includes('duplicate')) {
@@ -183,8 +183,8 @@ export async function upsertPrimaryAudience(
     .map((value) => normalizeDomain(value))
     .filter((value): value is string => !!value && !seeds.includes(value))
   for (const domain of references) {
-    const { error } = await client.from('icp_reference_accounts').insert({
-      icp_id: icp.id,
+    const { error } = await client.from('audience_references').insert({
+      audience_id: audience.id,
       domain,
     })
     if (error && !error.message.includes('duplicate')) {
@@ -210,7 +210,7 @@ export async function upsertPrimaryAudience(
     if (error) throw new Error(error.message)
   }
 
-  return { icpId: icp.id, lineageId: icp.lineage_id }
+  return { audienceId: audience.id, lineageId: audience.lineage_id }
 }
 
 export async function saveAudienceReviews(

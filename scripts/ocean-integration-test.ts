@@ -94,7 +94,7 @@ async function ensureFixture(
   seeds: string[],
 ): Promise<{
   businessId: string;
-  icpId: string;
+  audienceId: string;
   userId: string;
 }> {
   const { data: listed, error: listError } =
@@ -148,19 +148,19 @@ async function ensureFixture(
   }
 
   const { data: existingIcp, error: icpSelectError } = await client
-    .from("icps")
+    .from("audiences")
     .select("id")
     .eq("business_id", businessId)
     .eq("is_active", true)
     .maybeSingle();
   if (icpSelectError) {
-    throw new Error(`icps select failed: ${icpSelectError.message}`);
+    throw new Error(`audiences select failed: ${icpSelectError.message}`);
   }
 
-  let icpId = existingIcp?.id;
-  if (!icpId) {
+  let audienceId = existingIcp?.id;
+  if (!audienceId) {
     const { data, error } = await client
-      .from("icps")
+      .from("audiences")
       .insert({
         business_id: businessId,
         lineage_id: crypto.randomUUID(),
@@ -177,12 +177,12 @@ async function ensureFixture(
       .select("id")
       .single();
     if (error || !data) {
-      throw new Error(`icps insert failed: ${error?.message}`);
+      throw new Error(`audiences insert failed: ${error?.message}`);
     }
-    icpId = data.id;
+    audienceId = data.id;
   } else {
     const { error } = await client
-      .from("icps")
+      .from("audiences")
       .update({
         industry_slugs: ["b2b_saas"],
         employee_ranges: ["11-50", "51-200", "201-500"],
@@ -190,27 +190,27 @@ async function ensureFixture(
         buyer_titles: ["Head of Marketing", "VP Marketing", "CMO"],
         signal_types: ["funding"],
       })
-      .eq("id", icpId);
-    if (error) throw new Error(`icps update failed: ${error.message}`);
+      .eq("id", audienceId);
+    if (error) throw new Error(`audiences update failed: ${error.message}`);
   }
 
   const { data: existingSeeds, error: seedsSelectError } = await client
-    .from("icp_seed_accounts")
+    .from("audience_seeds")
     .select("domain")
-    .eq("icp_id", icpId);
+    .eq("audience_id", audienceId);
   if (seedsSelectError) {
-    throw new Error(`icp_seed_accounts select failed: ${seedsSelectError.message}`);
+    throw new Error(`audience_seeds select failed: ${seedsSelectError.message}`);
   }
   const have = new Set((existingSeeds ?? []).map((row) => row.domain));
   for (const seed of seeds) {
     if (have.has(seed)) continue;
     if (have.size >= 3) break;
-    const { error } = await client.from("icp_seed_accounts").insert({
-      icp_id: icpId,
+    const { error } = await client.from("audience_seeds").insert({
+      audience_id: audienceId,
       domain: seed,
     });
     if (error) {
-      throw new Error(`icp_seed_accounts insert failed: ${error.message}`);
+      throw new Error(`audience_seeds insert failed: ${error.message}`);
     }
     have.add(seed);
   }
@@ -239,7 +239,7 @@ async function ensureFixture(
     }
   }
 
-  return { businessId, icpId, userId };
+  return { businessId, audienceId, userId };
 }
 
 async function waitForVerifiedEmail(
@@ -283,24 +283,24 @@ async function waitForVerifiedEmail(
 async function ensureLookalikes(
   client: ServiceClient,
   businessId: string,
-  icpId: string,
+  audienceId: string,
   companyIds: string[],
   seedDomain: string,
 ): Promise<void> {
   for (const companyId of companyIds) {
-    const { error } = await client.from("business_lookalikes").upsert(
+    const { error } = await client.from("audience_lookalikes").upsert(
       {
         business_id: businessId,
-        icp_id: icpId,
+        audience_id: audienceId,
         company_id: companyId,
         similarity: null,
         seed_domain: seedDomain,
         fetched_at: new Date().toISOString(),
       },
-      { onConflict: "icp_id,company_id" },
+      { onConflict: "audience_id,company_id" },
     );
     if (error) {
-      throw new Error(`business_lookalikes upsert failed: ${error.message}`);
+      throw new Error(`audience_lookalikes upsert failed: ${error.message}`);
     }
   }
 }
@@ -308,7 +308,7 @@ async function ensureLookalikes(
 async function ensureTestDrop(input: {
   client: ServiceClient;
   businessId: string;
-  icpId: string;
+  audienceId: string;
   preferredCompanyId: string;
   contactId: string | null;
   seedDomains: string[];
@@ -318,7 +318,7 @@ async function ensureTestDrop(input: {
   created: boolean;
   companyId: string;
 }> {
-  const { client, businessId, icpId, preferredCompanyId, contactId, seedDomains } =
+  const { client, businessId, audienceId, preferredCompanyId, contactId, seedDomains } =
     input;
 
   const { data: existingAccount, error: existingError } = await client
@@ -442,7 +442,7 @@ async function ensureTestDrop(input: {
     .upsert(
       {
         business_id: businessId,
-        icp_id: icpId,
+        audience_id: audienceId,
         plan_id: "starter",
         scheduled_for: scheduledFor.toISOString(),
         status: "delivered",
@@ -562,7 +562,7 @@ async function main(): Promise<void> {
   const fixture = await ensureFixture(client, seeds);
   report.fixture = {
     businessId: fixture.businessId,
-    icpId: fixture.icpId,
+    audienceId: fixture.audienceId,
     email: FIXTURE_EMAIL,
   };
   console.log(`3) Fixture ready business=${fixture.businessId}`);
@@ -642,7 +642,7 @@ async function main(): Promise<void> {
   await ensureLookalikes(
     client,
     fixture.businessId,
-    fixture.icpId,
+    fixture.audienceId,
     companyIds,
     seeds[0]!,
   );
@@ -759,7 +759,7 @@ async function main(): Promise<void> {
   const drop = await ensureTestDrop({
     client,
     businessId: fixture.businessId,
-    icpId: fixture.icpId,
+    audienceId: fixture.audienceId,
     preferredCompanyId: finalistCompanyId,
     contactId,
     seedDomains: seeds,

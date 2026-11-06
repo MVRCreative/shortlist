@@ -157,7 +157,7 @@ const audienceConfirmSchema = z.object({
 /** Persist the business profile + primary audience for the signed-in member. */
 export async function persistOnboardingState(
   raw: z.infer<typeof audienceConfirmSchema>,
-): Promise<{ ok: true; businessId: string; icpId: string; lineageId: string } | { ok: false; error: string }> {
+): Promise<{ ok: true; businessId: string; audienceId: string; lineageId: string } | { ok: false; error: string }> {
   const parsed = audienceConfirmSchema.safeParse(raw)
   if (!parsed.success) return { ok: false, error: 'Profile is incomplete.' }
 
@@ -181,13 +181,13 @@ export async function persistOnboardingState(
       parsed.data.input,
       parsed.data.enriched,
     )
-    const { icpId, lineageId } = await upsertPrimaryAudience(supabase, businessId, parsed.data.input, {
+    const { audienceId, lineageId } = await upsertPrimaryAudience(supabase, businessId, parsed.data.input, {
       markOnboardingComplete: parsed.data.markComplete,
     })
     if (parsed.data.reviews.length > 0) {
       await saveAudienceReviews(supabase, businessId, lineageId, parsed.data.reviews)
     }
-    return { ok: true, businessId, icpId, lineageId }
+    return { ok: true, businessId, audienceId, lineageId }
   } catch (error) {
     const detail = error instanceof Error ? error.message : 'Unknown error'
     console.warn('[shortlist] persistOnboardingState', detail)

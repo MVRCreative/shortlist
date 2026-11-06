@@ -31,10 +31,10 @@ const DEFAULT_TARGET = 10;
 
 export type DeliverFirstDropInput = {
   businessId: string;
-  icpId: string;
+  audienceId: string;
   /** 2–3 lookalike client domains from onboarding. */
   seeds: string[];
-  /** Optional ICP filters; when set, drives Ocean company search. */
+  /** Optional audience filters; when set, drives Ocean company search. */
   profile?: Pick<
     ProfileInput,
     | "website"
@@ -80,32 +80,32 @@ function normalizeSeeds(seeds: string[]): string[] {
 
 async function syncSeeds(
   client: ServiceClient,
-  icpId: string,
+  audienceId: string,
   seeds: string[],
 ): Promise<void> {
   const { data: existingSeeds } = await client
-    .from("icp_seed_accounts")
+    .from("audience_seeds")
     .select("domain")
-    .eq("icp_id", icpId);
+    .eq("audience_id", audienceId);
   const have = new Set((existingSeeds ?? []).map((row) => row.domain));
   for (const seed of seeds) {
     if (have.has(seed) || have.size >= 3) continue;
-    const { error } = await client.from("icp_seed_accounts").insert({
-      icp_id: icpId,
+    const { error } = await client.from("audience_seeds").insert({
+      audience_id: audienceId,
       domain: seed,
     });
-    if (error) throw new Error(`icp_seed_accounts insert failed: ${error.message}`);
+    if (error) throw new Error(`audience_seeds insert failed: ${error.message}`);
     have.add(seed);
   }
 }
 
 /**
- * Look up business + active ICP for an auth user id (service role).
+ * Look up business + active audience for an auth user id (service role).
  */
 export async function resolveCustomerByUserId(
   client: ServiceClient,
   userId: string,
-): Promise<{ businessId: string; icpId: string }> {
+): Promise<{ businessId: string; audienceId: string }> {
   const { data: business, error: bErr } = await client
     .from("businesses")
     .select("id")
@@ -116,8 +116,8 @@ export async function resolveCustomerByUserId(
     throw new Error("No business for this account. Complete signup first.");
   }
 
-  const { data: icp, error: iErr } = await client
-    .from("icps")
+  const { data: audience, error: iErr } = await client
+    .from("audiences")
     .select("id")
     .eq("business_id", business.id)
     .eq("is_active", true)
@@ -125,24 +125,24 @@ export async function resolveCustomerByUserId(
     .maybeSingle();
   if (iErr) throw new Error(iErr.message);
 
-  if (icp) return { businessId: business.id, icpId: icp.id };
+  if (audience) return { businessId: business.id, audienceId: audience.id };
 
-  const { data: anyIcp, error: anyErr } = await client
-    .from("icps")
+  const { data: anyAudience, error: anyErr } = await client
+    .from("audiences")
     .select("id")
     .eq("business_id", business.id)
     .eq("is_active", true)
     .maybeSingle();
   if (anyErr) throw new Error(anyErr.message);
-  if (!anyIcp) throw new Error("No active audience for this account.");
+  if (!anyAudience) throw new Error("No active audience for this account.");
 
-  return { businessId: business.id, icpId: anyIcp.id };
+  return { businessId: business.id, audienceId: anyAudience.id };
 }
 
 export async function resolveCustomerByEmail(
   client: ServiceClient,
   email: string,
-): Promise<{ userId: string; businessId: string; icpId: string }> {
+): Promise<{ userId: string; businessId: string; audienceId: string }> {
   const normalized = email.trim().toLowerCase();
   const { data: listed, error } = await client.auth.admin.listUsers({
     perPage: 1000,
@@ -193,7 +193,7 @@ async function upsertDeeplineContact(
         email: enrichment.email,
         email_status: enrichment.email ? "verified" : "unknown",
         email_verified_at: enrichment.email ? new Date().toISOString() : null,
-        source: "manual",
+        source: "deepline",
         source_id: sourceId,
       })
       .eq("id", byLinkedIn.id)
@@ -215,7 +215,7 @@ async function upsertDeeplineContact(
       email: enrichment.email,
       email_status: enrichment.email ? "verified" : "unknown",
       email_verified_at: enrichment.email ? new Date().toISOString() : null,
-      source: "manual",
+      source: "deepline",
       source_id: sourceId,
     })
     .select("id")
@@ -254,7 +254,7 @@ export async function deliverFirstDrop(
     );
   }
 
-  await syncSeeds(client, input.icpId, seeds);
+  await syncSeeds(client, input.audienceId, seeds);
 
   const dataFields = await ocean.getDataFields(log(input.businessId));
   const { data: industries } = await client
@@ -337,16 +337,16 @@ export async function deliverFirstDrop(
   );
 
   for (const companyId of persistResult.companyIdsByDomain.values()) {
-    await client.from("business_lookalikes").upsert(
+    await client.from("audience_lookalikes").upsert(
       {
         business_id: input.businessId,
-        icp_id: input.icpId,
+        audience_id: input.audienceId,
         company_id: companyId,
         similarity: null,
         seed_domain: seeds[0]!,
         fetched_at: new Date().toISOString(),
       },
-      { onConflict: "icp_id,company_id" },
+      { onConflict: "audience_id,company_id" },
     );
   }
 
@@ -459,7 +459,7 @@ export async function deliverFirstDrop(
       .from("drops")
       .insert({
         business_id: input.businessId,
-        icp_id: input.icpId,
+        audience_id: input.audienceId,
         campaign_id: input.campaignId ?? null,
         audience_snapshot: input.audienceSnapshot ?? null,
         campaign_snapshot: input.campaignSnapshot ?? null,

@@ -230,7 +230,7 @@ export async function requestFirstDrop(
 
     await deliverFirstDrop(admin, {
       businessId: customer.businessId,
-      icpId: customer.icpId,
+      audienceId: customer.audienceId,
       seeds,
       profile: {
         website: parsed.data.website ?? "",

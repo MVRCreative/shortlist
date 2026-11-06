@@ -3,59 +3,9 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 
 export type Database = {
   
-  "graphql_public": {
+  "public": {
           Tables: {
-            [_ in never]: never
-          }
-          Views: {
-            [_ in never]: never
-          }
-          Functions: {
-            "graphql":
-{ Args: { "extensions"?: Json,"operationName"?: string,"query"?: string,"variables"?: Json }; Returns: Json
-                           }
-          }
-          Enums: {
-            [_ in never]: never
-          }
-          CompositeTypes: {
-            [_ in never]: never
-          }
-        },"public": {
-          Tables: {
-            "account_events": {
-                  Row: {
-                    "business_id": string,"drop_account_id": string,"id": string,"metadata": Json | null,"occurred_at": string,"type": Database["public"]['Enums']["account_event_type"]
-                  }
-                  ComputedFields: never
-                  Insert: {
-                    "business_id": string,"drop_account_id": string,"id"?: string,"metadata"?: Json | null,"occurred_at"?: string,"type": Database["public"]['Enums']["account_event_type"]
-                  }
-                  Update: {
-                    "business_id"?: string,"drop_account_id"?: string,"id"?: string,"metadata"?: Json | null,"occurred_at"?: string,"type"?: Database["public"]['Enums']["account_event_type"]
-                  }
-                  Relationships: [
-                    {
-      foreignKeyName: "account_events_business_id_fkey"
-      columns: ["business_id"]
-isOneToOne: false
-      referencedRelation: "businesses"
-      referencedColumns: ["id"]
-    },{
-      foreignKeyName: "account_events_business_id_fkey"
-      columns: ["business_id"]
-isOneToOne: false
-      referencedRelation: "member_activity"
-      referencedColumns: ["business_id"]
-    },{
-      foreignKeyName: "account_events_drop_account_id_fkey"
-      columns: ["drop_account_id"]
-isOneToOne: false
-      referencedRelation: "drop_accounts"
-      referencedColumns: ["id"]
-    }
-                  ]
-                },"app_config": {
+            "app_config": {
                   Row: {
                     "description": string | null,"key": string,"updated_at": string,"value": NonNullable<Json>
                   }
@@ -68,6 +18,142 @@ isOneToOne: false
                   }
                   Relationships: [
                     
+                  ]
+                },"audience_lookalikes": {
+                  Row: {
+                    "audience_id": string,"business_id": string,"company_id": string,"fetched_at": string,"seed_domain": string | null,"similarity": number | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "audience_id": string,"business_id": string,"company_id": string,"fetched_at"?: string,"seed_domain"?: string | null,"similarity"?: number | null
+                  }
+                  Update: {
+                    "audience_id"?: string,"business_id"?: string,"company_id"?: string,"fetched_at"?: string,"seed_domain"?: string | null,"similarity"?: number | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "audience_lookalikes_audience_id_fkey"
+      columns: ["audience_id"]
+isOneToOne: false
+      referencedRelation: "audiences"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "audience_lookalikes_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "audience_lookalikes_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "member_activity"
+      referencedColumns: ["business_id"]
+    },{
+      foreignKeyName: "audience_lookalikes_company_id_fkey"
+      columns: ["company_id"]
+isOneToOne: false
+      referencedRelation: "companies"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"audience_references": {
+                  Row: {
+                    "audience_id": string,"created_at": string,"domain": string,"id": string,"label": string | null,"url": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "audience_id": string,"created_at"?: string,"domain": string,"id"?: string,"label"?: string | null,"url"?: string | null
+                  }
+                  Update: {
+                    "audience_id"?: string,"created_at"?: string,"domain"?: string,"id"?: string,"label"?: string | null,"url"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "audience_references_audience_id_fkey"
+      columns: ["audience_id"]
+isOneToOne: false
+      referencedRelation: "audiences"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"audience_reviews": {
+                  Row: {
+                    "business_id": string,"company_name": string | null,"domain": string,"id": string,"lineage_id": string,"reviewed_at": string,"snapshot": Json | null,"verdict": Database["public"]['Enums']["audience_review_verdict"]
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "business_id": string,"company_name"?: string | null,"domain": string,"id"?: string,"lineage_id": string,"reviewed_at"?: string,"snapshot"?: Json | null,"verdict": Database["public"]['Enums']["audience_review_verdict"]
+                  }
+                  Update: {
+                    "business_id"?: string,"company_name"?: string | null,"domain"?: string,"id"?: string,"lineage_id"?: string,"reviewed_at"?: string,"snapshot"?: Json | null,"verdict"?: Database["public"]['Enums']["audience_review_verdict"]
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "audience_reviews_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "audience_reviews_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "member_activity"
+      referencedColumns: ["business_id"]
+    }
+                  ]
+                },"audience_seeds": {
+                  Row: {
+                    "audience_id": string,"company_id": string | null,"created_at": string,"domain": string,"id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "audience_id": string,"company_id"?: string | null,"created_at"?: string,"domain": string,"id"?: string
+                  }
+                  Update: {
+                    "audience_id"?: string,"company_id"?: string | null,"created_at"?: string,"domain"?: string,"id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "audience_seeds_audience_id_fkey"
+      columns: ["audience_id"]
+isOneToOne: false
+      referencedRelation: "audiences"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "audience_seeds_company_fk"
+      columns: ["company_id"]
+isOneToOne: false
+      referencedRelation: "companies"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"audiences": {
+                  Row: {
+                    "business_id": string,"buyer_titles": (string)[],"created_at": string,"custom_industries": (string)[],"description": string | null,"employee_ranges": (Database["public"]['Enums']["employee_range"])[],"id": string,"industry_slugs": (string)[],"is_active": boolean,"is_primary": boolean,"lineage_id": string,"name": string,"regions": (Database["public"]['Enums']["region_code"])[],"signal_types": (Database["public"]['Enums']["signal_type"])[],"updated_at": string,"version": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "business_id": string,"buyer_titles"?: (string)[],"created_at"?: string,"custom_industries"?: (string)[],"description"?: string | null,"employee_ranges"?: (Database["public"]['Enums']["employee_range"])[],"id"?: string,"industry_slugs"?: (string)[],"is_active"?: boolean,"is_primary"?: boolean,"lineage_id": string,"name"?: string,"regions"?: (Database["public"]['Enums']["region_code"])[],"signal_types"?: (Database["public"]['Enums']["signal_type"])[],"updated_at"?: string,"version": number
+                  }
+                  Update: {
+                    "business_id"?: string,"buyer_titles"?: (string)[],"created_at"?: string,"custom_industries"?: (string)[],"description"?: string | null,"employee_ranges"?: (Database["public"]['Enums']["employee_range"])[],"id"?: string,"industry_slugs"?: (string)[],"is_active"?: boolean,"is_primary"?: boolean,"lineage_id"?: string,"name"?: string,"regions"?: (Database["public"]['Enums']["region_code"])[],"signal_types"?: (Database["public"]['Enums']["signal_type"])[],"updated_at"?: string,"version"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "audiences_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "audiences_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "member_activity"
+      referencedColumns: ["business_id"]
+    }
                   ]
                 },"business_exclusions": {
                   Row: {
@@ -95,64 +181,6 @@ isOneToOne: false
       referencedColumns: ["business_id"]
     }
                   ]
-                },"business_lookalikes": {
-                  Row: {
-                    "business_id": string,"company_id": string,"fetched_at": string,"icp_id": string,"seed_domain": string | null,"similarity": number | null
-                  }
-                  ComputedFields: never
-                  Insert: {
-                    "business_id": string,"company_id": string,"fetched_at"?: string,"icp_id": string,"seed_domain"?: string | null,"similarity"?: number | null
-                  }
-                  Update: {
-                    "business_id"?: string,"company_id"?: string,"fetched_at"?: string,"icp_id"?: string,"seed_domain"?: string | null,"similarity"?: number | null
-                  }
-                  Relationships: [
-                    {
-      foreignKeyName: "business_lookalikes_business_id_fkey"
-      columns: ["business_id"]
-isOneToOne: false
-      referencedRelation: "businesses"
-      referencedColumns: ["id"]
-    },{
-      foreignKeyName: "business_lookalikes_business_id_fkey"
-      columns: ["business_id"]
-isOneToOne: false
-      referencedRelation: "member_activity"
-      referencedColumns: ["business_id"]
-    },{
-      foreignKeyName: "business_lookalikes_company_id_fkey"
-      columns: ["company_id"]
-isOneToOne: false
-      referencedRelation: "companies"
-      referencedColumns: ["id"]
-    },{
-      foreignKeyName: "business_lookalikes_icp_id_fkey"
-      columns: ["icp_id"]
-isOneToOne: false
-      referencedRelation: "icps"
-      referencedColumns: ["id"]
-    }
-                  ]
-                },"audience_reviews": {
-                  Row: {
-                    "business_id": string,"company_name": string | null,"domain": string,"id": string,"lineage_id": string,"reviewed_at": string,"snapshot": Json | null,"verdict": Database["public"]["Enums"]["audience_review_verdict"]
-                  }
-                  ComputedFields: never
-                  Insert: {
-                    "business_id": string,"company_name"?: string | null,"domain": string,"id"?: string,"lineage_id": string,"reviewed_at"?: string,"snapshot"?: Json | null,"verdict": Database["public"]["Enums"]["audience_review_verdict"]
-                  }
-                  Update: {
-                    "business_id"?: string,"company_name"?: string | null,"domain"?: string,"id"?: string,"lineage_id"?: string,"reviewed_at"?: string,"snapshot"?: Json | null,"verdict"?: Database["public"]["Enums"]["audience_review_verdict"]
-                  }
-                  Relationships: [
-                    {
-      foreignKeyName: "audience_reviews_business_id_fkey"
-      columns: ["business_id"]
-isOneToOne: false
-      referencedRelation: "businesses"
-      referencedColumns: ["id"]
-    }
-                  ]
                 },"businesses": {
                   Row: {
                     "attio_record_id": string | null,"attio_synced_at": string | null,"case_study_urls": (string)[],"created_at": string,"deal_size": Database["public"]['Enums']["deal_size"] | null,"description": string | null,"enriched_at": string | null,"enriched_profile": Json | null,"id": string,"linkedin_url": string | null,"name": string | null,"onboarding_completed_at": string | null,"owner_id": string,"prefill": Json | null,"prefilled_at": string | null,"services": (string)[],"stripe_customer_id": string | null,"updated_at": string,"website_domain": string,"x_url": string | null
@@ -171,6 +199,64 @@ isOneToOne: false
 isOneToOne: true
       referencedRelation: "profiles"
       referencedColumns: ["id"]
+    }
+                  ]
+                },"campaign_assets": {
+                  Row: {
+                    "body": string,"business_id": string,"campaign_id": string | null,"created_at": string,"edited_at": string | null,"id": string,"input_hash": string,"outline": Json | null,"title": string | null,"type": Database["public"]['Enums']["content_type"],"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "body": string,"business_id": string,"campaign_id"?: string | null,"created_at"?: string,"edited_at"?: string | null,"id"?: string,"input_hash": string,"outline"?: Json | null,"title"?: string | null,"type": Database["public"]['Enums']["content_type"],"updated_at"?: string
+                  }
+                  Update: {
+                    "body"?: string,"business_id"?: string,"campaign_id"?: string | null,"created_at"?: string,"edited_at"?: string | null,"id"?: string,"input_hash"?: string,"outline"?: Json | null,"title"?: string | null,"type"?: Database["public"]['Enums']["content_type"],"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "campaign_assets_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "campaign_assets_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "member_activity"
+      referencedColumns: ["business_id"]
+    },{
+      foreignKeyName: "campaign_assets_campaign_id_fkey"
+      columns: ["campaign_id"]
+isOneToOne: false
+      referencedRelation: "campaigns"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"campaigns": {
+                  Row: {
+                    "audience_lineage_id": string,"business_id": string,"created_at": string,"id": string,"interpreted": Json | null,"objective": string,"status": Database["public"]['Enums']["campaign_status"],"supporting_url": string | null,"title": string,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "audience_lineage_id": string,"business_id": string,"created_at"?: string,"id"?: string,"interpreted"?: Json | null,"objective": string,"status"?: Database["public"]['Enums']["campaign_status"],"supporting_url"?: string | null,"title": string,"updated_at"?: string
+                  }
+                  Update: {
+                    "audience_lineage_id"?: string,"business_id"?: string,"created_at"?: string,"id"?: string,"interpreted"?: Json | null,"objective"?: string,"status"?: Database["public"]['Enums']["campaign_status"],"supporting_url"?: string | null,"title"?: string,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "campaigns_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "campaigns_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "member_activity"
+      referencedColumns: ["business_id"]
     }
                   ]
                 },"companies": {
@@ -230,6 +316,38 @@ isOneToOne: false
       columns: ["company_id"]
 isOneToOne: false
       referencedRelation: "companies"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"drop_account_events": {
+                  Row: {
+                    "business_id": string,"drop_account_id": string,"id": string,"metadata": Json | null,"occurred_at": string,"type": Database["public"]['Enums']["account_event_type"]
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "business_id": string,"drop_account_id": string,"id"?: string,"metadata"?: Json | null,"occurred_at"?: string,"type": Database["public"]['Enums']["account_event_type"]
+                  }
+                  Update: {
+                    "business_id"?: string,"drop_account_id"?: string,"id"?: string,"metadata"?: Json | null,"occurred_at"?: string,"type"?: Database["public"]['Enums']["account_event_type"]
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "drop_account_events_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "drop_account_events_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "member_activity"
+      referencedColumns: ["business_id"]
+    },{
+      foreignKeyName: "drop_account_events_drop_account_id_fkey"
+      columns: ["drop_account_id"]
+isOneToOne: false
+      referencedRelation: "drop_accounts"
       referencedColumns: ["id"]
     }
                   ]
@@ -315,65 +433,25 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
-                },"campaign_assets": {
-                  Row: {
-                    "body": string,"business_id": string,"campaign_id": string | null,"created_at": string,"edited_at": string | null,"id": string,"input_hash": string,"outline": Json | null,"title": string | null,"type": Database["public"]["Enums"]["content_type"],"updated_at": string
-                  }
-                  ComputedFields: never
-                  Insert: {
-                    "body": string,"business_id": string,"campaign_id"?: string | null,"created_at"?: string,"edited_at"?: string | null,"id"?: string,"input_hash": string,"outline"?: Json | null,"title"?: string | null,"type": Database["public"]["Enums"]["content_type"],"updated_at"?: string
-                  }
-                  Update: {
-                    "body"?: string,"business_id"?: string,"campaign_id"?: string | null,"created_at"?: string,"edited_at"?: string | null,"id"?: string,"input_hash"?: string,"outline"?: Json | null,"title"?: string | null,"type"?: Database["public"]["Enums"]["content_type"],"updated_at"?: string
-                  }
-                  Relationships: [
-                    {
-      foreignKeyName: "campaign_assets_business_id_fkey"
-      columns: ["business_id"]
-isOneToOne: false
-      referencedRelation: "businesses"
-      referencedColumns: ["id"]
-    },{
-      foreignKeyName: "campaign_assets_campaign_id_fkey"
-      columns: ["campaign_id"]
-isOneToOne: false
-      referencedRelation: "campaigns"
-      referencedColumns: ["id"]
-    }
-                  ]
-                },"campaigns": {
-                  Row: {
-                    "audience_lineage_id": string,"business_id": string,"created_at": string,"id": string,"interpreted": Json | null,"objective": string,"status": Database["public"]["Enums"]["campaign_status"],"supporting_url": string | null,"title": string,"updated_at": string
-                  }
-                  ComputedFields: never
-                  Insert: {
-                    "audience_lineage_id": string,"business_id": string,"created_at"?: string,"id"?: string,"interpreted"?: Json | null,"objective": string,"status"?: Database["public"]["Enums"]["campaign_status"],"supporting_url"?: string | null,"title": string,"updated_at"?: string
-                  }
-                  Update: {
-                    "audience_lineage_id"?: string,"business_id"?: string,"created_at"?: string,"id"?: string,"interpreted"?: Json | null,"objective"?: string,"status"?: Database["public"]["Enums"]["campaign_status"],"supporting_url"?: string | null,"title"?: string,"updated_at"?: string
-                  }
-                  Relationships: [
-                    {
-      foreignKeyName: "campaigns_business_id_fkey"
-      columns: ["business_id"]
-isOneToOne: false
-      referencedRelation: "businesses"
-      referencedColumns: ["id"]
-    }
-                  ]
                 },"drops": {
                   Row: {
-                    "audience_snapshot": Json | null,"business_id": string,"campaign_id": string | null,"campaign_snapshot": Json | null,"created_at": string,"delivered_at": string | null,"delivered_count": number,"error": string | null,"icp_id": string,"id": string,"notified_at": string | null,"plan_id": string,"scheduled_for": string,"shortfall": number,"shortfall_note": string | null,"status": Database["public"]['Enums']["drop_status"],"target_count": number,"updated_at": string
+                    "audience_id": string,"audience_snapshot": Json | null,"business_id": string,"campaign_id": string | null,"campaign_snapshot": Json | null,"created_at": string,"delivered_at": string | null,"delivered_count": number,"error": string | null,"id": string,"notified_at": string | null,"plan_id": string,"scheduled_for": string,"shortfall": number,"shortfall_note": string | null,"status": Database["public"]['Enums']["drop_status"],"target_count": number,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "audience_snapshot"?: Json | null,"business_id": string,"campaign_id"?: string | null,"campaign_snapshot"?: Json | null,"created_at"?: string,"delivered_at"?: string | null,"delivered_count"?: number,"error"?: string | null,"icp_id": string,"id"?: string,"notified_at"?: string | null,"plan_id": string,"scheduled_for": string,"shortfall"?: number,"shortfall_note"?: string | null,"status"?: Database["public"]['Enums']["drop_status"],"target_count": number,"updated_at"?: string
+                    "audience_id": string,"audience_snapshot"?: Json | null,"business_id": string,"campaign_id"?: string | null,"campaign_snapshot"?: Json | null,"created_at"?: string,"delivered_at"?: string | null,"delivered_count"?: number,"error"?: string | null,"id"?: string,"notified_at"?: string | null,"plan_id": string,"scheduled_for": string,"shortfall"?: number,"shortfall_note"?: string | null,"status"?: Database["public"]['Enums']["drop_status"],"target_count": number,"updated_at"?: string
                   }
                   Update: {
-                    "audience_snapshot"?: Json | null,"business_id"?: string,"campaign_id"?: string | null,"campaign_snapshot"?: Json | null,"created_at"?: string,"delivered_at"?: string | null,"delivered_count"?: number,"error"?: string | null,"icp_id"?: string,"id"?: string,"notified_at"?: string | null,"plan_id"?: string,"scheduled_for"?: string,"shortfall"?: number,"shortfall_note"?: string | null,"status"?: Database["public"]["Enums"]["drop_status"],"target_count"?: number,"updated_at"?: string
+                    "audience_id"?: string,"audience_snapshot"?: Json | null,"business_id"?: string,"campaign_id"?: string | null,"campaign_snapshot"?: Json | null,"created_at"?: string,"delivered_at"?: string | null,"delivered_count"?: number,"error"?: string | null,"id"?: string,"notified_at"?: string | null,"plan_id"?: string,"scheduled_for"?: string,"shortfall"?: number,"shortfall_note"?: string | null,"status"?: Database["public"]['Enums']["drop_status"],"target_count"?: number,"updated_at"?: string
                   }
                   Relationships: [
                     {
+      foreignKeyName: "drops_audience_id_fkey"
+      columns: ["audience_id"]
+isOneToOne: false
+      referencedRelation: "audiences"
+      referencedColumns: ["id"]
+    },{
       foreignKeyName: "drops_business_id_fkey"
       columns: ["business_id"]
 isOneToOne: false
@@ -386,10 +464,10 @@ isOneToOne: false
       referencedRelation: "member_activity"
       referencedColumns: ["business_id"]
     },{
-      foreignKeyName: "drops_icp_id_fkey"
-      columns: ["icp_id"]
+      foreignKeyName: "drops_campaign_id_fkey"
+      columns: ["campaign_id"]
 isOneToOne: false
-      referencedRelation: "icps"
+      referencedRelation: "campaigns"
       referencedColumns: ["id"]
     },{
       foreignKeyName: "drops_plan_id_fkey"
@@ -397,78 +475,6 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "plans"
       referencedColumns: ["id"]
-    }
-                  ]
-                },"icp_reference_accounts": {
-                  Row: {
-                    "created_at": string,"domain": string,"icp_id": string,"id": string,"label": string | null,"url": string | null
-                  }
-                  ComputedFields: never
-                  Insert: {
-                    "created_at"?: string,"domain": string,"icp_id": string,"id"?: string,"label"?: string | null,"url"?: string | null
-                  }
-                  Update: {
-                    "created_at"?: string,"domain"?: string,"icp_id"?: string,"id"?: string,"label"?: string | null,"url"?: string | null
-                  }
-                  Relationships: [
-                    {
-      foreignKeyName: "icp_reference_accounts_icp_id_fkey"
-      columns: ["icp_id"]
-isOneToOne: false
-      referencedRelation: "icps"
-      referencedColumns: ["id"]
-    }
-                  ]
-                },"icp_seed_accounts": {
-                  Row: {
-                    "company_id": string | null,"created_at": string,"domain": string,"icp_id": string,"id": string
-                  }
-                  ComputedFields: never
-                  Insert: {
-                    "company_id"?: string | null,"created_at"?: string,"domain": string,"icp_id": string,"id"?: string
-                  }
-                  Update: {
-                    "company_id"?: string | null,"created_at"?: string,"domain"?: string,"icp_id"?: string,"id"?: string
-                  }
-                  Relationships: [
-                    {
-      foreignKeyName: "icp_seed_accounts_company_fk"
-      columns: ["company_id"]
-isOneToOne: false
-      referencedRelation: "companies"
-      referencedColumns: ["id"]
-    },{
-      foreignKeyName: "icp_seed_accounts_icp_id_fkey"
-      columns: ["icp_id"]
-isOneToOne: false
-      referencedRelation: "icps"
-      referencedColumns: ["id"]
-    }
-                  ]
-                },"icps": {
-                  Row: {
-                    "business_id": string,"buyer_titles": (string)[],"created_at": string,"custom_industries": (string)[],"description": string | null,"employee_ranges": (Database["public"]['Enums']["employee_range"])[],"id": string,"industry_slugs": (string)[],"is_active": boolean,"is_primary": boolean,"lineage_id": string,"name": string,"regions": (Database["public"]['Enums']["region_code"])[],"signal_types": (Database["public"]['Enums']["signal_type"])[],"updated_at": string,"version": number
-                  }
-                  ComputedFields: never
-                  Insert: {
-                    "business_id": string,"buyer_titles"?: (string)[],"created_at"?: string,"custom_industries"?: (string)[],"description"?: string | null,"employee_ranges"?: (Database["public"]['Enums']["employee_range"])[],"id"?: string,"industry_slugs"?: (string)[],"is_active"?: boolean,"is_primary"?: boolean,"lineage_id": string,"name"?: string,"regions"?: (Database["public"]['Enums']["region_code"])[],"signal_types"?: (Database["public"]['Enums']["signal_type"])[],"updated_at"?: string,"version": number
-                  }
-                  Update: {
-                    "business_id"?: string,"buyer_titles"?: (string)[],"created_at"?: string,"custom_industries"?: (string)[],"description"?: string | null,"employee_ranges"?: (Database["public"]['Enums']["employee_range"])[],"id"?: string,"industry_slugs"?: (string)[],"is_active"?: boolean,"is_primary"?: boolean,"lineage_id"?: string,"name"?: string,"regions"?: (Database["public"]['Enums']["region_code"])[],"signal_types"?: (Database["public"]['Enums']["signal_type"])[],"updated_at"?: string,"version"?: number
-                  }
-                  Relationships: [
-                    {
-      foreignKeyName: "icps_business_id_fkey"
-      columns: ["business_id"]
-isOneToOne: false
-      referencedRelation: "businesses"
-      referencedColumns: ["id"]
-    },{
-      foreignKeyName: "icps_business_id_fkey"
-      columns: ["business_id"]
-isOneToOne: false
-      referencedRelation: "member_activity"
-      referencedColumns: ["business_id"]
     }
                   ]
                 },"industries": {
@@ -563,6 +569,50 @@ isOneToOne: false
       referencedColumns: ["library_id"]
     }
                   ]
+                },"library_requests": {
+                  Row: {
+                    "alerted_at": string | null,"audience_id": string,"business_id": string,"created_at": string,"custom_industries": (string)[],"due_at": string | null,"employee_ranges": (Database["public"]['Enums']["employee_range"])[],"fulfilled_at": string | null,"id": string,"industry_slugs": (string)[],"library_id": string | null,"notes": string | null,"regions": (Database["public"]['Enums']["region_code"])[],"status": Database["public"]['Enums']["library_request_status"],"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "alerted_at"?: string | null,"audience_id": string,"business_id": string,"created_at"?: string,"custom_industries"?: (string)[],"due_at"?: string | null,"employee_ranges"?: (Database["public"]['Enums']["employee_range"])[],"fulfilled_at"?: string | null,"id"?: string,"industry_slugs"?: (string)[],"library_id"?: string | null,"notes"?: string | null,"regions"?: (Database["public"]['Enums']["region_code"])[],"status"?: Database["public"]['Enums']["library_request_status"],"updated_at"?: string
+                  }
+                  Update: {
+                    "alerted_at"?: string | null,"audience_id"?: string,"business_id"?: string,"created_at"?: string,"custom_industries"?: (string)[],"due_at"?: string | null,"employee_ranges"?: (Database["public"]['Enums']["employee_range"])[],"fulfilled_at"?: string | null,"id"?: string,"industry_slugs"?: (string)[],"library_id"?: string | null,"notes"?: string | null,"regions"?: (Database["public"]['Enums']["region_code"])[],"status"?: Database["public"]['Enums']["library_request_status"],"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "library_requests_audience_id_fkey"
+      columns: ["audience_id"]
+isOneToOne: false
+      referencedRelation: "audiences"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "library_requests_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "library_requests_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "member_activity"
+      referencedColumns: ["business_id"]
+    },{
+      foreignKeyName: "library_requests_library_id_fkey"
+      columns: ["library_id"]
+isOneToOne: false
+      referencedRelation: "libraries"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "library_requests_library_id_fkey"
+      columns: ["library_id"]
+isOneToOne: false
+      referencedRelation: "library_inventory"
+      referencedColumns: ["library_id"]
+    }
+                  ]
                 },"plans": {
                   Row: {
                     "accounts_per_drop": number,"billing_interval": Database["public"]['Enums']["billing_interval"],"content_types": (Database["public"]['Enums']["content_type"])[],"created_at": string,"currency": string,"delivery_cadence": Database["public"]['Enums']["plan_cadence"],"drops_per_month": number,"id": string,"is_public": boolean,"name": string,"price_cents": number,"sort_order": number,"stripe_price_id": string | null,"updated_at": string
@@ -621,50 +671,6 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "drops"
       referencedColumns: ["id"]
-    }
-                  ]
-                },"sector_requests": {
-                  Row: {
-                    "alerted_at": string | null,"business_id": string,"created_at": string,"custom_industries": (string)[],"due_at": string | null,"employee_ranges": (Database["public"]['Enums']["employee_range"])[],"fulfilled_at": string | null,"icp_id": string,"id": string,"industry_slugs": (string)[],"library_id": string | null,"notes": string | null,"regions": (Database["public"]['Enums']["region_code"])[],"status": Database["public"]['Enums']["sector_request_status"],"updated_at": string
-                  }
-                  ComputedFields: never
-                  Insert: {
-                    "alerted_at"?: string | null,"business_id": string,"created_at"?: string,"custom_industries"?: (string)[],"due_at"?: string | null,"employee_ranges"?: (Database["public"]['Enums']["employee_range"])[],"fulfilled_at"?: string | null,"icp_id": string,"id"?: string,"industry_slugs"?: (string)[],"library_id"?: string | null,"notes"?: string | null,"regions"?: (Database["public"]['Enums']["region_code"])[],"status"?: Database["public"]['Enums']["sector_request_status"],"updated_at"?: string
-                  }
-                  Update: {
-                    "alerted_at"?: string | null,"business_id"?: string,"created_at"?: string,"custom_industries"?: (string)[],"due_at"?: string | null,"employee_ranges"?: (Database["public"]['Enums']["employee_range"])[],"fulfilled_at"?: string | null,"icp_id"?: string,"id"?: string,"industry_slugs"?: (string)[],"library_id"?: string | null,"notes"?: string | null,"regions"?: (Database["public"]['Enums']["region_code"])[],"status"?: Database["public"]['Enums']["sector_request_status"],"updated_at"?: string
-                  }
-                  Relationships: [
-                    {
-      foreignKeyName: "sector_requests_business_id_fkey"
-      columns: ["business_id"]
-isOneToOne: false
-      referencedRelation: "businesses"
-      referencedColumns: ["id"]
-    },{
-      foreignKeyName: "sector_requests_business_id_fkey"
-      columns: ["business_id"]
-isOneToOne: false
-      referencedRelation: "member_activity"
-      referencedColumns: ["business_id"]
-    },{
-      foreignKeyName: "sector_requests_icp_id_fkey"
-      columns: ["icp_id"]
-isOneToOne: false
-      referencedRelation: "icps"
-      referencedColumns: ["id"]
-    },{
-      foreignKeyName: "sector_requests_library_id_fkey"
-      columns: ["library_id"]
-isOneToOne: false
-      referencedRelation: "libraries"
-      referencedColumns: ["id"]
-    },{
-      foreignKeyName: "sector_requests_library_id_fkey"
-      columns: ["library_id"]
-isOneToOne: false
-      referencedRelation: "library_inventory"
-      referencedColumns: ["library_id"]
     }
                   ]
                 },"subscriptions": {
@@ -742,11 +748,15 @@ isOneToOne: true
           }
           Functions: {
             "deliverable_companies":
-{ Args: { "p_business_id": string,"result_limit"?: number,"p_audience_lineage_id"?: string }; Returns: {
+{ Args: { "p_business_id": string,"result_limit"?: number }; Returns: {
+              "company_id": string,"score": number,"score_breakdown": Json
+            }[]
+                           } |
+{ Args: { "p_audience_lineage_id"?: string,"p_business_id": string,"result_limit"?: number }; Returns: {
               "company_id": string,"score": number,"score_breakdown": Json
             }[]
                            },
-"ensure_sector_request":
+"ensure_library_request":
 { Args: { "p_business_id": string }; Returns: string
                            },
 "get_my_streak":
@@ -754,7 +764,7 @@ isOneToOne: true
               "best_streak": number,"current_streak": number
             }[]
                            },
-"update_account_state":
+"update_drop_account":
 { Args: { "p_booked_call"?: boolean,"p_contacted"?: boolean,"p_drop_account_id": string,"p_fit_status"?: Database["public"]['Enums']["fit_status"],"p_not_fit_reason"?: Database["public"]['Enums']["not_fit_reason"],"p_replied"?: boolean,"p_viewed"?: boolean }; Returns: {
               "booked_call_at": string | null,
 "business_id": string,
@@ -786,7 +796,7 @@ isOneToOne: true
       } }
           }
           Enums: {
-            "account_event_type": "delivered"|"viewed"|"marked_fit"|"marked_not_fit"|"contacted"|"replied"|"booked_call","audience_review_verdict": "fit"|"not_fit","billing_interval": "monthly"|"yearly","campaign_status": "draft"|"active"|"completed"|"archived","content_type": "linkedin_post"|"x_post"|"blog_idea","data_source": "ocean"|"predictleads"|"csv"|"manual","deal_size": "under_10k"|"10k_25k"|"25k_75k"|"75k_plus","drop_status": "scheduled"|"building"|"delivered"|"failed"|"skipped","email_status": "verified"|"risky"|"invalid"|"unknown","employee_range": "1-10"|"11-50"|"51-200"|"201-500"|"501-1000"|"1000+","fit_status": "fit"|"not_fit","import_status": "pending"|"processing"|"completed"|"failed","library_status": "building"|"active"|"paused"|"archived","not_fit_reason": "too_small"|"too_big"|"wrong_industry"|"wrong_region"|"already_client","plan_cadence": "weekly"|"monthly","region_code": "north_america"|"uk_ireland"|"europe"|"apac"|"latin_america","sector_request_status": "open"|"in_progress"|"fulfilled"|"declined","signal_type": "funding"|"hiring"|"leadership_change"|"product_launch"|"expansion"|"news"|"other","subscription_status": "trialing"|"active"|"past_due"|"canceled"|"incomplete"|"incomplete_expired"|"unpaid"|"paused","suppression_type": "company_domain"|"person_linkedin"|"email","user_role": "standard"|"admin"
+            "account_event_type": "delivered"|"viewed"|"marked_fit"|"marked_not_fit"|"contacted"|"replied"|"booked_call","audience_review_verdict": "fit"|"not_fit","billing_interval": "monthly"|"yearly","campaign_status": "draft"|"active"|"completed"|"archived","content_type": "linkedin_post"|"x_post"|"blog_idea","data_source": "ocean"|"predictleads"|"csv"|"manual"|"deepline","deal_size": "under_10k"|"10k_25k"|"25k_75k"|"75k_plus","drop_status": "scheduled"|"building"|"delivered"|"failed"|"skipped","email_status": "verified"|"risky"|"invalid"|"unknown","employee_range": "1-10"|"11-50"|"51-200"|"201-500"|"501-1000"|"1000+","fit_status": "fit"|"not_fit","import_status": "pending"|"processing"|"completed"|"failed","library_request_status": "open"|"in_progress"|"fulfilled"|"declined","library_status": "building"|"active"|"paused"|"archived","not_fit_reason": "too_small"|"too_big"|"wrong_industry"|"wrong_region"|"already_client","plan_cadence": "weekly"|"monthly","region_code": "north_america"|"uk_ireland"|"europe"|"apac"|"latin_america","signal_type": "funding"|"hiring"|"leadership_change"|"product_launch"|"expansion"|"news"|"other","subscription_status": "trialing"|"active"|"past_due"|"canceled"|"incomplete"|"incomplete_expired"|"unpaid"|"paused","suppression_type": "company_domain"|"person_linkedin"|"email","user_role": "standard"|"admin"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -900,13 +910,9 @@ export type CompositeTypes<
   : never
 
 export const Constants = {
-  "graphql_public": {
+  "public": {
           Enums: {
-            
-          }
-        },"public": {
-          Enums: {
-            "account_event_type": ["delivered", "viewed", "marked_fit", "marked_not_fit", "contacted", "replied", "booked_call"],"audience_review_verdict": ["fit", "not_fit"],"billing_interval": ["monthly", "yearly"],"campaign_status": ["draft", "active", "completed", "archived"],"content_type": ["linkedin_post", "x_post", "blog_idea"],"data_source": ["ocean", "predictleads", "csv", "manual"],"deal_size": ["under_10k", "10k_25k", "25k_75k", "75k_plus"],"drop_status": ["scheduled", "building", "delivered", "failed", "skipped"],"email_status": ["verified", "risky", "invalid", "unknown"],"employee_range": ["1-10", "11-50", "51-200", "201-500", "501-1000", "1000+"],"fit_status": ["fit", "not_fit"],"import_status": ["pending", "processing", "completed", "failed"],"library_status": ["building", "active", "paused", "archived"],"not_fit_reason": ["too_small", "too_big", "wrong_industry", "wrong_region", "already_client"],"plan_cadence": ["weekly", "monthly"],"region_code": ["north_america", "uk_ireland", "europe", "apac", "latin_america"],"sector_request_status": ["open", "in_progress", "fulfilled", "declined"],"signal_type": ["funding", "hiring", "leadership_change", "product_launch", "expansion", "news", "other"],"subscription_status": ["trialing", "active", "past_due", "canceled", "incomplete", "incomplete_expired", "unpaid", "paused"],"suppression_type": ["company_domain", "person_linkedin", "email"],"user_role": ["standard", "admin"]
+            "account_event_type": ["delivered", "viewed", "marked_fit", "marked_not_fit", "contacted", "replied", "booked_call"],"audience_review_verdict": ["fit", "not_fit"],"billing_interval": ["monthly", "yearly"],"campaign_status": ["draft", "active", "completed", "archived"],"content_type": ["linkedin_post", "x_post", "blog_idea"],"data_source": ["ocean", "predictleads", "csv", "manual", "deepline"],"deal_size": ["under_10k", "10k_25k", "25k_75k", "75k_plus"],"drop_status": ["scheduled", "building", "delivered", "failed", "skipped"],"email_status": ["verified", "risky", "invalid", "unknown"],"employee_range": ["1-10", "11-50", "51-200", "201-500", "501-1000", "1000+"],"fit_status": ["fit", "not_fit"],"import_status": ["pending", "processing", "completed", "failed"],"library_request_status": ["open", "in_progress", "fulfilled", "declined"],"library_status": ["building", "active", "paused", "archived"],"not_fit_reason": ["too_small", "too_big", "wrong_industry", "wrong_region", "already_client"],"plan_cadence": ["weekly", "monthly"],"region_code": ["north_america", "uk_ireland", "europe", "apac", "latin_america"],"signal_type": ["funding", "hiring", "leadership_change", "product_launch", "expansion", "news", "other"],"subscription_status": ["trialing", "active", "past_due", "canceled", "incomplete", "incomplete_expired", "unpaid", "paused"],"suppression_type": ["company_domain", "person_linkedin", "email"],"user_role": ["standard", "admin"]
           }
         }
 } as const

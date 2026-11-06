@@ -69,8 +69,8 @@ async function main() {
     .single();
   if (bErr || !business) throw new Error(bErr?.message ?? "business insert");
 
-  const { data: icp, error: iErr } = await member
-    .from("icps")
+  const { data: audience, error: iErr } = await member
+    .from("audiences")
     .insert({
       business_id: business.id,
       lineage_id: crypto.randomUUID(),
@@ -86,7 +86,7 @@ async function main() {
     })
     .select("id")
     .single();
-  if (iErr || !icp) throw new Error(iErr?.message ?? "icp insert");
+  if (iErr || !audience) throw new Error(iErr?.message ?? "audience insert");
 
   await admin.from("subscriptions").insert({
     business_id: business.id,

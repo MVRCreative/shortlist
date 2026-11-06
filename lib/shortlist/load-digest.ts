@@ -20,6 +20,9 @@ type Snapshot = {
     email?: string | null;
   } | null;
   signal?: { title?: string; type?: string } | null;
+  fitReason?: string;
+  outreachAngle?: string;
+  linkedinMessage?: string;
 };
 
 function asSnapshot(raw: Json): Snapshot {
@@ -38,7 +41,7 @@ const REGION_LABELS: Record<Database["public"]["Enums"]["region_code"], string> 
 async function audienceFor(client: Client, businessId: string) {
   const empty = { industries: [] as string[], buyerTitles: [] as string[], regions: [] as string[] };
   const { data: icp, error } = await client
-    .from("icps")
+    .from("audiences")
     .select("custom_industries, industry_slugs, buyer_titles, regions")
     .eq("business_id", businessId)
     .eq("is_active", true)
@@ -141,10 +144,10 @@ export async function loadDigestForUser(client: Client): Promise<{
       domain,
       email,
       linkedinUrl,
-      signal: snap.signal?.title ?? "ICP lookalike match",
-      angle: row.outreach_angle,
-      fitReason: row.fit_reason,
-      message: row.linkedin_message,
+      signal: snap.signal?.title ?? "Lookalike match",
+      angle: snap.outreachAngle || row.outreach_angle,
+      fitReason: snap.fitReason || row.fit_reason,
+      message: snap.linkedinMessage || row.linkedin_message,
     };
   });
 

@@ -6,12 +6,12 @@ type Client = SupabaseClient<Database>;
 
 export type MemberAccountState = {
   businessId: string | null;
-  icpId: string | null;
+  audienceId: string | null;
   onboardingCompleted: boolean;
 };
 
 /**
- * Ensures the auth profile exists. Does not invent a business, ICP, or subscription.
+ * Ensures the auth profile exists. Does not invent a business, audience, or subscription.
  * Real profile and audience rows are written when the user confirms those steps.
  */
 export async function ensureMemberAccount(
@@ -46,33 +46,33 @@ export async function ensureMemberAccount(
     throw new Error(`businesses select failed: ${businessError.message}`);
   }
   if (!business) {
-    return { businessId: null, icpId: null, onboardingCompleted: false };
+    return { businessId: null, audienceId: null, onboardingCompleted: false };
   }
 
-  const { data: icp, error: icpError } = await client
-    .from("icps")
+  const { data: audience, error: audienceError } = await client
+    .from("audiences")
     .select("id")
     .eq("business_id", business.id)
     .eq("is_active", true)
     .eq("is_primary", true)
     .maybeSingle();
-  if (icpError) throw new Error(`icps select failed: ${icpError.message}`);
+  if (audienceError) throw new Error(`audiences select failed: ${audienceError.message}`);
 
-  let icpId = icp?.id ?? null;
-  if (!icpId) {
+  let audienceId = audience?.id ?? null;
+  if (!audienceId) {
     const { data: anyActive, error: anyError } = await client
-      .from("icps")
+      .from("audiences")
       .select("id")
       .eq("business_id", business.id)
       .eq("is_active", true)
       .maybeSingle();
-    if (anyError) throw new Error(`icps select failed: ${anyError.message}`);
-    icpId = anyActive?.id ?? null;
+    if (anyError) throw new Error(`audiences select failed: ${anyError.message}`);
+    audienceId = anyActive?.id ?? null;
   }
 
   return {
     businessId: business.id,
-    icpId,
+    audienceId,
     onboardingCompleted: !!business.onboarding_completed_at,
   };
 }

@@ -193,10 +193,10 @@ export async function loadAdminUser(
     };
   }
 
-  const [icpResult, subscriptionResult, dropsResult, accountsResult, industriesResult] =
+  const [audienceResult, subscriptionResult, dropsResult, accountsResult, industriesResult] =
     await Promise.all([
       supabase
-        .from("icps")
+        .from("audiences")
         .select(
           "industry_slugs, custom_industries, employee_ranges, regions, buyer_titles, signal_types",
         )
@@ -226,7 +226,7 @@ export async function loadAdminUser(
     ]);
 
   if (
-    icpResult.error ||
+    audienceResult.error ||
     subscriptionResult.error ||
     dropsResult.error ||
     accountsResult.error ||
@@ -250,7 +250,7 @@ export async function loadAdminUser(
   const industryLabels = new Map(
     industriesResult.data.map((industry) => [industry.slug, industry.label]),
   );
-  const icp = icpResult.data;
+  const audience = audienceResult.data;
   const accountsByDrop = new Map<string, AdminAccount[]>();
   for (const row of accountsResult.data) {
     const list = accountsByDrop.get(row.drop_id) ?? [];
@@ -289,15 +289,15 @@ export async function loadAdminUser(
           ? subscriptionStatusLabels[subscription.status]
           : null,
         industries: [
-          ...(icp?.industry_slugs.map(
+          ...(audience?.industry_slugs.map(
             (slug) => industryLabels.get(slug) ?? slug,
           ) ?? []),
-          ...(icp?.custom_industries ?? []),
+          ...(audience?.custom_industries ?? []),
         ],
-        companySizes: icp?.employee_ranges.map((size) => sizeLabels[size]) ?? [],
-        regions: icp?.regions.map((region) => regionLabels[region]) ?? [],
-        buyerTitles: icp?.buyer_titles ?? [],
-        signals: icp?.signal_types.map((signal) => signalLabels[signal]) ?? [],
+        companySizes: audience?.employee_ranges.map((size) => sizeLabels[size]) ?? [],
+        regions: audience?.regions.map((region) => regionLabels[region]) ?? [],
+        buyerTitles: audience?.buyer_titles ?? [],
+        signals: audience?.signal_types.map((signal) => signalLabels[signal]) ?? [],
       },
       digests,
     },
