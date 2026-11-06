@@ -496,7 +496,10 @@ async function runPlay(
 ): Promise<PlayRunResult> {
   if (!process.env.DEEPLINE_API_KEY) {
     console.error('[deepline] DEEPLINE_API_KEY is not set; skipping enrichment.')
-    return { ok: false, error: ENRICHMENT_UNAVAILABLE }
+    return {
+      ok: false,
+      error: 'Contact lookup isn’t connected yet. Add your Deepline API key in project settings, then try again.',
+    }
   }
 
   let result: { code: number; stdout: string; stderr: string }
